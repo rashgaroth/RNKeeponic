@@ -11,3 +11,4 @@ export const LOG_OUT = 'LOG_OUT';
 // input
 export const SET_USERNAME = 'SET_USERNAME';
 export const SET_PASSWORD = 'SET_PASSWORD';
+export const CLEAR_FORM = 'CLEAR_FORM';

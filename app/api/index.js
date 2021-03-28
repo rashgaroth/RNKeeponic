@@ -1,6 +1,6 @@
 // General api to access data
 import ApiConstants from './ApiConstants';
-export default function api(path, params, method, token) {
+export const api = (path, params, method, token) => {
   let options;
   options = {
     headers: {
@@ -17,3 +17,18 @@ export default function api(path, params, method, token) {
     .then(json => json)
     .catch(error => error);
 }
+
+export const fetchURL = (url, options = {}) => {
+  return fetch(url, options)
+    .then(response => {
+      if (!response.status === 200) {
+        throw response.json();
+      }
+      return response.json();
+    })
+    .then(json => {
+      return json;
+    })
+    .catch(error => { throw error });
+}
+

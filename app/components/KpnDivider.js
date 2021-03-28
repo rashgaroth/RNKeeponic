@@ -12,6 +12,12 @@ export default function KpnDivider({
     bottomStart, 
     topEnd, 
     topStart,
+    borderWidth,
+    borderColor,
+    borderEndWidth,
+    borderBottomWidth,
+    borderStartWidth,
+    borderTopWidth,
     style
 }){
     return (
@@ -24,6 +30,12 @@ export default function KpnDivider({
         borderBottomStartRadius: bottomStart || 0,
         borderTopEndRadius: topEnd || 0,
         borderTopStartRadius: topStart || 0,
+        borderWidth: borderWidth || 0,
+        borderColor: borderColor || COLORS.secondColor,
+        borderTopWidth: borderTopWidth || 0,
+        borderBottomWidth: borderBottomWidth || 0,
+        borderStartWidth: borderStartWidth || 0,
+        borderEndWidth: borderEndWidth || 0,
         ...style
         }}>
 

@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white
   },
   input:{
-    padding: 20,
+    // padding: 20,
     marginHorizontal: 30,
     alignSelf: 'auto',
     bottom: 30

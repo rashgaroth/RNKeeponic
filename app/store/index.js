@@ -1,6 +1,6 @@
 import { createStore, compose, applyMiddleware } from 'redux';
 import { persistStore, persistCombineReducers } from 'redux-persist';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
 
@@ -29,7 +29,7 @@ const enhancers = [applyMiddleware(...middleware)];
 const persistConfig = { enhancers };
 const store = createStore(reducers, undefined, compose(...enhancers));
 const persistor = persistStore(store, persistConfig, () => {
-  //   console.log('Test', store.getState());
+  //   ('Test', store.getState());
 });
 const configureStore = () => {
   return { persistor, store };

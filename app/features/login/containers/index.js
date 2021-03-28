@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StatusBar } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Button, HelperText } from 'react-native-paper';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as loginActions from '../actions';
@@ -9,20 +9,62 @@ import styles from './styles';
 import { KpnButton, KpnDivider, KpnInput } from "../../../components"
 import Logo from "../../../assets/images/svg/Logo"
 import { COLORS } from '../../../utils/colors';
+import { emailValidator, passwordValidator } from "../../../utils/validator";
+import { trimString } from "../../../utils/stringUtils";
 
 import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 export default function Login() {
   // useState or init the variable
-  const [text, setText] = useState('')
-  const id = useSelector(state => state.loginReducer.id);
+  const [placeholderColor, setPlaceholderColor] = useState(COLORS.primaryColor)
+  const [placeholderColorPassword, setPlaceholderColorPassword] = useState(COLORS.primaryColor)
+  const [emailForm, setEmailForm] = useState("")
+  const [passwordForm, setPasswordForm] = useState("")
+  const [emailError, setEmailError] = useState("")
+  const [passwordError, setPasswordError] = useState("")
+
+  // function lifecycle
+
   
   // Redux function
   const dispatch = useDispatch();
   const selector = useSelector(state => state.loginReducer);
-  const onLogin = () => dispatch(loginActions.requestLogin());
   const setUsername = (username) => dispatch(loginActions.setUsername(username))
   const setPassword = (password) => dispatch(loginActions.setPassword(password))
+
+  const onLogin = () => {
+      const isEmailError = emailValidator(emailForm)
+      const isPasswordError = passwordValidator(passwordForm)
+
+      if(isEmailError || isPasswordError){
+        setEmailError(isEmailError)
+        setPasswordError(isPasswordError)
+      }
+
+      if(emailForm != ""){
+        if(passwordForm != ""){
+          dispatch(loginActions.requestLogin())
+        }
+      }
+  }
+
+  const emailErrorHelper = () => {
+    return !emailForm.includes('@')
+  }
+
+  const passwordErrorHelper = () => {
+    return passwordForm.length <= 8
+  }
+
+  const setThisEmail = (text) => {
+    setEmailForm(text)
+    setUsername(text)
+  }
+  
+  const setThisPassword = (text) => {
+    setPasswordForm(text)
+    setPassword(text)
+  }
 
   // Button or Input function
   const googleLogin = () => { console.log(selector) }
@@ -34,18 +76,23 @@ export default function Login() {
         <KpnDivider
           height={150}
           width={40}
+          borderEndWidth={2}
+          borderBottomWidth={2}
           bottomEnd={15}
-          color={COLORS.secondColor}
+          color={COLORS.white}
         />
       </View>
       <View style={styles.dividerRight}>
         <KpnDivider
           height={150}
           width={40}
+          borderTopWidth={2}
+          borderBottomWidth={2}
+          borderStartWidth={2}
           topStart={15}
           bottomStart={15}
           style={{marginTop: 20}}
-          color={COLORS.secondColor}
+          color={COLORS.white}
         />
       </View>
     <View style={styles.container}>
@@ -53,26 +100,41 @@ export default function Login() {
         <Logo height={70} width={170} />
       </View>
       <View style={styles.input}>
+        <HelperText type="info" visible={emailErrorHelper()}>
+          Form harus menyertakan '@' pada email anda.
+        </HelperText>
         <KpnInput
-        label="username"
+        label="email"
         style={{ margin: 10 }}
-        onChangeText={text => setUsername(text)}
-        value={selector.username}
+        onChangeText={text => setThisEmail(text)}
+        placeholder={placeholderColor}
+        value={selector.emailForm}
+        isError
+        errorText={emailError}
         />
 
+        <HelperText type="info" visible={passwordErrorHelper()}>
+          Minimal input password adalah 8 huruf.
+        </HelperText>
         <KpnInput
           label="password"
           style={{margin: 10}}
-          onChangeText={text => setPassword(text)}
-          value={selector.password}
+          onChangeText={text => setThisPassword(text)}
+          value={selector.passwordForm}
+          placeholderColor={placeholderColorPassword}
+          isPassword
+          isError
+          errorText={passwordError}
         />
 
         <KpnButton 
         text="Login"
         isRounded
-        style={{marginTop: 10}}
+        style={{marginTop: 10, opacity: 0.7}}
+        color={COLORS.secondColor}
         onPress={() => onLogin()}
         />
+
       </View>
       <View style={styles.textRegistration}>
         <Text style={styles.text}>Doesn't have an account yet?</Text>

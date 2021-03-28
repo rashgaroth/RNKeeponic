@@ -53,3 +53,9 @@ export function setPassword(text) {
     text
   };
 }
+
+export function clearForm(){
+  return {
+    type: types.CLEAR_FORM
+  }
+}

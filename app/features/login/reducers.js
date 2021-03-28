@@ -6,9 +6,13 @@ import * as types from './types';
 
 const initialState = {
   isLoggedIn: false,
-  id: 0,
-  username: '',
-  password: '',
+  user_id: null,
+  email: null,
+  password: null,
+  name: "",
+  is_email_validated: null,
+  emailForm: null,
+  passwordForm:null,
 };
 
 export const loginReducer = createReducer(initialState, {
@@ -23,8 +27,10 @@ export const loginReducer = createReducer(initialState, {
   [types.LOGIN_RESPONSE](state, action) {
     return {
       ...state,
-      id: action.response.id,
+      user_id: action.user_id,
       isLoggedIn: true,
+      email: action.email,
+      is_email_validated: action.is_email_validated
     };
   },
   [types.LOGIN_FAILED](state) {
@@ -42,13 +48,21 @@ export const loginReducer = createReducer(initialState, {
   [types.SET_USERNAME](state, action){
     return {
       ...state,
-      username: action.text
+      emailForm: action.text
     }
   },
     [types.SET_PASSWORD](state, action) {
     return {
       ...state,
-      password: action.text
+      passwordForm: action.text,
+      password: action.text,
     }
-  }
+  },
+  [types.CLEAR_FORM](state, action) {
+    return {
+      ...state,
+      passwordForm: "",
+      emailForm: ""
+    }
+  },
 });
