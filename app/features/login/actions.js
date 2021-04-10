@@ -59,3 +59,9 @@ export function clearForm(){
     type: types.CLEAR_FORM
   }
 }
+
+export function disableLoading(){
+  return {
+    type: types.DISABLE_LOADING
+  }
+}

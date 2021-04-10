@@ -22,7 +22,7 @@ export default function KpnDivider({
 }){
     return (
         <View style=
-        {{
+        {!radius ? {
         height: height || 15, 
         width: width || 15,
         backgroundColor: color || COLORS.primaryColor,
@@ -36,6 +36,21 @@ export default function KpnDivider({
         borderBottomWidth: borderBottomWidth || 0,
         borderStartWidth: borderStartWidth || 0,
         borderEndWidth: borderEndWidth || 0,
+        ...style
+        }: {
+        borderBottomEndRadius: radius || 0,
+        borderBottomStartRadius: radius || 0,
+        borderTopEndRadius: radius || 0,
+        borderTopStartRadius: radius || 0,
+        borderWidth: borderWidth || 0,
+        borderColor: borderColor || COLORS.secondColor,
+        borderTopWidth: borderTopWidth || 0,
+        borderBottomWidth: borderBottomWidth || 0,
+        borderStartWidth: borderStartWidth || 0,
+        borderEndWidth: borderEndWidth || 0,
+        height: height || 15,
+        width: width || 15,
+        backgroundColor: color || COLORS.primaryColor,
         ...style
         }}>
 

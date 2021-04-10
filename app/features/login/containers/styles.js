@@ -44,6 +44,11 @@ const styles = StyleSheet.create({
     color: COLORS.blue,
     borderBottomColor: COLORS.blue,
     borderBottomWidth: 0.5
+  },
+  passwordInput: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center'
   }
 });
 

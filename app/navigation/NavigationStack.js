@@ -13,14 +13,7 @@ import { COLORS } from '../utils/colors';
 const Stack = createStackNavigator();
 
 const homeOptions = {
-  title: 'My home',
-  headerStyle: {
-    backgroundColor: COLORS.primaryColor,
-  },
-  headerTintColor: COLORS.white,
-  headerTitleStyle: {
-    fontWeight: 'bold',
-  },
+  headerShown: false
 };
 
 function App() {

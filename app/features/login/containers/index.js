@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StatusBar } from 'react-native';
-import { Text, Button, HelperText } from 'react-native-paper';
+import { Text, IconButton, HelperText } from 'react-native-paper';
+import Spinner from "react-native-loading-spinner-overlay"
 
 import { useDispatch, useSelector } from 'react-redux';
-import * as loginActions from '../actions';
+import * as loginActions from '../actions'; 
 import styles from './styles';
 
 import { KpnButton, KpnDivider, KpnInput } from "../../../components"
@@ -53,7 +54,7 @@ export default function Login() {
   }
 
   const passwordErrorHelper = () => {
-    return passwordForm.length <= 8
+    return passwordForm.length <= 0
   }
 
   const setThisEmail = (text) => {
@@ -70,8 +71,13 @@ export default function Login() {
   const googleLogin = () => { console.log(selector) }
 
   return (
-  <ScrollView style={styles.login}>
+    <ScrollView style={styles.login} keyboardShouldPersistTaps="handled">
     <StatusBar backgroundColor={COLORS.primaryOpacity} />
+      <Spinner
+        visible={selector.loading}
+        textContent={'Mohon Tunggu ...'}
+        textStyle={{color: COLORS.white}}
+      />
     <View style={styles.dividerLeft}>
         <KpnDivider
           height={150}
@@ -116,15 +122,16 @@ export default function Login() {
         <HelperText type="info" visible={passwordErrorHelper()}>
           Minimal input password adalah 8 huruf.
         </HelperText>
-        <KpnInput
+          <KpnInput
           label="password"
-          style={{margin: 10}}
+          style={{margin: 10, width: '94%'}}
           onChangeText={text => setThisPassword(text)}
           value={selector.passwordForm}
           placeholderColor={placeholderColorPassword}
           isPassword
           isError
           errorText={passwordError}
+          isSecure
         />
 
         <KpnButton 

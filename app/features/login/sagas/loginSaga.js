@@ -22,8 +22,6 @@ let loginState = state => state.loginReducer;
 
 // Our worker Saga that logins the user
 export default function* loginAsync() {
-  yield put(loginActions.enableLoader());
-
   // init state from reducer
   const getLoginState = yield select(loginState);
   
@@ -35,8 +33,6 @@ export default function* loginAsync() {
     password: getLoginState.passwordForm,
   }
 
-  const t0ken = yield getToken()
-
   try {
     if(param.email != null || param.email == ""){
       if(param.password != null || param.password == ""){
@@ -45,11 +41,11 @@ export default function* loginAsync() {
           // set token for async storage
           yield setToken(_response.data.token)
           yield put(loginActions.clearForm())
-          yield put(loginActions.onLoginResponse(_response.data.user));
-          yield put(loginActions.disableLoader({}));
+          yield put(loginActions.onLoginResponse(_response.data.user))
+          yield put(loginActions.disableLoading())
         }else{
-          yield put(loginActions.loginFailed());
-          yield put(loginActions.disableLoader({}));
+          yield put(loginActions.loginFailed())
+          yield put(loginActions.disableLoading())
           setTimeout(() => {
             Alert.alert('Keeponic Login', _response.data.message);
           }, 200);

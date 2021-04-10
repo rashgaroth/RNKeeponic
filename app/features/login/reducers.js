@@ -13,16 +13,15 @@ const initialState = {
   is_email_validated: null,
   emailForm: null,
   passwordForm:null,
+  loading: false,
 };
 
 export const loginReducer = createReducer(initialState, {
   [types.LOGIN_REQUEST](state, action) {
     return {
       ...state,
+      loading: true,
     };
-  },
-  [types.LOGIN_LOADING_ENDED](state) {
-    return { ...state };
   },
   [types.LOGIN_RESPONSE](state, action) {
     return {
@@ -63,6 +62,12 @@ export const loginReducer = createReducer(initialState, {
       ...state,
       passwordForm: "",
       emailForm: ""
+    }
+  },
+  [types.DISABLE_LOADING](state, action) {
+    return {
+      ...state,
+      loading: false,
     }
   },
 });
