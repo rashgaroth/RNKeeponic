@@ -3,7 +3,8 @@ import { COLORS } from '../../../utils/colors';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: COLORS.white
   },
   searchView:{
     backgroundColor: COLORS.sans,
@@ -60,6 +61,58 @@ const styles = StyleSheet.create({
     textAlign: "center",
     top: 85,
     color: COLORS.fontColor,
+  },
+  textMenuHidroponik: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20
+  },
+  textLihatSemua: {
+    fontSize: 13,
+    color: COLORS.primaryColor,
+    right: 10
+  },
+  textPaketHidroponik:{
+    fontWeight: "bold",
+    fontSize: 18,
+    color: COLORS.blackSans,
+    left: 10,
+  },
+  textLebihHemat: {
+    fontSize: 13,
+    color: COLORS.fontColor,
+    left: 10
+  },
+  cardProducts: {
+    left: 10,
+    marginTop: 20
+  },
+  cardLifestyle: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    // marginTop: 20,
+  },
+  cardLifestyle1: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    // marginTop: 20,
+  },
+  cardLifestyle2:{
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    marginRight: 10
+    // marginTop: 20,
+  },
+  wideCards: {
+    flex: 1,
   }
 });
 

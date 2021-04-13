@@ -9,6 +9,7 @@ const COLORS = {
     error: "#EB5E69",
     blackSans: "#474747",
     fontColor: "#8C8686",
+    colorC4: "#C4C4C4"
 }
 
 export {

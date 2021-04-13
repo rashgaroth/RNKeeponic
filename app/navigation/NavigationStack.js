@@ -7,13 +7,15 @@ import { navigationRef } from './NavigationService';
 
 import Login from 'app/features/login/containers';
 import Home from 'app/features/home/containers';
+import Notification from 'app/features/notification/containers';
+import BottomNavigationTab from 'app/features/BottomNavigationTab';
 
 import { COLORS } from '../utils/colors';
 
 const Stack = createStackNavigator();
 
 const homeOptions = {
-  headerShown: false
+  headerShown: false,
 };
 
 function App() {
@@ -23,7 +25,7 @@ function App() {
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         {isLoggedIn ? (
-          <Stack.Screen name="Home" component={Home} options={homeOptions} />
+          <Stack.Screen name="Home" component={BottomNavigationTab} options={homeOptions} />
         ) : (
           <Stack.Screen
             name="Login"
@@ -34,6 +36,13 @@ function App() {
             }}
           />
         )}
+        <Stack.Screen
+          name="Notification"
+          component={Notification}
+          options={{
+            headerShown: false
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
