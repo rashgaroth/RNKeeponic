@@ -5,10 +5,16 @@ import { useSelector } from 'react-redux';
 
 import { navigationRef } from './NavigationService';
 
-import Login from 'app/features/login/containers';
-import Home from 'app/features/home/containers';
-import Notification from 'app/features/notification/containers';
-import BottomNavigationTab from 'app/features/BottomNavigationTab';
+import { 
+  BottomNavigationTab, 
+  Cart, 
+  Home, 
+  Liked, 
+  Login, 
+  Notification, 
+  Package,
+  LifeStyleDetail
+} from "../features";
 
 import { COLORS } from '../utils/colors';
 
@@ -39,6 +45,34 @@ function App() {
         <Stack.Screen
           name="Notification"
           component={Notification}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="Liked"
+          component={Liked}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={Cart}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="Package"
+          component={Package}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="LifeStyleDetail"
+          component={LifeStyleDetail}
           options={{
             headerShown: false
           }}

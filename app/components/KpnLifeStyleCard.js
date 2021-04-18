@@ -3,8 +3,9 @@ import { Avatar, Button, Card, Title, Paragraph, Text } from 'react-native-paper
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
+import { navigationRef } from "../navigation/NavigationStack";
 
-const KpnLifeStyleCard = ({}) => {
+const KpnLifeStyleCard = ({ onPress }) => {
 
     const totalRating = 5;
     const Cart = props => <Avatar.Icon
@@ -23,7 +24,7 @@ const KpnLifeStyleCard = ({}) => {
             <Card.Cover style={styles.cardCover} source={{ uri: 'https://picsum.photos/200/300' }} />
             <Card.Content style={styles.cardContent}>
                 <View style={styles.cardTitle}>
-                    <TouchableOpacity style={styles.touchable}>
+                    <TouchableOpacity style={styles.touchable} onPress={onPress}>
                         <Title style={styles.title}>{'Card Title'}</Title>
                         <Paragraph style={styles.paragraph}>{'Card Paragraph'}</Paragraph>
                     </TouchableOpacity>

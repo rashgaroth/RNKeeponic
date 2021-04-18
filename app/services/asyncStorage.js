@@ -19,3 +19,23 @@ export async function setToken(token) {
         }, 200);
     }
 }
+
+export async function getStore(key){
+    try {
+        var data = await AsyncStorage.getItem(key)
+        return JSON.parse(data)
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export async function storeData(key, data){
+    try {
+        await AsyncStorage.setItem(key, JSON.stringify(data))
+    } catch (error) {
+        setTimeout(() => {
+            Alert.alert('Error Token', error.message);
+        }, 200);
+    }
+}

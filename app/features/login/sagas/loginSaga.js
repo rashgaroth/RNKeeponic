@@ -13,7 +13,7 @@ import * as apiService from "../../../services/index";
 import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as loginActions from '../actions';
-import { getToken, setToken } from "../../../services/asyncStorage";
+import { getToken, setToken, storeData, getStore } from "../../../services/asyncStorage";
 import { trimString } from "../../../utils/stringUtils";
 
 import { HeaderAuth, Header } from '../../../services/header';
@@ -39,7 +39,18 @@ export default function* loginAsync() {
         const _response = yield call(apiService.POST, API.BASE_URL + API.ENDPOINT.LOGIN, param, Header());
         if(_response.data.status === 200){
           // set token for async storage
+          const user = _response.data.user;
+          console.log(_response.data.token)
           yield setToken(_response.data.token)
+          yield storeData("email", user.email)
+          yield storeData("is_email_validated", user.is_email_validated)
+          yield storeData("name", user.name)
+          yield storeData("user_id", user.user_id)
+
+          // getStore("user_id").then((value) => (
+          //   console.log(value, "-----------VALUE---------------")
+          // )).catch((e) => console.log(e))
+
           yield put(loginActions.clearForm())
           yield put(loginActions.onLoginResponse(_response.data.user))
           yield put(loginActions.disableLoading())
@@ -61,6 +72,9 @@ export default function* loginAsync() {
       }, 200);
     }
   } catch (error) {
-    console.log("INI CATCH", error.message)
+    yield put(loginActions.disableLoading())
+    setTimeout(() => {
+      Alert.alert('Keeponic Login', error.message);
+    }, 200);
   }
 }

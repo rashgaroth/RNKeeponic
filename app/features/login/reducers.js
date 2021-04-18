@@ -36,6 +36,7 @@ export const loginReducer = createReducer(initialState, {
     return {
       ...state,
       isLoggedIn: false,
+      loading: false
     };
   },
   [types.LOG_OUT](state) {

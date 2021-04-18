@@ -83,6 +83,8 @@ target 'Keeponic' do
 
   pod 'RNGoogleSignin', :path => '../node_modules/@react-native-google-signin/google-signin'
 
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
   target 'KeeponicTests' do
     inherit! :complete
     # Pods for testing
