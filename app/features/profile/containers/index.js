@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { View, StatusBar, ScrollView, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, StatusBar, ScrollView, Text, TouchableOpacity, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
 import { Button, IconButton, Avatar, Switch } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay"
 // import BottomSheet from '@gorhom/bottom-sheet';
-import SkeletonContent from 'react-native-skeleton-content-nonexpo';
-// import BottomSheet from 'reanimated-bottom-sheet';
+// import SkeletonContent from 'react-native-skeleton-content-nonexpo';
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
 
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +23,7 @@ import { detailUser } from "../constant";
 export default function Profile() {
   const [notificationSwitch, setNotificationSwitch] = useState(false);
   const [recommendationSwitch, setRecommendationSwitch] = useState(false);
+  const [scrollEnabled, setScrollEnabled] = useState(true)
 
   const dispatch = useDispatch();
 
@@ -30,14 +32,17 @@ export default function Profile() {
   const onSwitchRecommendation = () => setRecommendationSwitch(!recommendationSwitch);
 
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
-  const openBottomSheet = () => bottomSheetRef.current.snapTo(0);
+  const fall = new Animated.Value(1);
+  // const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const openBottomSheet = () => {
+    bottomSheetRef.current.snapTo(0);
+  }
   const handleSheetChanges = useCallback((index) => {
     console.log('handleSheetChanges', index);
   }, []);
   const renderBottomSheet = () => {
     return(
-      <View>
+      <View style={styles.bottomSheet}>
           <View>
             <Text>Awesome 🎉</Text>
           </View>
@@ -46,99 +51,102 @@ export default function Profile() {
   }
 
   return (
-    <ScrollView>
-      <StatusBar backgroundColor={COLORS.sans} />
-      <Spinner
-        visible={false}
-        textContent={'Mohon Tunggu ...'}
-        textStyle={{ color: COLORS.white }}
-      />
-      <View style={stylesLocal.searchView}>
-        <Text style={stylesLocal.address}>Profile</Text>
-        {/* LOGO */}
-        <LogoRounded style={stylesLocal.logo} width={30} height={40} />
-      </View>
-      <View style={stylesLocal.avatar}>
-        {/* uri di ambil dari be */}
-        <Avatar.Image size={200} source={{ uri: "https://cdn-asset.jawapos.com/wp-content/uploads/2019/08/sapi-via-vallen-dimas-maulana.jpg" }} />
-      </View>
-      {/* View Detail User */}
-      {
-        detailUser.map((x, i) => (
-          <View key={i}>
-            <TouchableOpacity onPress={(e) => openBottomSheet()}>
-            <View style={stylesLocal.detailUsers}>
-              <Text style={stylesLocal.textTitle}>{x.title}</Text>
-              <Text style={stylesLocal.textDesc}>{x.content}</Text>
+    <SafeAreaView>
+      <ScrollView>
+        <StatusBar backgroundColor={COLORS.sans} />
+        <Spinner
+          visible={false}
+          textContent={'Mohon Tunggu ...'}
+          textStyle={{ color: COLORS.white }}
+        />
+        <View style={stylesLocal.searchView}>
+          <Text style={stylesLocal.address}>Profile</Text>
+          {/* LOGO */}
+          <LogoRounded style={stylesLocal.logo} width={30} height={40} />
+        </View>
+        <View style={stylesLocal.avatar}>
+          {/* uri di ambil dari be */}
+          <Avatar.Image size={200} source={{ uri: "https://cdn-asset.jawapos.com/wp-content/uploads/2019/08/sapi-via-vallen-dimas-maulana.jpg" }} />
+        </View>
+        {/* View Detail User */}
+        {
+          detailUser.map((x, i) => (
+            <View key={i}>
+              <TouchableOpacity onPress={(e) => openBottomSheet()}>
+                <View style={stylesLocal.detailUsers}>
+                  <Text style={stylesLocal.textTitle}>{x.title}</Text>
+                  <Text style={stylesLocal.textDesc}>{x.content}</Text>
+                </View>
+                <View style={stylesLocal.line}></View>
+              </TouchableOpacity>
             </View>
-              <View style={stylesLocal.line}></View>
-            </TouchableOpacity>
-          </View>
-        ))
-      }
-      {/* View Button */}
-      <View style={stylesLocal.buttonGroup}>
-        <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.primaryColor}>Ubah Password</Button>
-        <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.primaryColor}>Daftar Toko</Button>
-      </View>
-      {/* View Setting ON/OFF */}
-      <View>
-        <View style={stylesLocal.detailUsers}>
-          <Text style={stylesLocal.textTitle}>Notifikasi</Text>
-          <View style={stylesLocal.switch}>
-            <Text style={stylesLocal.textDesc}>Izinkan Aplikasi memberikan Notifikasi</Text>
-            <Switch value={notificationSwitch} onValueChange={onSwitchNotification} color={COLORS.primaryColor} />
-          </View>
+          ))
+        }
+        {/* View Button */}
+        <View style={stylesLocal.buttonGroup}>
+          <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.primaryColor}>Ubah Password</Button>
+          <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.primaryColor}>Daftar Toko</Button>
         </View>
-        <View style={stylesLocal.line}></View>
-      </View>
-      {/* skip */}
-      <View>
-        <View style={stylesLocal.detailUsers}>
-            <Text style={stylesLocal.textTitle}>Rekomendasi</Text>
-          <View style={stylesLocal.switch}>
-            <Text style={stylesLocal.textDesc}>Izinkan Aplikasi memberikan Rekomendasi</Text>
-            <Switch value={recommendationSwitch} onValueChange={onSwitchRecommendation} color={COLORS.primaryColor}/>
-          </View>
-        </View>
-        <View style={stylesLocal.line}></View>
-      </View>
-      {/* View Button Update & Logout */}
-      <View style={stylesLocal.buttonGroup}>
-        <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} disabled color={COLORS.primaryColor}>Ubah Profile</Button>
-        <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
-      </View>
-      {/* View Tetang */}
-      <View>
-        <Text>Tentang</Text>
+        {/* View Setting ON/OFF */}
         <View>
           <View style={stylesLocal.detailUsers}>
+            <Text style={stylesLocal.textTitle}>Notifikasi</Text>
             <View style={stylesLocal.switch}>
-              <Text style={stylesLocal.textInfo}>Tentang Keeponic</Text>
-              <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+              <Text style={stylesLocal.textDesc}>Izinkan Aplikasi memberikan Notifikasi</Text>
+              <Switch value={notificationSwitch} onValueChange={onSwitchNotification} color={COLORS.primaryColor} />
             </View>
           </View>
           <View style={stylesLocal.line}></View>
         </View>
-
+        {/* skip */}
         <View>
-          <View style={{marginLeft: 10}}>
+          <View style={stylesLocal.detailUsers}>
+            <Text style={stylesLocal.textTitle}>Rekomendasi</Text>
             <View style={stylesLocal.switch}>
-              <Text style={stylesLocal.textInfo}>Bantuan</Text>
-              <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+              <Text style={stylesLocal.textDesc}>Izinkan Aplikasi memberikan Rekomendasi</Text>
+              <Switch value={recommendationSwitch} onValueChange={onSwitchRecommendation} color={COLORS.primaryColor} />
             </View>
           </View>
           <View style={stylesLocal.line}></View>
         </View>
-      </View>
-      {/* <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={[260, 0]}
-        renderContent={renderBottomSheet}
-        initialSnap={1}
-        enabledGestureInteraction={true}
-      /> */}
-    </ScrollView>
+        {/* View Button Update & Logout */}
+        <View style={stylesLocal.buttonGroup}>
+          <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} disabled color={COLORS.primaryColor}>Ubah Profile</Button>
+          <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
+        </View>
+        {/* View Tetang */}
+        <View>
+          <Text>Tentang</Text>
+          <View>
+            <View style={stylesLocal.detailUsers}>
+              <View style={stylesLocal.switch}>
+                <Text style={stylesLocal.textInfo}>Tentang Keeponic</Text>
+                <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+              </View>
+            </View>
+            <View style={stylesLocal.line}></View>
+          </View>
+
+          <View>
+            <View style={{ marginLeft: 10 }}>
+              <View style={stylesLocal.switch}>
+                <Text style={stylesLocal.textInfo}>Bantuan</Text>
+                <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+              </View>
+            </View>
+            <View style={stylesLocal.line}></View>
+          </View>
+        </View>
+      </ScrollView>
+        <BottomSheet
+          ref={bottomSheetRef}
+          snapPoints={[260, 0]}
+          renderContent={renderBottomSheet}
+          initialSnap={1}
+          callbackNode={fall}
+          enabledGestureInteraction={true}
+        />
+    </SafeAreaView>
   );
 }
 
@@ -207,5 +215,8 @@ const stylesLocal = StyleSheet.create({
   },
   textInfo: {
     paddingTop: 15
+  },
+  bottomSheet:{
+    backgroundColor: COLORS.white
   }
 })

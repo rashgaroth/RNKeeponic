@@ -50,10 +50,10 @@ export default function* homeGetProducts(state){
                 }
             }else{
                 yield put(homeAction.hideLoading())
-                // setTimeout(() => {
-                //     Alert.alert('Keeponic', _response.data.message);
-                // }, 200);
-                // console.log(_response.data)
+                setTimeout(() => {
+                    Alert.alert('Keeponic', "Tidak bisa meload data");
+                }, 200);
+                console.log(_response.data, "----response")
             }
 
         }else{

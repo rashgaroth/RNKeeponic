@@ -113,7 +113,21 @@ const styles = StyleSheet.create({
   },
   wideCards: {
     flex: 1,
-  }
+  },
+  skeleton: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    // marginRight: 15
+  },
+  skeletonChild: {
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    // marginRight: 15
+  },
 });
 
 export default styles;
