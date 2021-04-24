@@ -16,6 +16,7 @@ import * as detailProductAction from '../actions';
 
 import { HeaderAuth, Header } from '../../../services/header';
 import { getToken } from '../../../services/asyncStorage';
+import { noImage } from "../constants";
 
 let detailState = state => state.detailProductReducer;
 
@@ -33,10 +34,7 @@ export default function* getProductDetail(state) {
     console.log(user_id, "WELCOME SAGA!_user");
     if(token){
         try {
-
-            if(stateDetail){
-                yield put(detailProductAction.clearProduct())
-            }
+            yield put(detailProductAction.clearProduct())
 
             const _response = yield call(
                 apiService.GET,
@@ -44,10 +42,30 @@ export default function* getProductDetail(state) {
                 HeaderAuth(token))
             if (_response.status === 200) {
                 yield put(detailProductAction.hideLoading());
-                yield put(detailProductAction.onSuccessGetDetail(_response.data.data))
+                // yield put(detailProductAction.onSuccessGetDetail(_response.data.data))
+                const payload = _response.data.data;
+                let avatar = payload.avatar;
+                let second_avatar = payload.second_avatar;
+                let third_avatar = payload.third_avatar;
+                let fourth_avatar = payload.fourth_avatar;
+
+                if(second_avatar === ""){
+                    second_avatar = noImage
+                }
+                if(third_avatar === ""){
+                    third_avatar = noImage
+                }
+                if(fourth_avatar === ""){
+                    fourth_avatar = noImage
+                }
+
+                const image = []
+                image.push(avatar, second_avatar, third_avatar, fourth_avatar);
+
+                yield put(detailProductAction.setProductOnReducer(payload, image))
                 console.log("Sukses get produk");
                 setTimeout(() => {
-                    console.log(stateDetail);
+                    console.log(payload, "payload --- ");
                 }, 1000);
             }
         } catch (error) {

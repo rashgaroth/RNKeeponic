@@ -32,3 +32,15 @@ export function homeTokenNotFound(){
         type: types.HOME_TOKEN_EXPIRED,
     }
 }
+
+export function spinnerLoadingShow(){
+    return{
+        type: types.SPINNER_LOADING
+    }
+}
+
+export function hideSpinnerLoadingShow() {
+    return {
+        type: types.HIDE_SPINNER_LOADING
+    }
+}

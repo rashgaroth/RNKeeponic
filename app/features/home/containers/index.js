@@ -194,11 +194,11 @@ export default function Home({ navigation }) {
       />
     }>
         <StatusBar backgroundColor={COLORS.sans} />
-        {/* <Spinner
-          visible={homeSelector.isLoading}
+        <Spinner
+          visible={homeSelector.spinnerLoading}
           textContent={'Mohon Tunggu ...'}
           textStyle={{ color: COLORS.white }}
-        /> */}
+        />
         <View style={styles.searchView}>
           <Text style={styles.address}>Kosan Mandor</Text>
           <Button icon="chevron-down" style={styles.buttonDown} color={COLORS.white} />

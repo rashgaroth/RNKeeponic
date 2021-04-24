@@ -8,3 +8,4 @@ export const SET_LOADING = "SET_LOADING";
 export const SHOW_LOADING = "SHOW_LOADING";
 export const HIDE_LOADING = "HIDE_LOADING";
 export const CLEAR_PRODUCT = "CLEAR_PRODUCT";
+export const SET_PRODUCT_ON_REDUCER = "SET_PRODUCT_ON_REDUCER";

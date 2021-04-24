@@ -31,3 +31,11 @@ export const clearProduct = () => {
         type: types.CLEAR_PRODUCT
     }
 }
+
+export const setProductOnReducer = (data, image) => {
+    return {
+        type: types.SET_PRODUCT_ON_REDUCER,
+        data,
+        image
+    }
+}

@@ -6,6 +6,7 @@ import * as types from "./types";
 
 const initialState = {
     isLoading: false,
+    spinnerLoading: false,
     isSkeleton: false,
     isError: false,
     user: {

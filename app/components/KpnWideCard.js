@@ -3,9 +3,11 @@ import { Avatar, Button, Card, Title, Paragraph, Text } from 'react-native-paper
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
+import * as detailProductAction from "../features/productDetail/actions";
+import { useDispatch } from "react-redux";
 
 const KpnWideCard = ({ rating, title, price, image, paragraph }) => {
-
+    
     const totalRating = 5;
     const Cart = props => <Avatar.Icon
         {...props}
