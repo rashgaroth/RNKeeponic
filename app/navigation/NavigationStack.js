@@ -13,10 +13,12 @@ import {
   Login, 
   Notification, 
   Package,
-  LifeStyleDetail
+  LifeStyleDetail,
+  ProductDetail
 } from "../features";
 
 import { COLORS } from '../utils/colors';
+import FBSearchBar from '../features/productDetail/containers';
 
 const Stack = createStackNavigator();
 
@@ -73,6 +75,13 @@ function App() {
         <Stack.Screen
           name="LifeStyleDetail"
           component={LifeStyleDetail}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="ProductDetail"
+          component={ProductDetail}
           options={{
             headerShown: false
           }}

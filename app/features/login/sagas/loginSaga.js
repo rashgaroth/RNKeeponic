@@ -13,7 +13,7 @@ import * as apiService from "../../../services/index";
 import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as loginActions from '../actions';
-import { getToken, setToken, storeData, getStore } from "../../../services/asyncStorage";
+import { getToken, setToken, storeData, removeToken, removeAllItems } from "../../../services/asyncStorage";
 import { trimString } from "../../../utils/stringUtils";
 
 import { HeaderAuth, Header } from '../../../services/header';
@@ -36,11 +36,13 @@ export default function* loginAsync() {
   try {
     if(param.email != null || param.email == ""){
       if(param.password != null || param.password == ""){
+        yield removeToken();
+        yield removeAllItems();
         const _response = yield call(apiService.POST, API.BASE_URL + API.ENDPOINT.LOGIN, param, Header());
         if(_response.data.status === 200){
           // set token for async storage
           const user = _response.data.user;
-          console.log(_response.data.token)
+          // console.log(_response.data.token)
           yield setToken(_response.data.token)
           yield storeData("email", user.email)
           yield storeData("is_email_validated", user.is_email_validated)
@@ -50,6 +52,8 @@ export default function* loginAsync() {
           // getStore("user_id").then((value) => (
           //   console.log(value, "-----------VALUE---------------")
           // )).catch((e) => console.log(e))
+
+          console.log("------RESSSPOOONNSEEE-----------", _response.data.user);
 
           yield put(loginActions.clearForm())
           yield put(loginActions.onLoginResponse(_response.data.user))

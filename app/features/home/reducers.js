@@ -7,6 +7,7 @@ import * as types from "./types";
 const initialState = {
     isLoading: false,
     isSkeleton: false,
+    isError: false,
     user: {
         username: "",
         email: "",
@@ -96,6 +97,12 @@ export const homeReducer = createReducer(initialState, {
         return {
             ...state,
             products : action.products
+        }
+    },
+    [types.HOME_TOKEN_EXPIRED](state) {
+        return {
+            ...state,
+            isError: true
         }
     },
 });

@@ -3,8 +3,10 @@ import { Avatar, Button, Card, Title, Paragraph, Text } from 'react-native-paper
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
+import { navigate } from "../navigation/NavigationService";
+import { LiquidLike } from 'react-native-animated-pagination-dots';
 
-const KpnCardProducts = ({rating, title, price, image}) => {
+const KpnCardProducts = ({rating, title, price, image, userId, productId}) => {
 
     const totalRating = 5;
     const Cart = props => <Avatar.Icon 
@@ -23,7 +25,7 @@ const KpnCardProducts = ({rating, title, price, image}) => {
             <Card.Cover style={styles.cardCover} source={{ uri: image || 'https://picsum.photos/200' }} />
             <Card.Content style={styles.cardContent}>
                 <View style={styles.cardTitle}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigate("ProductDetail", {userId, productId})}>
                         <Paragraph>{title || 'Card Paragraph'}</Paragraph>
                     </TouchableOpacity>
                 </View>

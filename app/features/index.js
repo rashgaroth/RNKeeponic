@@ -5,6 +5,7 @@ import Cart from "./cart/containers";
 import Liked from "./liked/containers";
 import Package from "./package/containers";
 import LifeStyleDetail from "./lifestyleDetail/containers";
+import ProductDetail from "./productDetail/containers";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -16,5 +17,6 @@ export {
     Liked,
     Package,
     BottomNavigationTab,
-    LifeStyleDetail
+    LifeStyleDetail,
+    ProductDetail
 }

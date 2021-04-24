@@ -2,12 +2,14 @@
  */
 
 // const API_BASE_URL = 'http://192.168.0.107:3000/';
-const API_BASE_URL = 'http://keeponicbackend-env.eba-3c3aqnef.ap-southeast-1.elasticbeanstalk.com/';
+// const API_BASE_URL = 'http://keeponicbackend-env.eba-3c3aqnef.ap-southeast-1.elasticbeanstalk.com/';
+const API_BASE_URL = 'https://d1f31mzn1ab53p.cloudfront.net/';
 
 const API_ENDPOINT = {
   LOGIN: 'mobilelogin',
   // dapat digunakan untuk mendapatkan pagination atau detail, atau tidak dengan pagin
   GET_PRODUCT: 'client/product',
+  GET_PRODUCT_DETAIL: 'client/product/findOne',
   GET_PROFILE: 'client/user',
   GET_PROFILE_ADDRESS: 'client/user/address',
   GET_ALL_ADDRESS: 'client/address/all'

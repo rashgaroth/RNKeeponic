@@ -6,14 +6,17 @@ import * as types from './types';
 
 const initialState = {
   isLoggedIn: false,
-  user_id: null,
-  email: null,
   password: null,
-  name: "",
-  is_email_validated: null,
+  email: "",
   emailForm: null,
   passwordForm:null,
   loading: false,
+  user:{
+    user_id: null,
+    email: "",
+    name: "",
+    is_email_validated: null
+  },
 };
 
 export const loginReducer = createReducer(initialState, {
@@ -28,8 +31,13 @@ export const loginReducer = createReducer(initialState, {
       ...state,
       user_id: action.user_id,
       isLoggedIn: true,
-      email: action.email,
-      is_email_validated: action.is_email_validated
+      user:{
+        ...state.user,
+        user_id: action.response.user_id,
+        email: action.response.email,
+        name: action.response.name,
+        is_email_validated: action.response.is_email_validated,
+      }
     };
   },
   [types.LOGIN_FAILED](state) {

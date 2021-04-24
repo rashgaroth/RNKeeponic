@@ -26,3 +26,9 @@ export function getProductSuccess(products){
         products
     }
 }
+
+export function homeTokenNotFound(){
+    return{
+        type: types.HOME_TOKEN_EXPIRED,
+    }
+}

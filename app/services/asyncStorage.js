@@ -1,5 +1,27 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export async function removeToken(){
+    try {
+        await AsyncStorage.removeItem('TOKEN')
+    } catch (error) {
+        setTimeout(() => {
+            Alert.alert('Error Token', error.message);
+        }, 200);
+    }
+}
+
+export async function removeAllItems(){
+    try {
+        await AsyncStorage.getAllKeys()
+            .then(keys => AsyncStorage.multiRemove(keys))
+            .then((e) => console.log("Cannot Remove Item Because : ", e));
+    } catch (error) {
+        setTimeout(() => {
+            Alert.alert('Error Storage', error.message);
+        }, 200);
+    }
+}
+
 export async function getToken() {
     try {
         var token = await AsyncStorage.getItem('TOKEN')

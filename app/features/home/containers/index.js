@@ -2,10 +2,12 @@ import React, {useState, useEffect} from 'react';
 import { View, StatusBar, ScrollView, Text, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay"
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
+import LinearGradient from 'react-native-linear-gradient';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
+import * as loginAction from '../../login/actions';
 import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
@@ -14,7 +16,6 @@ import { truncate, getInitials } from "../../../utils/stringUtils";
 import { KpnWideCard, KpnDivider, KpnCardProducts, KpnLifeStyleCard } from "../../../components";
 import LogoRounded from "../../../assets/images/svg/LogoRounded";
 import { navigationRef } from "../../../navigation/NavigationService";
-import { getStore } from "../../../services/asyncStorage";
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ export default function Home({ navigation }) {
   const load = true
 
   const homeSelector = useSelector(state => state.homeReducer)
+  const loginSelector = useSelector(state => state.loginReducer)
 
   const menu = {
     title: [
@@ -45,29 +47,12 @@ export default function Home({ navigation }) {
   const onPressMenuDivider = (type) => {
     navigationRef.current?.navigate(type)
   }
-
-  async function store(key){
-    try {
-      await getStore(key).then((value) => {
-        console.log(value)
-        if(key === 'name'){
-          setName(value)
-        }else if(key === 'user_id'){
-          setUserId(value)
-        }else{
-          return value
-        }
-        return value
-      }).catch((e) => {
-        return e
-      });
-    } catch (error) {
-      throw error.message
-    }
-  }
   
-  async function fetchAllHomeRequest(){
-    await dispatch(homeAction.requestHome(name, userId))
+  function fetchAllHomeRequest(){
+      dispatch(homeAction.showLoading())
+      dispatch(homeAction.requestHome(name, loginSelector.user.user_id))
+      setUserId(loginSelector.user.user_id)
+      setName(loginSelector.user.name)
   }
 
   const onRefreshAll = () => {
@@ -76,90 +61,130 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
 
-    store('name')
-    store('user_id')
-
+    console.log("LOGIN SELECTOR----------", loginSelector.user);
     fetchAllHomeRequest()
+    // getName()
 
   }, [])
 
-  const renderSkeleton = () => {
+  const renderSkeleton = (name, size=1) => {
 
-    let arr = [1,2,3];
-
+    if(name === "paket"){
+      return (
+        <View style={{ flexDirection: "row" }}>
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 170,
+              borderRadius: 16,
+              marginLeft: 10
+            }}
+          />
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 170,
+              borderRadius: 16,
+              marginLeft: 10
+            }}
+          />
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 170,
+              borderRadius: 16,
+              marginLeft: 10
+            }}
+          />
+        </View>
+    )
+  }else if( name === "lifestyle"){
     return (
-      <View>
-          <View>
-            <View style={[styles.skeletonChild, { marginTop: 10 }]}>
-              <SkeletonPlaceholder>
-                <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
-                  {/* <SkeletonPlaceholder.Item width={60} height={69} borderRadius={15} /> */}
-                  <SkeletonPlaceholder.Item marginLeft={20}>
-                    <SkeletonPlaceholder.Item width={90} height={20} borderRadius={4} />
-                    <SkeletonPlaceholder.Item
-                      marginTop={6}
-                      width={80}
-                      height={20}
-                      borderRadius={4}
-                    />
-                  </SkeletonPlaceholder.Item>
-                </SkeletonPlaceholder.Item>
-              </SkeletonPlaceholder>
-
-              <SkeletonPlaceholder>
-                <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
-                  {/* <SkeletonPlaceholder.Item width={60} height={69} borderRadius={15} /> */}
-                  <SkeletonPlaceholder.Item marginLeft={20}>
-                    <SkeletonPlaceholder.Item width={90} height={20} borderRadius={4} />
-                    <SkeletonPlaceholder.Item
-                      marginTop={6}
-                      width={80}
-                      height={20}
-                      borderRadius={4}
-                    />
-                  </SkeletonPlaceholder.Item>
-                </SkeletonPlaceholder.Item>
-              </SkeletonPlaceholder>
-            </View>
-          </View>
-      {
-        arr.map((x, i) => (
-          <View style={[styles.skeleton, { marginLeft: 7, marginTop: 10 }]} key={i}>
-            <SkeletonPlaceholder>
-              <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
-                <SkeletonPlaceholder.Item width={60} height={69} borderRadius={15} />
-                <SkeletonPlaceholder.Item marginLeft={20}>
-                  <SkeletonPlaceholder.Item width={90} height={20} borderRadius={4} />
-                  <SkeletonPlaceholder.Item
-                    marginTop={6}
-                    width={80}
-                    height={20}
-                    borderRadius={4}
-                  />
-                </SkeletonPlaceholder.Item>
-              </SkeletonPlaceholder.Item>
-            </SkeletonPlaceholder>
-
-            <SkeletonPlaceholder>
-              <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
-                <SkeletonPlaceholder.Item width={60} height={69} borderRadius={15} />
-                <SkeletonPlaceholder.Item marginLeft={20}>
-                  <SkeletonPlaceholder.Item width={90} height={20} borderRadius={4} />
-                  <SkeletonPlaceholder.Item
-                    marginTop={6}
-                    width={80}
-                    height={20}
-                    borderRadius={4}
-                  />
-                </SkeletonPlaceholder.Item>
-              </SkeletonPlaceholder.Item>
-            </SkeletonPlaceholder>
-          </View>
-        ))
-      }
+      <View style={{ flexDirection: "row", justifyContent: "space-between"}}>
+        <View style={{ marginHorizontal: 10 }}>
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 80,
+              borderRadius: 16,
+              marginTop: 10,
+              // marginLeft: 10
+            }}
+          />
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 80,
+              borderRadius: 16,
+              marginTop: 10,
+              // marginLeft: 10
+            }}
+          />
+        </View>
+        <View style={{}}>
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 80,
+              borderRadius: 16,
+              marginTop: 10,
+              // marginLeft: 10
+            }}
+          />
+          <ShimmerPlaceHolder
+            LinearGradient={LinearGradient}
+            // visible={homeSelector.isLoading}
+            style={{
+              width: 170,
+              height: 80,
+              marginTop: 10,
+              borderRadius: 16,
+              // marginLeft: 10
+            }}
+          />
+        </View>
+      </View>
+    )
+  }else{
+    return(
+      <View style={{ flexDirection: "row" }}>
+        <ShimmerPlaceHolder
+          LinearGradient={LinearGradient}
+          // visible={homeSelector.isLoading}
+          style={{
+            width: 170,
+            height: 170,
+            borderRadius: 16,
+            marginLeft: 10
+          }}
+        />
+        <ShimmerPlaceHolder
+          LinearGradient={LinearGradient}
+          // visible={homeSelector.isLoading}
+          style={{
+            width: 170,
+            height: 170,
+            borderRadius: 16,
+            marginLeft: 10
+          }}
+        />
       </View>
     )
   }
+
+}
 
   return (
     <ScrollView style={styles.container} refreshControl={
@@ -218,7 +243,7 @@ export default function Home({ navigation }) {
           <View>
           {/* Untuk saat ini belum dapat menggunakan skeleton karna terdapat bugs yang terjadi
               di react-native-reanimated = perbedaan versi dengan peerdependecies nya si skeleton */}
-          {homeSelector.isLoading ? renderSkeleton() : <View>
+          {<View>
             <View style={styles.textMenuHidroponik}>
               <Text style={styles.textPaketHidroponik}>Paket Hidroponik</Text>
               <TouchableOpacity onPress={(e) => console.log("homeSelector")}>
@@ -227,7 +252,7 @@ export default function Home({ navigation }) {
             </View>
             <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
             <View style={styles.cardProducts}>
-              {
+              {homeSelector.isLoading ? renderSkeleton ("paket") :
                 <FlatList
                   horizontal
                   data={homeSelector.products}
@@ -237,6 +262,8 @@ export default function Home({ navigation }) {
                   }}
                   renderItem={({ item }) => (
                     <KpnCardProducts
+                      userId={loginSelector.user.user_id}
+                      productId={item.id}
                       rating={item.rating}
                       title={truncate(item.name, 30)}
                       image={item.avatar}
@@ -254,14 +281,19 @@ export default function Home({ navigation }) {
               </TouchableOpacity>
             </View>
             <View style={styles.cardLifestyle}>
-              <View style={styles.cardLifestyle1}>
-                <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
-                <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
-              </View>
-              <View style={styles.cardLifestyle2}>
-                <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
-                <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
-              </View>
+              {
+                homeSelector.isLoading ? renderSkeleton("lifestyle") : 
+                <>
+                  <View style={styles.cardLifestyle1}>
+                    <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
+                    <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
+                  </View>
+                  <View style={styles.cardLifestyle2}>
+                    <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
+                    <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} />
+                  </View>
+              </>
+              }
             </View>
             <View style={styles.textMenuHidroponik}>
               <Text style={styles.textPaketHidroponik}>Khusus Untuk John Doe</Text>
