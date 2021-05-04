@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import { View, StatusBar, ScrollView, Text, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
-import Spinner from "react-native-loading-spinner-overlay"
-import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
+import Spinner from "react-native-loading-spinner-overlay";
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
+import SplashScreen from 'react-native-splash-screen';
+import Icon from "react-native-vector-icons/MaterialIcons";
+import Config from "react-native-config";
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
@@ -27,6 +30,8 @@ export default function Home({ navigation }) {
 
   const homeSelector = useSelector(state => state.homeReducer)
   const loginSelector = useSelector(state => state.loginReducer)
+  const apiKey = Config.API_ENCRYPTION;
+  const allProducts = homeSelector.allProducts;
 
   const menu = {
     title: [
@@ -48,23 +53,21 @@ export default function Home({ navigation }) {
     navigationRef.current?.navigate(type)
   }
   
-  function fetchAllHomeRequest(){
+  async function fetchAllHomeRequest(){
       dispatch(homeAction.showLoading())
-      dispatch(homeAction.requestHome(name, loginSelector.user.user_id))
+      dispatch(homeAction.getUserProfile(apiKey, loginSelector.user.user_id))
+      dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0))
       setUserId(loginSelector.user.user_id)
       setName(loginSelector.user.name)
   }
 
-  const onRefreshAll = () => {
-    fetchAllHomeRequest();
+  const onRefreshAll = async () => {
+    await fetchAllHomeRequest();
   }
 
   useEffect(() => {
-
-    console.log("LOGIN SELECTOR----------", loginSelector.user);
+    SplashScreen.hide();
     fetchAllHomeRequest()
-    // getName()
-
   }, [])
 
   const renderSkeleton = (name, size=1) => {
@@ -243,7 +246,7 @@ export default function Home({ navigation }) {
           <View>
           {/* Untuk saat ini belum dapat menggunakan skeleton karna terdapat bugs yang terjadi
               di react-native-reanimated = perbedaan versi dengan peerdependecies nya si skeleton */}
-          {<View>
+          <View>
             <View style={styles.textMenuHidroponik}>
               <Text style={styles.textPaketHidroponik}>Paket Hidroponik</Text>
               <TouchableOpacity onPress={(e) => console.log("homeSelector")}>
@@ -306,15 +309,18 @@ export default function Home({ navigation }) {
             <View style={styles.cardProducts}>
               <FlatList
                 horizontal
-                data={homeSelector.dummyProducts.flatListData}
+                data={homeSelector.products}
                 snapToInterval={ITEM_WIDTH + SPACING * 1.6}
                 contentContainerStyle={{
                   paddingRight: width - ITEM_WIDTH - SPACING * 2,
                 }}
                 renderItem={({ item }) => (
                   <KpnCardProducts
+                    userId={loginSelector.user.user_id}
+                    productId={item.id}
                     rating={item.rating}
-                    title={item.name}
+                    title={truncate(item.name, 30)}
+                    image={item.avatar}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -362,23 +368,46 @@ export default function Home({ navigation }) {
             <View style={styles.cardProducts}>
               <FlatList
                 horizontal
-                data={homeSelector.dummyProducts.flatListData}
+                data={homeSelector.products}
                 snapToInterval={ITEM_WIDTH + SPACING * 1.6}
                 contentContainerStyle={{
                   paddingRight: width - ITEM_WIDTH - SPACING * 2,
                 }}
                 renderItem={({ item }) => (
                   <KpnCardProducts
+                    userId={loginSelector.user.user_id}
+                    productId={item.id}
                     rating={item.rating}
-                    title={item.name}
+                    title={truncate(item.name, 30)}
+                    image={item.avatar}
                   />
                 )}
                 keyExtractor={(item) => item.id}
                 extraData={selectedId}
               />
             </View>
-          </View>}
-          
+            {/* Other Products */}
+            <View>
+              <Text style={styles.textPaketHidroponik}>Produk lainnya</Text>
+              <Text style={styles.textLebihHemat}>Produk lain nya, hanya di KEEPONIC</Text>
+            </View>
+            <View style={styles.otherProducts}>
+                { 
+                allProducts ? allProducts.map((data, index) => (
+                  <View key={index}>
+                    <KpnCardProducts
+                      userId={loginSelector.user.user_id}
+                      productId={data.id}
+                      rating={data.rating}
+                      title={truncate(data.name, 30)}
+                      image={data.avatar}
+                      
+                    />
+                  </View>
+                )) : null
+                }
+            </View>
+          </View>
           {/* </SkeletonContent> */}
         </View>
       </View>

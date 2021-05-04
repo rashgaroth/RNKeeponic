@@ -7,5 +7,7 @@
 import { takeEvery } from 'redux-saga/effects';
 import * as types from '../types';
 import homeSaga from './homeSaga';
+import profileSaga from './profileSaga';
 
 export const homeSagas = [takeEvery(types.HOME_REQUEST, homeSaga)];
+export const profileSagas = [takeEvery(types.GET_USER_PROFILE, profileSaga)];

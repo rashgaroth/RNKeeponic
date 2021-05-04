@@ -3,14 +3,15 @@ import { TouchableOpacity, StyleSheet } from "react-native";
 import { Button } from 'react-native-paper';
 import { COLORS } from '../utils/colors';
 
-const KpnButton = ({text, icon, onPress, mode, key, color, isRounded, onLongPress, theme, style}) => (
-    <TouchableOpacity>
+const KpnButton = ({text, icon, onPress, mode, key, color, isRounded, onLongPress, theme, style, disabled}) => (
+    <TouchableOpacity disabled={disabled}>
         <Button 
         key={key || null}
         style={isRounded ? {...styles.Button, ...style} : {...style}}
         icon={icon || null}
         theme={theme}
         uppercase
+        disabled={disabled ? true : false}
         onLongPress={onLongPress}
         mode={mode || "contained"} 
         color={color || COLORS.secondColor}
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     Button: {
         borderRadius: 15,
         padding: 3,
-        marginHorizontal: 50,
+        marginHorizontal: 10,
         textAlign: 'center',
         justifyContent: 'center',
     }

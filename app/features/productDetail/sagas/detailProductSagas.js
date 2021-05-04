@@ -30,8 +30,6 @@ export default function* getProductDetail(state) {
     const url = API.BASE_URL +
         API.ENDPOINT.GET_PRODUCT_DETAIL +
         `?user_id=${user_id}&id_product=${product_id}`
-    console.log(product_id, "WELCOME SAGA!_product");
-    console.log(user_id, "WELCOME SAGA!_user");
     if(token){
         try {
             yield put(detailProductAction.clearProduct())
@@ -44,6 +42,7 @@ export default function* getProductDetail(state) {
                 yield put(detailProductAction.hideLoading());
                 // yield put(detailProductAction.onSuccessGetDetail(_response.data.data))
                 const payload = _response.data.data;
+                const market = _response.data.market[0];
                 let avatar = payload.avatar;
                 let second_avatar = payload.second_avatar;
                 let third_avatar = payload.third_avatar;
@@ -62,11 +61,11 @@ export default function* getProductDetail(state) {
                 const image = []
                 image.push(avatar, second_avatar, third_avatar, fourth_avatar);
 
-                yield put(detailProductAction.setProductOnReducer(payload, image))
-                console.log("Sukses get produk");
+                yield put(detailProductAction.setProductOnReducer(payload, image));
+                yield put(detailProductAction.setMarketOnReducer(market));
                 setTimeout(() => {
-                    console.log(payload, "payload --- ");
-                }, 1000);
+                    console.log(stateDetail.mMarket.avatar, "avatar ---");
+                }, 7000);
             }
         } catch (error) {
             console.log(error, "ERRORNYA")

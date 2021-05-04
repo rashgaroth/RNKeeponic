@@ -7,6 +7,16 @@ export function HeaderAuth(token) {
     };
 }
 
+export function HeaderApiKey(token, key) {
+    return {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+            'api_key': key
+        }
+    };
+}
+
 export function HeaderFile(token) {
     return {
         headers: {

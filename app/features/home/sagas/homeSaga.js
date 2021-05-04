@@ -19,6 +19,7 @@ import { trimString } from "../../../utils/stringUtils";
 
 import { HeaderAuth, Header } from '../../../services/header';
 import { navigate } from "../../../navigation/NavigationService";
+import * as logger from "../../../utils/logging";
 
 let loginState = state => state.homeReducer;
 
@@ -33,7 +34,7 @@ export default function* homeGetProducts(state){
         if(token){
             console.log(token, "----TOKEN----")
             const products = getHomeState.products;
-            if(products.length){
+            if(products){
                 const length = products.length;
                 for(let i = length; i>0; i--){
                     products.pop();
@@ -43,14 +44,38 @@ export default function* homeGetProducts(state){
             const _response = yield call(apiService.GET,
                 API.BASE_URL +
                 API.ENDPOINT.GET_PRODUCT +
-                `?user_id=${state.userId}&page=0&size=5`,
+                `?user_id=${state.userId}&page=${state.page}&size=5`,
                 HeaderAuth(token)
             )
 
-            if(_response.data.error < 1){
-                const productData = _response.data.response.product
+            const [productList, allProduct] = yield all([
+                call(apiService.GET,
+                    API.BASE_URL +
+                    API.ENDPOINT.GET_PRODUCT +
+                    `?user_id=${state.userId}&page=${state.page}&size=5`,
+                    HeaderAuth(token)
+                ),
+                call(apiService.GET,
+                    API.BASE_URL +
+                    API.ENDPOINT.GET_PRODUCT +
+                    `?user_id=${state.userId}`,
+                    HeaderAuth(token)
+                )
+            ])
+
+            if(productList.data.error < 1){
+                const productData = productList.data.response.product
                 yield put(homeAction.getProductSuccess(productData))
-                yield put(homeAction.hideLoading())
+                if(allProduct.data.error < 1){
+                    const productAll = allProduct.data.response.product
+                    yield put(homeAction.getAllProducts(productAll))
+                    yield put(homeAction.hideLoading())
+                }else{
+                    yield put(homeAction.hideLoading())
+                }
+                setTimeout(() => {
+                    logger.loggingInfo(getHomeState.allProducts, 'All products');
+                }, 7000);
             }else{
                 yield put(homeAction.hideLoading())
                 // yield put(loginAction.logOut())

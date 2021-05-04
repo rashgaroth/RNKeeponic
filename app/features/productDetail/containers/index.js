@@ -42,6 +42,8 @@ export default function Home(props) {
   const [isFocus, setIsFocus] = useState(false);
   const [activeIndex, setActiveIndex] = useState(false);
   const [isLove, setIsLove] = useState(false);
+  const [readableDesc, setReadableDesc] = useState(false);
+  const [description, setDescription] = useState("");
 
   const dispatch = useDispatch();
   const homeSelector = useSelector(state => state.homeReducer)
@@ -115,13 +117,24 @@ export default function Home(props) {
     }
   }
 
-  const fetchProductDetail = () => {
-    dispatch(detailProductAction.showLoading());
-    dispatch(detailProductAction.getDetailProduct(param));
+  const onRead = () => {
+    if(!readableDesc){
+      setDescription(mProducts.description);
+      setReadableDesc(!readableDesc);
+    }else{
+      setDescription(truncate(mProducts.description, 200));
+      setReadableDesc(!readableDesc);
+    }
+  }
+
+  const fetchProductDetail = async () => {
+    await dispatch(detailProductAction.showLoading());
+    await dispatch(detailProductAction.getDetailProduct(param));
   }
 
   useEffect(() => {
     dispatch(homeActions.hideSpinnerLoadingShow());
+    setDescription(truncate(mProducts.description, 200))
   }, []);
 
   return (
@@ -548,8 +561,8 @@ export default function Home(props) {
                       />
                     </View> :
                     <View style={{ marginHorizontal: 10 }}>
-                      <Text style={{ marginBottom: 10, marginTop: 10 }}> {mProducts.description} </Text>
-                      <Text style={{ color: COLORS.blue }}> Baca Selengkapnya </Text>
+                      <Text style={{ marginBottom: 10, marginTop: 10 }}> { description } </Text>
+                      <Text style={{ color: COLORS.blue }} onPress={(e) => onRead()}>{ readableDesc ? "Minimalkan" : "Baca Selengkapnya" }</Text>
                     </View>
                 }
                 <View style={styles.lineProducts} />

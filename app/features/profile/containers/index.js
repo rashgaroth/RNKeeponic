@@ -28,8 +28,6 @@ import { truncate, getInitials } from "../../../utils/stringUtils";
 import { KpnWideCard, KpnDivider, KpnCardProducts, KpnLifeStyleCard } from "../../../components";
 import LogoRounded from "../../../assets/images/svg/LogoRounded";
 import { navigationRef } from "../../../navigation/NavigationService";
-import { getStore } from "../../../services/asyncStorage";
-import { detailUser } from "../constant";
 import * as loginActions from "../../login/actions";
 import { removeAllItems } from "../../../services/asyncStorage";
 
@@ -39,10 +37,35 @@ export default function Profile() {
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [field, setField] = useState('');
   const [fieldValue, setFieldValue] = useState('');
-  const [profileImages, setProfileImages] = useState('https://cdn-asset.jawapos.com/wp-content/uploads/2019/08/sapi-via-vallen-dimas-maulana.jpg')
+  const [profileImages, setProfileImages] = useState('https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg')
   const [isPhotoUpdated, setIsPhotoUpdated] = useState(false);
 
   const dispatch = useDispatch();
+  const homeSelector = useSelector(state => state.homeReducer);
+  const userProfile = homeSelector.userProfile;
+  const userAddress = homeSelector.userAddress;
+  const detailUser = [
+    {
+      title: "Nama",
+      content: userProfile.name,
+    },
+    {
+      title: "Kecamatan",
+      content: userAddress.subdistrict === "" ? "Kecamatan belum diisi" : userAddress.subdistrict
+    },
+    {
+      title: "Kota",
+      content: userAddress.city === "" ? "Kota belum diisi" : userAddress.city,
+    },
+    {
+      title: "Provinsi",
+      content: userAddress.prov === "" ? "Provinsi belum diisi" : userAddress.prov
+    },
+    {
+      title: "Email",
+      content: userProfile.email,
+    }
+  ]
 
   const onLogout = () => {
     removeAllItems();
@@ -68,6 +91,14 @@ export default function Profile() {
     setFieldValue(value);
     bottomSheetEditRef.current.snapTo(id);
   }
+
+  useEffect(() => {
+    if(userProfile.avatar){
+        setProfileImages(userProfile.avatar)
+      }else{
+      setProfileImages("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
+    }
+  }, []);
 
   const bottomSheetEditPhoto = (id) => {
     bottomSheetEditPhotoRef.current.snapTo(id);

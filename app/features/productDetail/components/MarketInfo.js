@@ -1,10 +1,24 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, StyleSheet } from "react-native";
 import { Text, Avatar, Chip, Button } from "react-native-paper"
 import { COLORS } from "../../../utils/colors";
 import { width } from "../../../utils/theme";
+import { useDispatch, useSelector } from "react-redux"
+
 
 export default function MarketInfo(){
+    const [image, setImage] = useState("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
+    const dispatcher = useDispatch();
+    const marketSelector = useSelector(state => state.detailProductReducer.mMarket);
+
+    useEffect(() => {
+        if(marketSelector.avatar){
+            setImage(marketSelector.avatar)
+        }else{
+            setImage("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <View>
@@ -12,16 +26,16 @@ export default function MarketInfo(){
             </View>
             <View style={styles.rowInformation}>
                 <View style={{ top: 10 }}>
-                    <Avatar.Image size={70} source={{ uri: "https://duniasapi.com/media/k2/items/cache/75b44b0e9c2e5d305fa323c6c51d3476_Generic.jpg" }} />
+                    <Avatar.Image size={70} source={{ uri: image }} />
                 </View>
                 <View style={{ marginLeft: 10 }}>
                     <View style={styles.rowChips,[{ marginLeft: 5 }]}>
-                        <Text>Hidroponik Bandung</Text>
+                        <Text>{marketSelector.market_name}</Text>
                         {/* <Chip onPress={() => console.log('Pressed')}>Bandung</Chip> */}
                     </View>
                     <View style={[styles.rowChips,{ marginTop: 5 }]}>
                         <Chip icon="star" onPress={() => console.log('Pressed')}>3.6</Chip>
-                        <Chip onPress={() => console.log('Pressed')}>Bandung</Chip>
+                        <Chip onPress={() => console.log('Pressed')}>{marketSelector.followers + " " + "Pengikut"}</Chip>
                     </View>
                     <Button 
                     mode="outlined" 

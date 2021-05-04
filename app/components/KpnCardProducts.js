@@ -79,7 +79,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: COLORS.colorC4,
         borderRadius: 10,
-        marginRight: 10
+        marginRight: 10,
+        marginVertical: 10
     },
     cardCover: {
         borderRadius: 10,

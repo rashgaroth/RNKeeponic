@@ -14,7 +14,12 @@ import {
   Notification, 
   Package,
   LifeStyleDetail,
-  ProductDetail
+  ProductDetail,
+  Register,
+  RegisterNext,
+  RegisterPassword,
+  RegisterPhoneName,
+  RegisterVerification
 } from "../features";
 
 import { COLORS } from '../utils/colors';
@@ -82,6 +87,41 @@ function App() {
         <Stack.Screen
           name="ProductDetail"
           component={ProductDetail}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="RegisterNext"
+          component={RegisterNext}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="RegisterPassword"
+          component={RegisterPassword}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="RegisterPhoneName"
+          component={RegisterPhoneName}
+          options={{
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="RegisterVerification"
+          component={RegisterVerification}
           options={{
             headerShown: false
           }}

@@ -128,6 +128,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     // marginRight: 15
   },
+  otherProducts:{
+    marginTop: 10,
+    marginHorizontal: 10,
+    flex: 1,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  }
 });
 
 export default styles;

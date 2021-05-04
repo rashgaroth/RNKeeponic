@@ -26,14 +26,12 @@ const MyComponent = ({placeholder,
         <>
         {isError? <Text style={styles.errorText}>{errorText}</Text> : null}
         { isSecure ? 
-        <AvoidKeyboard>
+        <KeyboardAvoidingView>
         <View>
             <TextInput
                 label={label}
                 value={value}
                 mode="outlined"
-                onFocus={() => setFocus(true)}
-                onBlur={() => setFocus(false)}
                 theme={{ colors: {
                     placeholder: placeholderColor || COLORS.primaryColor,
                     underlineColor: COLORS.white,
@@ -57,15 +55,13 @@ const MyComponent = ({placeholder,
             />
             {isError? <Text style={styles.errorText}>{errorText}</Text> : null}
         </View>
-        </AvoidKeyboard>
+        </KeyboardAvoidingView>
         :
-        <AvoidKeyboard>
+        <KeyboardAvoidingView>
             <TextInput
                 label={label}
                 value={value}
                 mode="outlined"
-                onFocus={() => setFocus(true)}
-                onBlur={() => setFocus(false)}
                 theme={{
                     colors: {
                         placeholder: placeholderColor || COLORS.primaryColor,
@@ -82,7 +78,7 @@ const MyComponent = ({placeholder,
                 secureTextEntry={isPassword ? true : false}
                 {...props}
             />
-        </AvoidKeyboard>
+        </KeyboardAvoidingView>
         }
         </>
     );
@@ -102,7 +98,7 @@ const styles = StyleSheet.create({
         position: 'absolute', 
         alignSelf: 'center', 
         right: 10, 
-        top: 20, 
+        top: 26, 
         zIndex: 100
     }
 })

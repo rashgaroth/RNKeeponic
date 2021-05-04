@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1069012109484",
+    "project_id": "rnkeeponic",
+    "storage_bucket": "rnkeeponic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069012109484:android:ad3eda816bb6aa1f353709",
+        "android_client_info": {
+          "package_name": "com.rnboilerplate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069012109484-kev0e82rm5qi0tlf5eq7ppccjau3kjrs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rnboilerplate",
+            "certificate_hash": "cf018110849cd38c5a873164f1c59d663d413646"
+          }
+        },
+        {
+          "client_id": "1069012109484-fn1u4u6j2naokpql3867tu464dugu51o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDauxWzMc_s4sKeEPYDsToTFmi96ClwqE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069012109484-fn1u4u6j2naokpql3867tu464dugu51o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

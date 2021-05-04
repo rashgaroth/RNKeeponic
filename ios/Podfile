@@ -85,6 +85,12 @@ target 'Keeponic' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+
+  pod 'react-native-config', :path => '../node_modules/react-native-config'
+
+  pod 'RNCPicker', :path => '../node_modules/@react-native-picker/picker'
+
   target 'KeeponicTests' do
     inherit! :complete
     # Pods for testing

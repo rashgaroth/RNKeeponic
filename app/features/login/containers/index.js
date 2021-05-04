@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StatusBar } from 'react-native';
 import { Text, IconButton, HelperText } from 'react-native-paper';
-import Spinner from "react-native-loading-spinner-overlay"
+import Spinner from "react-native-loading-spinner-overlay";
+import SplashScreen from "react-native-splash-screen";
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as loginActions from '../actions'; 
@@ -11,9 +12,9 @@ import { KpnButton, KpnDivider, KpnInput } from "../../../components"
 import Logo from "../../../assets/images/svg/Logo"
 import { COLORS } from '../../../utils/colors';
 import { emailValidator, passwordValidator } from "../../../utils/validator";
-import { trimString } from "../../../utils/stringUtils";
+import { navigate } from "../../../navigation/NavigationService";
 
-import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
+// import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 export default function Login() {
   // useState or init the variable
@@ -66,6 +67,17 @@ export default function Login() {
     setPasswordForm(text)
     setPassword(text)
   }
+
+  const onRegister = () => {
+    navigate("Register");
+  }
+
+  useEffect(() => {
+
+    SplashScreen.hide();
+    // getName()
+
+  }, [])
 
   // Button or Input function
   const googleLogin = () => { console.log(selector) }
@@ -137,21 +149,21 @@ export default function Login() {
         <KpnButton 
         text="Login"
         isRounded
-        style={{marginTop: 10, opacity: 0.7}}
+        style={{ marginTop: 10, opacity: 1, width: '94%', alignSelf: 'center' }}
         color={COLORS.secondColor}
         onPress={() => onLogin()}
         />
 
       </View>
       <View style={styles.textRegistration}>
-        <Text style={styles.text}>Doesn't have an account yet?</Text>
-        <Text style={styles.textRegist}>Create Account</Text>
-        <Text style={[styles.text, {top: 10}]}>Or</Text>
-          <GoogleSigninButton
+        <Text style={styles.text}>Tidak punya akun?</Text>
+        <Text style={styles.textRegist} onPress={ (e) => onRegister() }>Buat akun</Text>
+        {/* <Text style={[styles.text, {top: 10}]}>Or</Text> */}
+          {/* <GoogleSigninButton
             style={{ width: 200, height: 58, top: 17 }}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
-            onPress={googleLogin} />
+            onPress={googleLogin} /> */}
       </View>
     </View>
     </ScrollView>

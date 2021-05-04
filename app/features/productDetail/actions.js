@@ -39,3 +39,10 @@ export const setProductOnReducer = (data, image) => {
         image
     }
 }
+
+export const setMarketOnReducer = (data) => {
+    return {
+        type: types.SET_MARKET_ON_REDUCER,
+        data
+    }
+}
