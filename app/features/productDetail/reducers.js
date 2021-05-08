@@ -5,7 +5,7 @@ import createReducer from 'app/lib/createReducer';
 import * as types from "./types";
 
 const initialState = {
-    loading: false,
+    loading: true,
     market_id: null,
     avatar: null,
     mMarket: {
@@ -68,6 +68,7 @@ export const detailProductReducer = createReducer(initialState, {
         return {
             ...state,
             avatar: null,
+            loading: true,
             mProducts: {
                 ...state.mProducts,
                 name: "",
@@ -143,6 +144,13 @@ export const detailProductReducer = createReducer(initialState, {
                 created_date: action.data.created_date,
                 updated_date: action.data.updated_date
             },
+        };
+    },
+    [types.SET_LOADING](state, action) {
+        return {
+            ...state,
+            loading: action.loader,
+            avatar: null
         };
     },
 });

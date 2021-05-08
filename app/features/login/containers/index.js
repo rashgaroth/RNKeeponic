@@ -6,6 +6,7 @@ import SplashScreen from "react-native-splash-screen";
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as loginActions from '../actions'; 
+import * as registerActions from '../../register/actions';
 import styles from './styles';
 
 import { KpnButton, KpnDivider, KpnInput } from "../../../components"
@@ -16,7 +17,7 @@ import { navigate } from "../../../navigation/NavigationService";
 
 // import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
-export default function Login() {
+export default function Login(props) {
   // useState or init the variable
   const [placeholderColor, setPlaceholderColor] = useState(COLORS.primaryColor)
   const [placeholderColorPassword, setPlaceholderColorPassword] = useState(COLORS.primaryColor)
@@ -31,8 +32,10 @@ export default function Login() {
   // Redux function
   const dispatch = useDispatch();
   const selector = useSelector(state => state.loginReducer);
+  const registerSelector = useSelector(state => state.registerReducer);
   const setUsername = (username) => dispatch(loginActions.setUsername(username))
   const setPassword = (password) => dispatch(loginActions.setPassword(password))
+  const { cancel } = props.route
 
   const onLogin = () => {
       const isEmailError = emailValidator(emailForm)
@@ -75,16 +78,20 @@ export default function Login() {
   useEffect(() => {
 
     SplashScreen.hide();
+    dispatch(registerActions.setClearValue())
+    dispatch(loginActions.clearForm())
+    
+    console.log("this is reselector", registerSelector.errorMsg)
     // getName()
 
-  }, [])
+  }, [registerSelector.errorMsg.error])
 
   // Button or Input function
   const googleLogin = () => { console.log(selector) }
 
   return (
     <ScrollView style={styles.login} keyboardShouldPersistTaps="handled">
-    <StatusBar backgroundColor={COLORS.primaryOpacity} />
+      <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
       <Spinner
         visible={selector.loading}
         textContent={'Mohon Tunggu ...'}

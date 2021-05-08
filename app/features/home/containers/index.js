@@ -6,7 +6,6 @@ import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import SplashScreen from 'react-native-splash-screen';
 import Icon from "react-native-vector-icons/MaterialIcons";
-import Config from "react-native-config";
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
@@ -18,7 +17,7 @@ import { ITEM_WIDTH, SPACING, width } from "../../../utils/theme";
 import { truncate, getInitials } from "../../../utils/stringUtils";
 import { KpnWideCard, KpnDivider, KpnCardProducts, KpnLifeStyleCard } from "../../../components";
 import LogoRounded from "../../../assets/images/svg/LogoRounded";
-import { navigationRef } from "../../../navigation/NavigationService";
+import { navigate, navigationRef } from "../../../navigation/NavigationService";
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
@@ -30,7 +29,7 @@ export default function Home({ navigation }) {
 
   const homeSelector = useSelector(state => state.homeReducer)
   const loginSelector = useSelector(state => state.loginReducer)
-  const apiKey = Config.API_ENCRYPTION;
+  const apiKey = "Config.API_ENCRYPTION;"
   const allProducts = homeSelector.allProducts;
 
   const menu = {
@@ -67,8 +66,16 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     SplashScreen.hide();
-    fetchAllHomeRequest()
+    fetchAllHomeRequest();
   }, [])
+
+  const onNavigateToDetail = (user_id, product_id) => {
+    const param = {
+      userId: user_id, 
+      productId: product_id
+    }
+    navigate("ProductDetail", param)
+  }
 
   const renderSkeleton = (name, size=1) => {
 
@@ -195,7 +202,9 @@ export default function Home({ navigation }) {
         refreshing={homeSelector.isLoading}
         onRefresh={onRefreshAll}
       />
-    }>
+    }
+    scrollEnabled={!homeSelector.isLoading}
+    >
         <StatusBar backgroundColor={COLORS.sans} />
         <Spinner
           visible={homeSelector.spinnerLoading}
@@ -265,11 +274,11 @@ export default function Home({ navigation }) {
                   }}
                   renderItem={({ item }) => (
                     <KpnCardProducts
-                      userId={loginSelector.user.user_id}
-                      productId={item.id}
+                      key={item.id}
                       rating={item.rating}
                       title={truncate(item.name, 30)}
                       image={item.avatar}
+                      onPress={() => onNavigateToDetail(loginSelector.user.user_id, item.id) }
                     />
                   )}
                   keyExtractor={(item) => item.id}
@@ -316,11 +325,11 @@ export default function Home({ navigation }) {
                 }}
                 renderItem={({ item }) => (
                   <KpnCardProducts
-                    userId={loginSelector.user.user_id}
-                    productId={item.id}
+                    key={item.id}
                     rating={item.rating}
                     title={truncate(item.name, 30)}
                     image={item.avatar}
+                    onPress={() => onNavigateToDetail(loginSelector.user.user_id, item.id)}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -375,11 +384,11 @@ export default function Home({ navigation }) {
                 }}
                 renderItem={({ item }) => (
                   <KpnCardProducts
-                    userId={loginSelector.user.user_id}
-                    productId={item.id}
+                    key={item.id}
                     rating={item.rating}
                     title={truncate(item.name, 30)}
                     image={item.avatar}
+                    onPress={() => onNavigateToDetail(loginSelector.user.user_id, item.id)}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -396,12 +405,11 @@ export default function Home({ navigation }) {
                 allProducts ? allProducts.map((data, index) => (
                   <View key={index}>
                     <KpnCardProducts
-                      userId={loginSelector.user.user_id}
-                      productId={data.id}
+                      key={data.id}
                       rating={data.rating}
                       title={truncate(data.name, 30)}
                       image={data.avatar}
-                      
+                      onPress={() => onNavigateToDetail(loginSelector.user.user_id, data.id)}
                     />
                   </View>
                 )) : null

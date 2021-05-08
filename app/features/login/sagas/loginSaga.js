@@ -17,6 +17,7 @@ import { getToken, setToken, storeData, removeToken, removeAllItems } from "../.
 import { trimString } from "../../../utils/stringUtils";
 
 import { HeaderAuth, Header } from '../../../services/header';
+import { navigate } from '../../../navigation/NavigationService';
 
 let loginState = state => state.loginReducer;
 
@@ -53,9 +54,8 @@ export default function* loginAsync() {
           //   console.log(value, "-----------VALUE---------------")
           // )).catch((e) => console.log(e))
 
-          console.log("------RESSSPOOONNSEEE-----------", _response.data.user);
-
           yield put(loginActions.clearForm())
+          yield put(loginActions.setToken(_response.data.token))
           yield put(loginActions.onLoginResponse(_response.data.user))
           yield put(loginActions.disableLoading())
         }else{

@@ -24,15 +24,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
-import { goBack } from "../../../navigation/NavigationService";
-import { searchProduct, imageData, noImage } from "../constants";
+import { goBack, navigate } from "../../../navigation/NavigationService";
+import { searchProduct, imageData } from "../constants";
 import { truncate } from "../../../utils/stringUtils";
 import { widthScreen, width } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
 import CommentProduct from '../components/CommentProduct';
 import { KpnCardProducts } from "../../../components";
 import * as detailProductAction from "../actions";
-import * as homeActions from "../../home/actions";
 
 const imageW = widthScreen;
 const imageH = imageW * 1;
@@ -52,21 +51,11 @@ export default function Home(props) {
   let scrollX = React.useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null)
   const keyExtractor = useCallback((_, index) => index.toString(), []);
-  const { mProducts, loading } = detailProductSelector;
+  const { mProducts } = detailProductSelector;
+  const loading = detailProductSelector.loading
   const debugginLoader = true;
-  // const onViewRef = useRef(({ viewableItems }) => {
-  //   setActiveIndex(viewableItems[0].index);
-  // });
 
   const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold : 50 });
-  const {
-    userId,
-    productId
-  } = props.route.params;
-  const param = {
-    user_id: userId,
-    product_id: productId
-  }
 
   const renderItem = useCallback(({ item }) => {
     return (
@@ -94,7 +83,6 @@ export default function Home(props) {
 
   const onPressCart = () => {
     Keyboard.dismiss();
-    console.log("Blured!")
   }
 
   const onPressBell = () => {
@@ -108,12 +96,13 @@ export default function Home(props) {
     setActiveIndex(true);
   }
 
-  const onBackPressed = () => {
+  const onBackPressed = async () => {
     if(isFocus){
       setIsFocus(false);
       Keyboard.dismiss();
     }else{
       goBack();
+      await dispatch(detailProductAction.setLoading(true));
     }
   }
 
@@ -128,12 +117,19 @@ export default function Home(props) {
   }
 
   const fetchProductDetail = async () => {
-    await dispatch(detailProductAction.showLoading());
+    const {
+      userId,
+      productId
+    } = props.route.params;
+    const param = {
+      user_id: userId,
+      product_id: productId
+    }
     await dispatch(detailProductAction.getDetailProduct(param));
   }
 
   useEffect(() => {
-    dispatch(homeActions.hideSpinnerLoadingShow());
+    fetchProductDetail()
     setDescription(truncate(mProducts.description, 200))
   }, []);
 
@@ -141,9 +137,11 @@ export default function Home(props) {
     <>
     <ScrollView style={styles.container} refreshControl={
       <RefreshControl
-        refreshing={homeSelector.isLoading}
+        refreshing={loading}
         onRefresh={fetchProductDetail}
-      />}>
+      />}
+      scrollEnabled={!loading}
+      >
       <StatusBar backgroundColor={COLORS.primaryOpacity} />
       {/* SearchBar */}
       <View style={styles.containerInput}>

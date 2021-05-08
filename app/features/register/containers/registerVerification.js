@@ -1,160 +1,174 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StatusBar, SafeAreaView, StyleSheet } from 'react-native';
-import { Checkbox, HelperText, Button } from 'react-native-paper';
+import { View, StatusBar, SafeAreaView, StyleSheet, Alert } from 'react-native';
+import { Snackbar } from 'react-native-paper';
 import { ScrollView } from 'react-native-gesture-handler';
-import BottomSheet from 'reanimated-bottom-sheet';
-import Animated from 'react-native-reanimated';
 import Spinner from "react-native-loading-spinner-overlay";
-import {
-    CodeField,
-    Cursor,
-    useBlurOnFulfill,
-    useClearByFocusCell,
-} from 'react-native-confirmation-code-field';
+import CodeInput from '@andreferi/react-native-confirmation-code-input';
 import { Input, Text } from 'react-native-elements';
 
 import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
-import SignUp from "../../../assets/images/svg/SignUp";
-import Error from "../../../assets/images/svg/Error";
+import Verification from "../../../assets/images/svg/Verification";
 import { KpnButton, KpnDivider, KpnInput } from "../../../components"
 import { navigate } from '../../../navigation/NavigationService';
 import * as registerActions from "../actions";
+import * as loginActions from "../../login/actions";
 
 const CELL_COUNT = 4;
 
 export default function RegisterVerification() {
-    const [checkedTerms, setCheckedTerms] = useState(false);
-    const [validatorErrorMsg, setValidatorErrorMsg] = useState('');
-    const [value, setValue] = useState('');
-    const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
-    const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-        value,
-        setValue,
-    });
-
+    const [timerCount, setTimer] = useState(60);
+    const [disabled, setDisabled] = useState(true);
+    const [onTimeRun, setOnTimeRun] = useState(true);
     
     const dispatch = useDispatch();
-    const fall = new Animated.Value(1);
-    const userDataSelector = useSelector(state => state.registerReducer.userData);
-    const bottomSheetErrorRef = useRef(null);
     const registerSelector = useSelector(state => state.registerReducer);
 
-    const checkValidation = () => {
-        if (value === '') {
-            setValidatorErrorMsg("Password tidak boleh kosong")
-            return false
-        } else {
-            return true
-        }
+    sendBackVerification = () => {
+        setTimer(60)
     }
+
+    const setCountDownTimer = () => {
+        setTimer(60)
+        let interval = setInterval(() => {
+            setTimer(lastTimerCount => {
+                lastTimerCount <= 1 && clearInterval(interval)
+                if (lastTimerCount == 1) {
+                    setDisabled(false)
+                }
+                return lastTimerCount - 1
+            })
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }
+
+    useEffect( () => {
+        if(onTimeRun){
+            setCountDownTimer()
+        }
+        dispatch(loginActions.setUsername(registerSelector.userData.email))
+        dispatch(loginActions.setPassword(registerSelector.userData.password))
+        console.log(registerSelector.userData.email, "PARAM2")
+        console.log(registerSelector.userData.password, "PARAM3")
+        // console.log(registerSelector, "SELECTOR USER -----")
+    },[]);
 
     const onRegistrationSubmit = () => {
-        const validator = checkValidation();
-        if (validator) {
-            // dispatch(registerActions.onChangeVerification(value))
-            dispatch(registerActions.setLoader(true, "loading"))
-            // navigate("RegisterNext")
-        } else {
-            bottomSheetErrorRef.current.snapTo(0);
-        }
+        console.log(registerSelector.address.province, "SELECTOR USER -----")
+        setDisabled(true)
+        setOnTimeRun(false)
+        setCountDownTimer()
     }
 
-    const renderHeader = () => (
-        <View style={styles.header}>
-            <View style={styles.panelHeader}>
-                <View style={styles.panelHandle} />
-            </View>
-        </View>
-    );
+    const checkCode = (isValid, code) => {
+        dispatch(registerActions.submitVerification(code))
+    }
 
-    const renderInner = () => (
-        <View style={styles.panel}>
-            <View style={{ alignItems: 'center' }}>
-                <Text style={styles.panelTitle}>Gagal Registrasi</Text>
-                <Error />
-                <Text style={styles.panelSubtitle}>{validatorErrorMsg}</Text>
-            </View>
-            <View style={styles.buttonGroup}>
-                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={() => bottomSheetErrorRef.current.snapTo(1)} style={styles.button} color={COLORS.sans}>Oke</Button>
-            </View>
-        </View>
-    );
+    const onDismissSnackBar = () => {
+        dispatch(registerActions.setError("", "", false, "", false))
+    }
+
+    const onPressAction = () => {
+        dispatch(registerActions.setError("", "", false, "", false))
+    }
 
     return (
         <>
             <ScrollView style={styles.container}>
-                <StatusBar backgroundColor={COLORS.primaryOpacity} />
+                <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
                 <Spinner
                     visible={registerSelector.loading}
                     textContent={'Mengirim Email Verifikasi ...'}
                     textStyle={{ color: COLORS.white }}
                 />
-                <View style={{ alignSelf: "center" }}>
-                    <SignUp />
+                <View style={{ alignSelf: "center", marginTop: 10 }}>
+                    <Verification />
                 </View>
                 <Text h4 style={{ justifyContent: 'center', alignSelf: "center" }}>Konfirmasi Kode Verifikasi</Text>
                 <View>
                     <SafeAreaView style={stylesLocal.root}>
-                        <CodeField
-                            ref={ref}
-                            caretHidden={false} // when users can't paste a text value, because context menu doesn't appear
-                            value={value}
-                            onChangeText={setValue}
-                            cellCount={CELL_COUNT}
-                            rootStyle={stylesLocal.codeFieldRoot}
-                            keyboardType="number-pad"
-                            textContentType="oneTimeCode"
-                            renderCell={({ index, symbol, isFocused }) => (
-                                <Text
-                                    key={index}
-                                    style={[stylesLocal.cell, isFocused && stylesLocal.focusCell]}
-                                    onLayout={getCellOnLayoutHandler(index)}>
-                                    {symbol || (isFocused ? <Cursor /> : null)}
-                                </Text>
-                            )}
+                        <Text style={stylesLocal.text}>Masukkan kode verifikasi</Text>
+                        <Text style={stylesLocal.text2}>Verifikasi dapat dikirim ulang dalam kurun {timerCount} detik</Text>
+                        {/* <Text style={stylesLocal.text3} onPress={sendBackVerification()} >{text}</Text> */}
+                        <CodeInput
+                            // ref="codeInputRef2"
+                            keyboardType="numeric"
+                            codeLength={4}
+                            // className='border-circle'
+                            className={'border-b'}
+                            compareWithCode='1234'
+                            autoFocus={true}
+                            ignoreCase={true}
+                            inputPosition='center'
+                            size={40}
+                            containerStyle={{ marginTop: 30 }}
+                            activeColor={COLORS.white}
+                            inactiveColor={COLORS.white}
+                            codeInputStyle={{ fontWeight: 'bold', fontSize: 20 }}
+                            onFulfill={(isValid, code) => checkCode(isValid, code)}
                         />
                     </SafeAreaView>
                 </View>
                 <KpnButton
-                    text="Berikutnya"
+                    text={`Kirim Ulang Verifikasi`}
                     isRounded
+                    disabled={disabled}
                     // disabled={!checkedTerms}
-                    style={{ marginTop: 10, opacity: 1, marginBottom: 10 }}
+                    style={{ marginTop: 10, opacity: 1, }}
                     color={COLORS.secondColor}
                     onPress={() => onRegistrationSubmit()}
                 />
             </ScrollView>
-            <BottomSheet
-                ref={bottomSheetErrorRef}
-                snapPoints={[360, 0]}
-                renderHeader={renderHeader}
-                renderContent={renderInner}
-                initialSnap={1}
-                callbackNode={fall}
-                enabledGestureInteraction={true}
-            />
+            <Snackbar
+                visible={registerSelector.errorMsg.visible}
+                onDismiss={onDismissSnackBar}
+                style={{ backgroundColor: registerSelector.errorMsg.error ? COLORS.red : COLORS.primaryOpacity, borderRadius: 16 }}
+                theme={{
+                    colors: {
+                        primary: COLORS.white,
+                        onBackground: COLORS.white,
+                        accent: COLORS.white,
+                    }
+                }}
+                action={{
+                    label: `${registerSelector.errorMsg.buttonMsg}`,
+                    onPress: () => onPressAction(),
+                }}>
+                {registerSelector.errorMsg.msg}
+            </Snackbar>
         </>
     );
 }
 
 const stylesLocal = StyleSheet.create({
-    root: { flex: 1, padding: 20 },
+    root: { 
+        padding: 20, 
+        backgroundColor: COLORS.primaryOpacity, 
+        borderRadius: 16,
+        marginHorizontal: 15, 
+    },
     title: { textAlign: 'center', fontSize: 30 },
     codeFieldRoot: { marginTop: 20 },
-    cell: {
-        width: 40,
-        height: 40,
-        lineHeight: 38,
-        fontSize: 24,
-        borderWidth: 2,
-        color: COLORS.primaryColor,
-        borderColor: COLORS.primaryColor,
-        textAlign: 'center',
-    },
     focusCell: {
         borderColor: COLORS.primaryColor,
     },
+    text: {
+        color: COLORS.white,
+        alignSelf: 'center',
+        fontWeight: 'bold'
+    },
+    text2: {
+        color: COLORS.white,
+        alignSelf: 'center',
+        textAlign: 'center',
+    },
+    text3: {
+        color: COLORS.blue,
+        alignSelf: 'center',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    }
 });

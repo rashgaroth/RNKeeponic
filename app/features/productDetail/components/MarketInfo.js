@@ -29,15 +29,15 @@ export default function MarketInfo(){
                     <Avatar.Image size={70} source={{ uri: image }} />
                 </View>
                 <View style={{ marginLeft: 10 }}>
-                    <View style={styles.rowChips,[{ marginLeft: 5 }]}>
-                        <Text>{marketSelector.market_name}</Text>
+                    <View style={styles.rowChips,[{ marginLeft: 5, top: 10 }]}>
+                        <Text style={{ fontWeight: "bold" }}>{marketSelector.market_name}</Text>
                         {/* <Chip onPress={() => console.log('Pressed')}>Bandung</Chip> */}
                     </View>
-                    <View style={[styles.rowChips,{ marginTop: 5 }]}>
+                    <View style={[styles.rowChips,{  }]}>
                         <Chip icon="star" onPress={() => console.log('Pressed')}>3.6</Chip>
                         <Chip onPress={() => console.log('Pressed')}>{marketSelector.followers + " " + "Pengikut"}</Chip>
                     </View>
-                    <Button 
+                    {/* <Button 
                     mode="outlined" 
                     color={COLORS.blue} 
                     style={{ 
@@ -47,19 +47,8 @@ export default function MarketInfo(){
                         marginTop: 5,
                         alignItems: 'center',
                         alignContent: 'center'
-                    }}>Detail Toko</Button>
+                    }}>Detail Toko</Button> */}
                 </View>
-                <Button
-                    mode="outlined"
-                    color={COLORS.primaryOpacity}
-                    style={{
-                        borderRadius: 16,
-                        borderColor: COLORS.primaryOpacity,
-                        height: 40,
-                        marginTop: 5,
-                        justifyContent: "flex-end",
-                        left: 100
-                    }}>Ikuti</Button>
             </View>
         </View>
     );
@@ -68,7 +57,7 @@ export default function MarketInfo(){
 const styles = StyleSheet.create({
     container: {
         marginHorizontal: 10,
-        marginTop: 10
+        marginVertical: 10
     },
     title: {
         fontWeight: "bold",
@@ -82,6 +71,9 @@ const styles = StyleSheet.create({
     },
     rowChips:{
         flexDirection: "row",
+        bottom: 0,
+        top: 20,
+        justifyContent: "flex-end",
         // flexWrap: "nowrap",
     }
 })

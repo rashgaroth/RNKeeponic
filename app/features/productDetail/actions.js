@@ -6,6 +6,13 @@ export const showLoading = () => {
     }
 }
 
+export const setLoading = (loader) => {
+    return {
+        type: types.SET_LOADING,
+        loader
+    }
+}
+
 export const hideLoading = () => {
     return {
         type: types.HIDE_LOADING

@@ -1,5 +1,4 @@
 apply plugin: "com.android.application"
-apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 apply plugin: 'com.google.gms.google-services'
 import com.android.build.OutputFile
 
@@ -217,10 +216,10 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 //    implementation project(path: ':@react-native-google-signin_google-signin')
     implementation project(':react-native-splash-screen')
-    implementation project(':react-native-config')
     implementation platform('com.google.firebase:firebase-bom:27.1.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation project(':react-native-push-notification')
+    implementation project(path: ':@react-native-picker_picker')
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
     }

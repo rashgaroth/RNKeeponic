@@ -1,35 +1,34 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { View, StatusBar, KeyboardAvoidingView } from 'react-native';
-import { Checkbox, HelperText, Button } from 'react-native-paper';
+import { Snackbar } from 'react-native-paper';
 import { ScrollView } from 'react-native-gesture-handler';
-import BottomSheet from 'reanimated-bottom-sheet';
-import Animated from 'react-native-reanimated';
+import Spinner from "react-native-loading-spinner-overlay";
 
 import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
-import { Input, Text } from 'react-native-elements';
+import { Text } from 'react-native-elements';
 import SignUp from "../../../assets/images/svg/SignUp";
-import Error from "../../../assets/images/svg/Error";
 import { KpnButton, KpnDivider, KpnInput } from "../../../components"
 import { navigate } from '../../../navigation/NavigationService';
 import * as registerActions from "../actions";
 
 export default function Home() {
-  const [checkedTerms, setCheckedTerms] = useState(false);
   const [validatorErrorMsg, setValidatorErrorMsg] = useState('');
+  const [errVisible, setErrVisible] = useState(false);
+  const [isError, setIsError] = useState(false);
   
   const dispatch = useDispatch();
-  const fall = new Animated.Value(1);
   const userDataSelector = useSelector(state => state.registerReducer.userData);
-  const bottomSheetErrorRef = useRef(null);
+  const registerSelector = useSelector(state => state.registerReducer);
 
   const checkValidation = () => {
-    if (userDataSelector.email === ''){
+    if (userDataSelector.email === '' || !userDataSelector.email.includes("@")){
       setValidatorErrorMsg("Email tidak Boleh kosong")
+      setIsError(true)
       return false
-    }else{      
+    }else{ 
       return true
     }
   }
@@ -46,40 +45,45 @@ export default function Home() {
       }
       navigate("RegisterPhoneName", param)
     }else{
-      bottomSheetErrorRef.current.snapTo(0);
+      setErrVisible(true)
     }
   }
 
-  useEffect(() => {
-    dispatch(registerActions.getAddress())
-  })
+  const onDismissSnackBar = () => {
+    setErrVisible(false)
+  }
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View style={styles.panelHeader}>
-        <View style={styles.panelHandle} />
-      </View>
-    </View>
-  );
-
-  const renderInner = () => (
-    <View style={styles.panel}>
-      <View style={{ alignItems: 'center' }}>
-        <Text style={styles.panelTitle}>Gagal Registrasi</Text>
-        <Error />
-        <Text style={styles.panelSubtitle}>{validatorErrorMsg}</Text>
-      </View>
-      <View style={styles.buttonGroup}>
-        <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={() => bottomSheetErrorRef.current.snapTo(1)} style={styles.button} color={COLORS.sans}>Oke</Button>
-      </View>
-    </View>
-  );
+  const onPressAction = () => {
+    setErrVisible(false)
+  }
 
   return (
     <>
+      <Snackbar
+        visible={errVisible}
+        onDismiss={onDismissSnackBar}
+        style={{ backgroundColor: isError ? COLORS.red : COLORS.primaryOpacity, borderRadius: 16 }}
+        theme={{
+          colors: {
+            primary: COLORS.white,
+            onBackground: COLORS.white,
+            accent: COLORS.white,
+          }
+        }}
+        action={{
+          label: `Oke`,
+          onPress: () => onPressAction(),
+        }}>
+        {validatorErrorMsg}
+      </Snackbar>
         <ScrollView style={styles.container}>
-          <StatusBar backgroundColor={COLORS.primaryOpacity} />
-          <View style={{ alignSelf: "center" }}>
+          <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
+          <Spinner
+            visible={registerSelector.loadingEmail}
+            textContent={'Mohon Tunggu ...'}
+            textStyle={{ color: COLORS.white }}
+          />
+          <View style={{ alignSelf: "center", marginTop: 10}}>
             <SignUp />
           </View>
           <Text h4 style={{ justifyContent: 'center', alignSelf: "center" }}>Daftarkan Emailmu</Text>
@@ -87,11 +91,11 @@ export default function Home() {
             <View style={styles.form}>
               <Text style={styles.inputTitle}>Email</Text>
               <KpnInput
-                label="email"
+                // label="email"
                 onChangeText={text => onChangeEmail(text)}
                 value={userDataSelector.email}
                 isError
-
+                keyboardType="email"
               />
             </View>
           </View>
@@ -104,15 +108,6 @@ export default function Home() {
             onPress={() => onRegistrationSubmit()}
           />
         </ScrollView>
-      <BottomSheet
-        ref={bottomSheetErrorRef}
-        snapPoints={[360, 0]}
-        renderHeader={renderHeader}
-        renderContent={renderInner}
-        initialSnap={1}
-        callbackNode={fall}
-        enabledGestureInteraction={true}
-      />
     </>
   );
 }

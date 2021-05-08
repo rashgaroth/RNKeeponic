@@ -65,3 +65,16 @@ export function disableLoading(){
     type: types.DISABLE_LOADING
   }
 }
+
+export function loginFromRegister(){
+  return {
+    type: types.LOGIN_FROM_REGISTER
+  }
+}
+
+export function setToken(data){
+  return{
+    type: types.SET_TOKEN,
+    data
+  }
+}

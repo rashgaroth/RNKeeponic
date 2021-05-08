@@ -4,8 +4,7 @@
  * un - username
  * pwd - password
  */
-import { all, takeEvery, put, select, call, fork } from 'redux-saga/effects';
-import { delay } from 'redux-saga';
+import { put, select, call } from 'redux-saga/effects';
 
 import API from '../../../api/ApiConstants';
 import * as apiService from "../../../services/index";
@@ -14,66 +13,65 @@ import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as detailProductAction from '../actions';
 
-import { HeaderAuth, Header } from '../../../services/header';
-import { getToken } from '../../../services/asyncStorage';
-import { noImage } from "../constants";
+import { HeaderAuth } from '../../../services/header';
 
-let detailState = state => state.detailProductReducer;
+let loginReducer = state => state.loginReducer;
 
 // Our worker Saga that logins the user
 export default function* getProductDetail(state) {
-    yield put( detailProductAction.showLoading() )
-    const stateDetail = yield select(detailState);
-    const token = yield getToken();
-    const product_id = state.payload.product_id;
-    const user_id = state.payload.user_id;
-    const url = API.BASE_URL +
-        API.ENDPOINT.GET_PRODUCT_DETAIL +
-        `?user_id=${user_id}&id_product=${product_id}`
+    yield put(detailProductAction.clearProduct())
+    const loginState = yield select(loginReducer);
+    const token = loginState.user.token
     if(token){
         try {
-            yield put(detailProductAction.clearProduct())
-
+            const product_id = state.payload.product_id;
+            const user_id = state.payload.user_id;
+            const url = API.BASE_URL +
+                API.ENDPOINT.GET_PRODUCT_DETAIL +
+                `?user_id=${user_id}&id_product=${product_id}`
+            console.log("beres url")
             const _response = yield call(
                 apiService.GET,
                 url,
                 HeaderAuth(token))
             if (_response.status === 200) {
-                yield put(detailProductAction.hideLoading());
                 // yield put(detailProductAction.onSuccessGetDetail(_response.data.data))
                 const payload = _response.data.data;
                 const market = _response.data.market[0];
+                console.log("success")
                 let avatar = payload.avatar;
                 let second_avatar = payload.second_avatar;
                 let third_avatar = payload.third_avatar;
                 let fourth_avatar = payload.fourth_avatar;
-
-                if(second_avatar === ""){
-                    second_avatar = noImage
-                }
-                if(third_avatar === ""){
-                    third_avatar = noImage
-                }
-                if(fourth_avatar === ""){
-                    fourth_avatar = noImage
-                }
-
                 const image = []
-                image.push(avatar, second_avatar, third_avatar, fourth_avatar);
-
+                // if (second_avatar === "" && third_avatar === "" && fourth_avatar === ""){
+                //     image.push(avatar);
+                // }
+                // if (second_avatar =! "") {
+                //     image.push(avatar, second_avatar);
+                // }
+                // if(third_avatar =! ""){
+                //     image.push(third_avatar, avatar)
+                // }
+                // if(fourth_avatar =! ""){
+                //     image.push(fourth_avatar, avatar)
+                // }
+                console.log("pushing image")
+                image.push(avatar)
+                console.log("selesai")
+                console.log("------------------------------------")
                 yield put(detailProductAction.setProductOnReducer(payload, image));
                 yield put(detailProductAction.setMarketOnReducer(market));
-                setTimeout(() => {
-                    console.log(stateDetail.mMarket.avatar, "avatar ---");
-                }, 7000);
+                yield put(detailProductAction.hideLoading());
             }
         } catch (error) {
-            console.log(error, "ERRORNYA")
+            yield put(detailProductAction.hideLoading());
             setTimeout(() => {
                 Alert.alert('Keeponic', "Error saat menerima data");
             }, 200);
         }
     }else{
+        yield put(detailProductAction.hideLoading());
         setTimeout(() => {
             Alert.alert('Keeponic', "Token Tidak Tersedia");
         }, 200);

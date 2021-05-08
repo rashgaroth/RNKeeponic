@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StatusBar, KeyboardAvoidingView } from 'react-native';
-import { Checkbox, HelperText, Button } from 'react-native-paper';
+import { Checkbox, Button, Snackbar } from 'react-native-paper';
 import { ScrollView } from 'react-native-gesture-handler';
-import BottomSheet from 'reanimated-bottom-sheet';
-import Animated from 'react-native-reanimated';
 import Spinner from "react-native-loading-spinner-overlay";
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,110 +9,101 @@ import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
 import { Input, Text } from 'react-native-elements';
-import SignUp from "../../../assets/images/svg/SignUp";
-import Error from "../../../assets/images/svg/Error";
+import Password from "../../../assets/images/svg/Password";
 import { KpnButton, KpnDivider, KpnInput } from "../../../components"
 import { navigate } from '../../../navigation/NavigationService';
 import * as registerActions from "../actions";
+import PasswordForm from "../components/passwordForm";
 
 export default function RegisterPassword() {
     const [checkedTerms, setCheckedTerms] = useState(false);
     const [validatorErrorMsg, setValidatorErrorMsg] = useState('');
+    const [errVisible, setErrVisible] = useState(false);
+    const [isError, setIsError] = useState(false);
 
     const dispatch = useDispatch();
-    const fall = new Animated.Value(1);
     const userDataSelector = useSelector(state => state.registerReducer.userData);
-    const bottomSheetErrorRef = useRef(null);
     const registerSelector = useSelector(state => state.registerReducer);
+    const errMsg = useSelector(state => state.registerReducer.errorMsg);
 
     const checkValidation = () => {
         if (userDataSelector.password === '') {
-            setValidatorErrorMsg("Password tidak boleh kosong")
+            setValidatorErrorMsg("Password Tidak Boleh Kosong")
+            setIsError(true)
             return false
-        } else if (userDataSelector.confirmationPassword != userDataSelector.password || userDataSelector.confirmationPassword === '') {
-            setValidatorErrorMsg("Password tidak sama, atau kosong")
+        } else if (userDataSelector.confirmationPassword != userDataSelector.password) {
+            setValidatorErrorMsg("Password Tidak Sama")
+            setIsError(true)
+            return false
+        } else if (userDataSelector.confirmationPassword === '') {
+            setValidatorErrorMsg("Password Konfirmasi Tidak Boleh Kosong")
+            setIsError(true)
+            return false
+        } else if (userDataSelector.confirmationPassword.length <= 8){
+            setValidatorErrorMsg("Minimum Password yang dimasukkan adalah 8 huruf")
+            setIsError(true)
             return false
         } else {
             return true
         }
     }
 
-    const onChangePassword = (t) => {
-        dispatch(registerActions.onChangePassword(t))
+    const onDismissSnackBar = () => {
+        setErrVisible(false)
     }
 
-    const onChangeConfirmation = (t) => {
-        dispatch(registerActions.onChangeConfirmationPassword(t))
-    }
-
-    const onRegistrationSubmit = () => {
-        const validator = checkValidation();
-        if (validator) {
-            // navigate("RegisterVerification")
-            dispatch(registerActions.submitRegistration())
-        } else {
-            bottomSheetErrorRef.current.snapTo(0);
+    const onPressAction = () => {
+        if (registerSelector.errorMsg.field === "email"){
+            navigate("Register")
+        }else{
+            setErrVisible(true)
         }
     }
 
-    const renderHeader = () => (
-        <View style={styles.header}>
-            <View style={styles.panelHeader}>
-                <View style={styles.panelHandle} />
-            </View>
-        </View>
-    );
+    const hasError = () => {
+        if (errMsg.error) {
+            if (registerSelector.errorType === "email") {
+                setValidatorErrorMsg(`Email ${registerSelector.userData.email} Telah Terdaftar`)
+                setIsError(true)
+                setErrVisible(true)
+            }
+        }
+    }
 
-    const renderInner = () => (
-        <View style={styles.panel}>
-            <View style={{ alignItems: 'center' }}>
-                <Text style={styles.panelTitle}>Gagal Registrasi</Text>
-                <Error />
-                <Text style={styles.panelSubtitle}>{validatorErrorMsg}</Text>
-            </View>
-            <View style={styles.buttonGroup}>
-                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={() => bottomSheetErrorRef.current.snapTo(1)} style={styles.button} color={COLORS.sans}>Oke</Button>
-            </View>
-        </View>
-    );
+    useEffect(() => {
+        console.log(errMsg)
+        console.log(registerSelector.userData)
+        
+        console.log("Use effect will closed")
+        
+    }, [null])
+
+    const onRegistrationSubmit = async () => {
+        const validator = checkValidation();
+        if (validator) {
+            dispatch(registerActions.setLoader(true, "loadingPassword"))
+            await dispatch(registerActions.getAddress())
+            await dispatch(registerActions.submitRegistration())
+        }else{
+            setErrVisible(true)
+        }
+    }
 
     return (
         <>
             <ScrollView style={styles.container}>
-                <StatusBar backgroundColor={COLORS.primaryOpacity} />
+                <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
                 <Spinner
                     visible={registerSelector.loadingPassword}
                     textContent={'Mengirim Email Verifikasi ...'}
                     textStyle={{ color: COLORS.white }}
                 />
-                <View style={{ alignSelf: "center" }}>
-                    <SignUp />
+                <View style={{ alignSelf: "center", marginTop: 10 }}>
+                    <Password />
                 </View>
                 <Text h4 style={{ justifyContent: 'center', alignSelf: "center" }}>Konfirmasi Passwordmu</Text>
                 <View>
-                    <View style={styles.form}>
-                        <Text style={styles.inputTitle}>Password</Text>
-                        <KpnInput
-                            label="password"
-                            onChangeText={text => onChangePassword(text)}
-                            value={userDataSelector.password}
-                            style={styles.input}
-                            isSecure
-                            isPassword
-                        />
-                    </View>
-                    <View style={styles.form}>
-                        <Text style={styles.inputTitle}>Konfirmasi Password</Text>
-                        <KpnInput
-                            label="konfirmasi password"
-                            onChangeText={text => onChangeConfirmation(text)}
-                            value={userDataSelector.confirmationPassword}
-                            // isError
-                            style={styles.input}
-                            isPassword
-                            isSecure
-                        />
-                    </View>
+                    <PasswordForm />
                     <View style={styles.terms}>
                         <Checkbox
                             status={checkedTerms ? 'checked' : 'unchecked'}
@@ -135,15 +124,23 @@ export default function RegisterPassword() {
                     onPress={() => onRegistrationSubmit()}
                 />
             </ScrollView>
-            <BottomSheet
-                ref={bottomSheetErrorRef}
-                snapPoints={[360, 0]}
-                renderHeader={renderHeader}
-                renderContent={renderInner}
-                initialSnap={1}
-                callbackNode={fall}
-                enabledGestureInteraction={true}
-            />
+            <Snackbar
+                visible={errVisible}
+                onDismiss={onDismissSnackBar}
+                style={{ backgroundColor: isError ? COLORS.red : COLORS.primaryOpacity, borderRadius: 16 }}
+                theme={{
+                    colors: {
+                        primary: COLORS.white,
+                        onBackground: COLORS.white,
+                        accent: COLORS.white,
+                    }
+                }}
+                action={{
+                    label: `Oke`,
+                    onPress: () => onPressAction(),
+                }}>
+                {validatorErrorMsg}
+            </Snackbar>
         </>
     );
 }

@@ -20,14 +20,14 @@ const BottomNavTabs = () => {
     const [routes] = React.useState([
         { key: 'beranda', title: 'Beranda', icon: 'home', color: COLORS.white },
         { key: 'pesanan', title: 'Pesanan', icon: 'cart', color: COLORS.white },
-        { key: 'cari', title: 'Cari', icon: 'feature-search-outline', color: COLORS.white },
+        { key: 'artikel', title: 'Artikel', icon: 'feature-search-outline', color: COLORS.white },
         { key: 'akun', title: 'Akun', icon: 'account', color: COLORS.white }
     ]);
 
     const renderScene = BottomNavigation.SceneMap({
         beranda: HomeRoute,
         pesanan: OrderRoute,
-        cari: SearchRoute,
+        artikel: SearchRoute,
         akun: ProfileRoute
     });
 

@@ -8,9 +8,11 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/es/integration/react';
 import { configureFonts, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { enableScreens } from 'react-native-screens';
 
 import Navigator from 'app/navigation';
 import configureStore from 'app/store';
+enableScreens(false);
 const { persistor, store } = configureStore();
 
 const theme = {
@@ -18,10 +20,7 @@ const theme = {
   roundness: 2,
   colors: {
     ...DefaultTheme.colors,
-    // primary: '#3498db',
-    // accent: '#f1c40f',
   },
-  // fonts: configureFonts(fontConfig)
 };
 
 export default function Entrypoint() {

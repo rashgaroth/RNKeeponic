@@ -15,8 +15,10 @@ const initialState = {
     user_id: null,
     email: "",
     name: "",
-    is_email_validated: null
+    is_email_validated: null,
+    token: ""
   },
+  isRegistrant: false
 };
 
 export const loginReducer = createReducer(initialState, {
@@ -69,14 +71,42 @@ export const loginReducer = createReducer(initialState, {
   [types.CLEAR_FORM](state, action) {
     return {
       ...state,
-      passwordForm: "",
-      emailForm: ""
+      isLoggedIn: false,
+      password: null,
+      email: "",
+      emailForm: null,
+      passwordForm: null,
+      loading: false,
+      user: {
+        ...state.user,
+        user_id: null,
+        email: "",
+        name: "",
+        is_email_validated: null,
+        token: ""
+      },
+      isRegistrant: false
     }
   },
   [types.DISABLE_LOADING](state, action) {
     return {
       ...state,
       loading: false,
+    }
+  },
+  [types.LOGIN_FROM_REGISTER](state, action) {
+    return {
+      ...state,
+      isRegistrant: true,
+    }
+  },
+  [types.SET_TOKEN](state, action) {
+    return {
+      ...state,
+      user:{
+        ...state.user,
+        token: action.data
+      }
     }
   },
 });

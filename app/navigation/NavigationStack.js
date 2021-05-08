@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useSelector } from 'react-redux';
 
 import { navigationRef } from './NavigationService';
+import { enableScreens } from 'react-native-screens';
 
 import { 
   BottomNavigationTab, 
@@ -23,8 +24,8 @@ import {
 } from "../features";
 
 import { COLORS } from '../utils/colors';
-import FBSearchBar from '../features/productDetail/containers';
 
+enableScreens(false);
 const Stack = createStackNavigator();
 
 const homeOptions = {
@@ -95,7 +96,8 @@ function App() {
           name="Register"
           component={Register}
           options={{
-            headerShown: false
+            headerShown: true,
+            title: "Masukkan Email"
           }}
         />
         <Stack.Screen
@@ -109,21 +111,24 @@ function App() {
           name="RegisterPassword"
           component={RegisterPassword}
           options={{
-            headerShown: false
+            headerShown: true,
+            title: "Masukkan Password"
           }}
         />
         <Stack.Screen
           name="RegisterPhoneName"
           component={RegisterPhoneName}
           options={{
-            headerShown: false
+            headerShown: true,
+            title: "Masukkan Nomor Telepon"
           }}
         />
         <Stack.Screen
           name="RegisterVerification"
           component={RegisterVerification}
           options={{
-            headerShown: false
+            headerShown: true,
+            title: "Masukkan Kode Verifikasi"
           }}
         />
       </Stack.Navigator>

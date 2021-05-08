@@ -1,9 +1,11 @@
-import React, { useState, useRef,} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
     View, 
     StyleSheet,
     ScrollView,
     Alert,
+    BackHandler,
+    StatusBar
 } from 'react-native';
 import {
     Text,
@@ -11,6 +13,7 @@ import {
  } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
 import { useDispatch, useSelector } from 'react-redux';
+import Spinner from "react-native-loading-spinner-overlay";
 
 import { KpnInput, KpnErrorDialog, KpnButton } from "../../../components"
 import City from "../../../assets/images/svg/City";
@@ -29,6 +32,7 @@ export default function RegisterNext(props){
     
     const dispatch = useDispatch();
     const addressSelector = useSelector(state => state.registerReducer.address);
+    const registerSelector = useSelector(state => state.registerReducer);
     const bottomSheetRef = (ref) => useRef(ref);
 
     const onChangePicker = (data, id) => {
@@ -36,9 +40,11 @@ export default function RegisterNext(props){
             setCity(null)
             setSelectedProvince(data)
             setProvinceId(data)
-            let city = addressSelector.city.filter(x => x.province_id === provinceId)
-            console.log(city, "KOTA")
-            setCity(city)
+            if(addressSelector.city){
+                let city = addressSelector.city.filter(x => x.province_id === provinceId)
+                console.log(city, "KOTA")
+                setCity(city)
+            }
         }catch(err){
             console.log(err)
         }
@@ -56,32 +62,58 @@ export default function RegisterNext(props){
 
     const onChangeDetail = (data) => {
         setDetail(data)
+        dispatch(registerActions.onChangeDetailAddress(data))
+        console.log(registerSelector.userData)
     }
 
     const onChangePostalCode = (data) => {
         setPostalCode(data)
+        dispatch(registerActions.onChangePostalCode(data))
     }
 
     const onChangeSubdist = (data) => {
+        console.log(data, "SUBDIST");
         setSubdistrict(data)
+        dispatch(registerActions.onChangeSubdistrict(data))
     }
 
     const onNextRegistration = (data) => {
-        const { 
-        email,
-        password,
-        phone,
-        name
-        } = props.route.params;
-
-        console.log(email, password)
-        console.log(phone, name)
+        dispatch(registerActions.submitAddress())
     }
+
+    useEffect( () => {
+        console.log("hit use Effect!")
+        dispatch(registerActions.getAddress())
+        const backAction = () => {
+            Alert.alert("Keeponic", "Batalkan Registrasi ?", [
+                {
+                    text: "Cancel",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "YES", onPress: () => BackHandler.exitApp() }
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, [null])
 
     return (
         <>
         <ScrollView style={{ backgroundColor: COLORS.white }}>
-            <View style={{ alignSelf: 'center'}}>
+            <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
+            <Spinner
+                visible={registerSelector.loadingNext}
+                textContent={'Mohon Tunggu ...'}
+                textStyle={{ color: COLORS.white }}
+            />
+            <View style={{ alignSelf: "center", marginTop: 10}}>
                 <City />
             </View>
             <View style={{ alignSelf: 'center'}}>
@@ -94,9 +126,9 @@ export default function RegisterNext(props){
                     onValueChange={(itemValue, itemIndex) =>
                         onChangePicker(itemValue, itemIndex)
                     }>
-                    { addressSelector.province.map(( element, index ) => (
+                    { addressSelector.province ? addressSelector.province.map(( element, index ) => (
                         <Picker.Item key={index} label={element.province_name} value={element.province_id} />
-                    )) }
+                    )) : null }
                 </Picker>
                 { 
                     city ? 
@@ -135,14 +167,14 @@ export default function RegisterNext(props){
                         <>
                             <Text style={{ marginLeft: 10, fontWeight: 'bold' }}>Detail Alamat</Text>
                             <KpnInput
-                                label="Detail Alamat"
+                                // label="Detail Alamat"
                                 onChangeText={text => onChangeDetail(text)}
                                 value={detail}
                                 style={{ marginHorizontal: 10}}
                             />
                             <Text style={{ marginLeft: 10, fontWeight: 'bold', marginTop: 10 }}>Kode Pos</Text>
                             <KpnInput
-                                label="Kode Pos"
+                                // label="Kode Pos"
                                 onChangeText={text => onChangePostalCode(text)}
                                 value={postalCode}
                                 style={{ marginHorizontal: 10 }}

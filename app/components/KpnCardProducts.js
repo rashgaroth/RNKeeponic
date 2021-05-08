@@ -3,28 +3,7 @@ import { Avatar, Button, Card, Title, Paragraph, Text } from 'react-native-paper
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
-import { navigate } from "../navigation/NavigationService";
-import { LiquidLike } from 'react-native-animated-pagination-dots';
-import * as detailProductAction from "../features/productDetail/actions";
-import * as homeActions from "../features/home/actions";
-import { useDispatch } from "react-redux";
-const KpnCardProducts = ({rating, title, price, image, userId, productId}) => {
-    
-    const dispatch = useDispatch();
-
-    const param = {
-        user_id: userId,
-        product_id: productId
-    }
-
-    const onNavigate = () => {
-        dispatch(homeActions.spinnerLoadingShow())
-        dispatch(detailProductAction.showLoading())
-        dispatch(detailProductAction.clearProduct())
-        dispatch(detailProductAction.getDetailProduct(param))
-        navigate("ProductDetail", { userId, productId })
-    }
-
+const KpnCardProducts = ({rating, title, price, image, userId, productId, onPress}) => {
     const totalRating = 5;
     const Cart = props => <Avatar.Icon 
     {...props} 
@@ -42,7 +21,7 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId}) => {
             <Card.Cover style={styles.cardCover} source={{ uri: image || 'https://picsum.photos/200' }} />
             <Card.Content style={styles.cardContent}>
                 <View style={styles.cardTitle}>
-                    <TouchableOpacity onPress={() => onNavigate()}>
+                    <TouchableOpacity onPress={onPress}>
                         <Paragraph>{title || 'Card Paragraph'}</Paragraph>
                     </TouchableOpacity>
                 </View>

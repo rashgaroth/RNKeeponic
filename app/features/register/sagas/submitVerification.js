@@ -13,30 +13,46 @@ import * as apiService from "../../../services/index";
 import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as registerActions from '../actions';
-import { getToken, setToken, storeData, removeToken, removeAllItems } from "../../../services/asyncStorage";
-import { trimString } from "../../../utils/stringUtils";
 
-import { HeaderAuth, Header } from '../../../services/header';
+import { Header } from '../../../services/header';
+import { navigate } from '../../../navigation/NavigationService';
 
 let registerState = state => state.registerReducer;
 // Our worker Saga that logins the user
-export default function* submitRegistration() {
+export default function* submitRegistration(stateSagas) {
     const state = yield select(registerState)
+    yield put(registerActions.setLoader(true, "loading"))
     try {
+        const param = {
+            registrant_id: state.registrantData.id,
+            code:stateSagas.data
+        }
         const _response = yield call(
-            apiService.GET,
-            API.BASE_URL + API.ENDPOINT.REGISTER + "/getAddress",
+            apiService.POST,
+            API.BASE_URL + API.ENDPOINT.REGISTER + "/confirm",
+            param,
             Header());
         if (_response.status === 200) {
             const { data } = _response.data;
-            yield put(registerActions.getAddressSuccess(data.city, data.province, data.subdistrict))
+            setTimeout(() => {
+                console.log(param, "PARAM")
+                console.log(_response.data, "PARAM")
+            }, 5000);
+            yield put(registerActions.onSuccessVerification(data))
+            yield put(registerActions.setLoader(false, "loading"))
+            navigate("RegisterNext")
+        }else {
+            setTimeout(() => {
+                console.log(param, "PARAM")
+                console.log(_response.data, "PARAM")
+            }, 5000);
+            yield put(registerActions.setLoader(false, "loading"))
+            if(_response.data.msg.includes("code")){
+                Alert.alert('Keeponic', `Kode Verifikasi Salah`);
+            }
         }
-        setTimeout(() => {
-            console.log(state.address)
-        }, 5000);
     } catch (error) {
-        setTimeout(() => {
-            Alert.alert('Keeponic Login', error.message);
-        }, 200);
+        console.log(error)
+        yield put(registerActions.setLoader(false, "loading"))
     }
 }

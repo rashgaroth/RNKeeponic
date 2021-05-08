@@ -5,7 +5,7 @@ import createReducer from 'app/lib/createReducer';
 import * as types from "./types";
 
 const initialState = {
-    isLoading: false,
+    isLoading: true,
     spinnerLoading: false,
     isSkeleton: false,
     isError: false,

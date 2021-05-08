@@ -23,18 +23,29 @@ let registerState = state => state.registerReducer;
 export default function* registSagas() {
     const state = yield select(registerState)
     try {
+        yield put(registerActions.setLoader(true, "loadingPassword"))
+        yield put(registerActions.setLoader(true, "loadingNext"))
+        console.log("---get address")
         const _response = yield call(
              apiService.GET,
              API.BASE_URL + API.ENDPOINT.REGISTER + "/getAddress", 
              Header());
+             yield put(registerActions.setClearAddress())
         if(_response.status === 200){
             const { data } = _response.data;
+            console.log(data.province);
             yield put(registerActions.getAddressSuccess(data.city, data.province, data.subdistrict))
+            yield put(registerActions.setLoader(false, "loadingPassword"))
+        }else{
+            setTimeout(() => {
+                Alert.alert('Keeponic Login', "Error Mengambil Data Alamat");
+            }, 500);
         }
-        // setTimeout(() => {
-        //     console.log(state.address)
-        // }, 5000);
+        yield put(registerActions.setLoader(false, "loadingPassword"))
+        yield put(registerActions.setLoader(false, "loadingNext"))
     } catch (error) {
+        yield put(registerActions.setLoader(false, "loadingPassword"))
+        yield put(registerActions.setLoader(false, "loadingNext"))
         setTimeout(() => {
             Alert.alert('Keeponic Login', error.message);
         }, 200);
