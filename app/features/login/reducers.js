@@ -6,13 +6,16 @@ import * as types from './types';
 
 const initialState = {
   isLoggedIn: false,
+  isNewUser: true,
+  isUserRegistered: false,
+  isUserAlreadyExplore: false,
   password: null,
   email: "",
   emailForm: null,
   passwordForm:null,
   loading: false,
   user:{
-    user_id: null,
+    user_id: 0,
     email: "",
     name: "",
     is_email_validated: null,
@@ -33,12 +36,33 @@ export const loginReducer = createReducer(initialState, {
       ...state,
       user_id: action.user_id,
       isLoggedIn: true,
+      isNewUser: false,
+      isUserRegistered: true,
+      isUserAlreadyExplore: true,
       user:{
         ...state.user,
         user_id: action.response.user_id,
         email: action.response.email,
         name: action.response.name,
         is_email_validated: action.response.is_email_validated,
+      }
+    };
+  },
+  [types.LOGIN_GOOGLE_AUTH_SUCCESS](state, action) {
+    return {
+      ...state,
+      user_id: action.data.user.user_id,
+      isLoggedIn: true,
+      isNewUser: false,
+      isUserRegistered: true,
+      isUserAlreadyExplore: true,
+      user: {
+        ...state.user,
+        user_id: action.data.user.user_id,
+        email: action.data.user.email,
+        name: action.data.user.name,
+        is_email_validated: action.data.user.is_email_validated,
+        token: action.data.token
       }
     };
   },
@@ -107,6 +131,30 @@ export const loginReducer = createReducer(initialState, {
         ...state.user,
         token: action.data
       }
+    }
+  },
+  [types.SET_NEW_USER](state, action) {
+    return {
+      ...state,
+      isNewUser: action.data
+    }
+  },
+  [types.SET_USER_REGISTERED](state, action) {
+    return {
+      ...state,
+      isUserRegistered: action.data
+    }
+  },
+  [types.SET_EXPLORE](state, action) {
+    return {
+      ...state,
+      isLoggedIn: true
+    }
+  },
+  [types.SET_USER_ALREADY_EXPLORED](state, action) {
+    return {
+      ...state,
+      isUserAlreadyExplore: action.data
     }
   },
 });

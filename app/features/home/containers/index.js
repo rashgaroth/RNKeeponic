@@ -24,7 +24,6 @@ export default function Home({ navigation }) {
   // const onLogout = () => dispatch(loginActions.logOut());
   const [selectedId, setSelectedId] = useState(null);
   const [name, setName] = useState(null);
-  const [userId, setUserId] = useState('');
   const load = true
 
   const homeSelector = useSelector(state => state.homeReducer)
@@ -54,10 +53,14 @@ export default function Home({ navigation }) {
   
   async function fetchAllHomeRequest(){
       dispatch(homeAction.showLoading())
-      dispatch(homeAction.getUserProfile(apiKey, loginSelector.user.user_id))
-      dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0))
-      setUserId(loginSelector.user.user_id)
-      setName(loginSelector.user.name)
+      if(loginSelector.isUserRegistered){
+        await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0))
+        await dispatch(homeAction.getUserProfile(apiKey, loginSelector.user.user_id))
+        setName(loginSelector.user.name)
+      }else{
+        await dispatch(homeAction.requestHome(name, 0, 0))
+        setName("Kamu")
+      }
   }
 
   const onRefreshAll = async () => {
@@ -71,7 +74,7 @@ export default function Home({ navigation }) {
 
   const onNavigateToDetail = (user_id, product_id) => {
     const param = {
-      userId: user_id, 
+      // userId: user_id, 
       productId: product_id
     }
     navigate("ProductDetail", param)
@@ -278,7 +281,7 @@ export default function Home({ navigation }) {
                       rating={item.rating}
                       title={truncate(item.name, 30)}
                       image={item.avatar}
-                      onPress={() => onNavigateToDetail(loginSelector.user.user_id, item.id) }
+                      onPress={() => onNavigateToDetail(0, item.id) }
                     />
                   )}
                   keyExtractor={(item) => item.id}
@@ -329,7 +332,7 @@ export default function Home({ navigation }) {
                     rating={item.rating}
                     title={truncate(item.name, 30)}
                     image={item.avatar}
-                    onPress={() => onNavigateToDetail(loginSelector.user.user_id, item.id)}
+                    onPress={() => onNavigateToDetail(0, item.id)}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -388,7 +391,7 @@ export default function Home({ navigation }) {
                     rating={item.rating}
                     title={truncate(item.name, 30)}
                     image={item.avatar}
-                    onPress={() => onNavigateToDetail(loginSelector.user.user_id, item.id)}
+                    onPress={() => onNavigateToDetail(0, item.id)}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -409,7 +412,7 @@ export default function Home({ navigation }) {
                       rating={data.rating}
                       title={truncate(data.name, 30)}
                       image={data.avatar}
-                      onPress={() => onNavigateToDetail(loginSelector.user.user_id, data.id)}
+                      onPress={() => onNavigateToDetail(0, data.id)}
                     />
                   </View>
                 )) : null

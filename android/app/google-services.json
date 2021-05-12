@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "1069012109484",
-    "project_id": "rnkeeponic",
-    "storage_bucket": "rnkeeponic.appspot.com"
+    "project_number": "871007962536",
+    "project_id": "androidkeeponicapp",
+    "storage_bucket": "androidkeeponicapp.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1069012109484:android:ad3eda816bb6aa1f353709",
+        "mobilesdk_app_id": "1:871007962536:android:9225df6fc61ce49432c99d",
         "android_client_info": {
-          "package_name": "com.rnboilerplate"
+          "package_name": "com.keeponicrn"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1069012109484-kev0e82rm5qi0tlf5eq7ppccjau3kjrs.apps.googleusercontent.com",
+          "client_id": "871007962536-64pffm2j2ssndagibn0o6g4704k4t9fj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.rnboilerplate",
-            "certificate_hash": "cf018110849cd38c5a873164f1c59d663d413646"
+            "package_name": "com.keeponicrn",
+            "certificate_hash": "648a4c1efafb32edb4cc5d7868996ca1603ec6e0"
           }
         },
         {
-          "client_id": "1069012109484-fn1u4u6j2naokpql3867tu464dugu51o.apps.googleusercontent.com",
+          "client_id": "871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDauxWzMc_s4sKeEPYDsToTFmi96ClwqE8"
+          "current_key": "AIzaSyD2yZpfTEXhISl5OwCkzA-pzSrPI1CCAgc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1069012109484-fn1u4u6j2naokpql3867tu464dugu51o.apps.googleusercontent.com",
+              "client_id": "871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

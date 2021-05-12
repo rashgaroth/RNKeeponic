@@ -9,11 +9,13 @@ const KpnButton = ({text, icon, onPress, mode, key, color, isRounded, onLongPres
         key={key || null}
         style={isRounded ? {...styles.Button, ...style} : {...style}}
         icon={icon || null}
-        theme={theme}
+        theme={theme || {
+            colors: COLORS.white,
+        }}
         uppercase
         disabled={disabled ? true : false}
         onLongPress={onLongPress}
-        mode={mode || "contained"} 
+        mode={mode || "contained"}
         color={color || COLORS.secondColor}
         onPress={onPress}>
             {text}

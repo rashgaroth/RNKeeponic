@@ -11,6 +11,7 @@ import RegisterNext from "./register/containers/registerNext";
 import RegisterPassword from "./register/containers/registerPassword";
 import RegisterPhoneName from "./register/containers/registerPhoneName";
 import RegisterVerification from "./register/containers/registerVerification";
+import WelcomePage from "./login/containers/welcomePage";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -28,5 +29,6 @@ export {
     RegisterNext,
     RegisterPassword,
     RegisterPhoneName,
-    RegisterVerification
+    RegisterVerification,
+    WelcomePage
 }

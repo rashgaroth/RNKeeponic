@@ -4,7 +4,7 @@
  *
  */
 import { all } from 'redux-saga/effects';
-import { loginSagas } from 'app/features/login/sagas';
+import { loginSagas, loginGoogleSagas } from 'app/features/login/sagas';
 import { homeSagas, profileSagas } from 'app/features/home/sagas';
 import { getDetailProduct } from 'app/features/productDetail/sagas';
 import { registerSagas } from 'app/features/register/sagas';
@@ -23,4 +23,5 @@ export default function* rootSaga() {
   yield all([...submitRegistrationSagas]);
   yield all([...submitVerificationSagas]);
   yield all([...submitAddress]);
+  yield all([...loginGoogleSagas]);
 }

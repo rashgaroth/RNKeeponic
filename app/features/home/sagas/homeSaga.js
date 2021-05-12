@@ -21,17 +21,19 @@ import { HeaderAuth, Header } from '../../../services/header';
 import { navigate } from "../../../navigation/NavigationService";
 import * as logger from "../../../utils/logging";
 
-let loginState = state => state.homeReducer;
+let homeState = state => state.homeReducer;
+let loginState = state => state.loginReducer;
 
 export default function* homeGetProducts(state){
 
     // state home
-    const getHomeState = yield select(loginState)
-    const token = yield getToken()
+    const getHomeState = yield select(homeState)
+    const getLoginState = yield select(loginState)
+    const token = getLoginState.user.token
 
     try {
         yield put(homeAction.showLoading())
-        if(token){
+        // if(token){
             console.log(token, "----TOKEN----")
             const products = getHomeState.products;
             if(products){
@@ -41,24 +43,16 @@ export default function* homeGetProducts(state){
                 }
             }
 
-            const _response = yield call(apiService.GET,
-                API.BASE_URL +
-                API.ENDPOINT.GET_PRODUCT +
-                `?user_id=${state.userId}&page=${state.page}&size=5`,
-                HeaderAuth(token)
-            )
-
             const [productList, allProduct] = yield all([
                 call(apiService.GET,
                     API.BASE_URL +
                     API.ENDPOINT.GET_PRODUCT +
-                    `?user_id=${state.userId}&page=${state.page}&size=5`,
+                    `?page=${state.page}&size=5`,
                     HeaderAuth(token)
                 ),
                 call(apiService.GET,
                     API.BASE_URL +
-                    API.ENDPOINT.GET_PRODUCT +
-                    `?user_id=${state.userId}`,
+                    API.ENDPOINT.GET_PRODUCT,
                     HeaderAuth(token)
                 )
             ])
@@ -73,24 +67,21 @@ export default function* homeGetProducts(state){
                 }else{
                     yield put(homeAction.hideLoading())
                 }
-                setTimeout(() => {
-                    logger.loggingInfo(getHomeState.allProducts, 'All products');
-                }, 7000);
             }else{
                 yield put(homeAction.hideLoading())
                 // yield put(loginAction.logOut())
-                console.log(_response);
                 setTimeout(() => {
-                    Alert.alert('Keeponic', "Sesi Sudah Habis, Silahkan Login Kembali :)");
+                    Alert.alert('Keeponic', "Tidak Dapat Memuat Data Produk :)");
                 }, 200);
+                yield put(loginAction.logOut())
             }
-
-        }else{
-            yield put(homeAction.hideLoading())
-            setTimeout(() => {
-                Alert.alert('Keeponic', "Sesi anda sudah habis, silahkan Login kembali :)");
-            }, 200);
-        }
+        // }else{
+        //     yield put(homeAction.hideLoading())
+        //     setTimeout(() => {
+        //         Alert.alert('Keeponic', "Sesi anda sudah habis, silahkan Login kembali :)");
+        //     }, 200);
+        //     yield put(loginAction.logOut())
+        // }
     } catch (error) {
         yield put(homeAction.hideLoading())
         console.log("INI CATCH", error.message)

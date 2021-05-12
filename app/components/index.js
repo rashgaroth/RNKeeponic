@@ -6,6 +6,8 @@ import KpnCardProducts from "./KpnCardProducts"
 import KpnLifeStyleCard from "./KpnLifeStyleCard"
 import KpnWideCard from "./KpnWideCard"
 import KpnErrorDialog from "./KpnErrorDialog"
+import CustomSearchBar from "./CustomSearchBar"
+import ToastMessage from "./ToastMessage"
 
 export {
     KpnButton,
@@ -15,5 +17,7 @@ export {
     KpnCardProducts,
     KpnLifeStyleCard,
     KpnWideCard,
-    KpnErrorDialog
+    KpnErrorDialog,
+    CustomSearchBar,
+    ToastMessage
 }

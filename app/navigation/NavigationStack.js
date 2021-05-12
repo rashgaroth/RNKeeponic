@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { navigationRef } from './NavigationService';
 import { enableScreens } from 'react-native-screens';
@@ -20,10 +20,9 @@ import {
   RegisterNext,
   RegisterPassword,
   RegisterPhoneName,
-  RegisterVerification
+  RegisterVerification,
+  WelcomePage
 } from "../features";
-
-import { COLORS } from '../utils/colors';
 
 enableScreens(false);
 const Stack = createStackNavigator();
@@ -34,7 +33,6 @@ const homeOptions = {
 
 function App() {
   const isLoggedIn = useSelector(state => state.loginReducer.isLoggedIn);
-
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
@@ -42,8 +40,8 @@ function App() {
           <Stack.Screen name="Home" component={BottomNavigationTab} options={homeOptions} />
         ) : (
           <Stack.Screen
-            name="Login"
-            component={Login}
+            name="WelcomePage"
+            component={WelcomePage}
             options={{
               animationTypeForReplace: isLoggedIn ? 'push' : 'pop',
               headerShown: false

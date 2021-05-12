@@ -6,9 +6,9 @@ import * as types from './types';
 
 const initialState = {
     address: {
-        province: null,
-        city: null,
-        subdistrict: null
+        province: [],
+        city: [],
+        subdistrict: []
     },
     userData: {
         email: "",
@@ -19,7 +19,7 @@ const initialState = {
         detailAddress: "",
         postalCode: "",
         verification: "",
-        subdistrict: null
+        subdistrict: 0
     },
     registrantData: {
         id: null,
@@ -71,9 +71,9 @@ export const registerReducer = createReducer(initialState, {
             ...state,
             address: {
                 ...state.address,
-                province: null,
-                city: null,
-                subdistrict: null
+                province: [],
+                city: [],
+                subdistrict: []
             }
         };
     },
@@ -203,9 +203,9 @@ export const registerReducer = createReducer(initialState, {
             ...state,
             address: {
                 ...state.address,
-                province: null,
-                city: null,
-                subdistrict: null
+                province: [],
+                city: [],
+                subdistrict: []
             },
             userData: {
                 ...state.userData,
@@ -283,9 +283,9 @@ export const registerReducer = createReducer(initialState, {
             ...state,
             address: {
                 ...state.address,
-                province: null,
-                city: null,
-                subdistrict: null
+                province: [],
+                city: [],
+                subdistrict: []
             },
         };
     },

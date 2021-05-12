@@ -8,6 +8,7 @@ const API_BASE_URL = 'https://d1f31mzn1ab53p.cloudfront.net/';
 const API_ENDPOINT = {
   // login
   LOGIN: 'mobilelogin',
+  GOOGLE_LOGIN: 'client/user/login/oauth2',
   // register
   REGISTER: 'client/user/registration',
   // dapat digunakan untuk mendapatkan pagination atau detail, atau tidak dengan pagin

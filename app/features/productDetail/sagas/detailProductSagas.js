@@ -22,13 +22,13 @@ export default function* getProductDetail(state) {
     yield put(detailProductAction.clearProduct())
     const loginState = yield select(loginReducer);
     const token = loginState.user.token
-    if(token){
+    // if(token){
         try {
             const product_id = state.payload.product_id;
-            const user_id = state.payload.user_id;
+            // const user_id = state.payload.user_id;
             const url = API.BASE_URL +
                 API.ENDPOINT.GET_PRODUCT_DETAIL +
-                `?user_id=${user_id}&id_product=${product_id}`
+                `?id_product=${product_id}`
             console.log("beres url")
             const _response = yield call(
                 apiService.GET,
@@ -44,22 +44,11 @@ export default function* getProductDetail(state) {
                 let third_avatar = payload.third_avatar;
                 let fourth_avatar = payload.fourth_avatar;
                 const image = []
-                // if (second_avatar === "" && third_avatar === "" && fourth_avatar === ""){
-                //     image.push(avatar);
-                // }
-                // if (second_avatar =! "") {
-                //     image.push(avatar, second_avatar);
-                // }
-                // if(third_avatar =! ""){
-                //     image.push(third_avatar, avatar)
-                // }
-                // if(fourth_avatar =! ""){
-                //     image.push(fourth_avatar, avatar)
-                // }
-                console.log("pushing image")
-                image.push(avatar)
-                console.log("selesai")
-                console.log("------------------------------------")
+                if (second_avatar&& third_avatar && fourth_avatar){
+                    image.push(avatar, second_avatar, third_avatar, fourth_avatar);
+                }else{
+                    image.push(avatar)
+                }
                 yield put(detailProductAction.setProductOnReducer(payload, image));
                 yield put(detailProductAction.setMarketOnReducer(market));
                 yield put(detailProductAction.hideLoading());
@@ -70,11 +59,11 @@ export default function* getProductDetail(state) {
                 Alert.alert('Keeponic', "Error saat menerima data");
             }, 200);
         }
-    }else{
-        yield put(detailProductAction.hideLoading());
-        setTimeout(() => {
-            Alert.alert('Keeponic', "Token Tidak Tersedia");
-        }, 200);
-    }
+    // }else{
+    //     yield put(detailProductAction.hideLoading());
+    //     setTimeout(() => {
+    //         Alert.alert('Keeponic', "Token Tidak Tersedia");
+    //     }, 200);
+    // }
 
 }

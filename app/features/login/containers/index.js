@@ -3,6 +3,11 @@ import { View, ScrollView, StatusBar } from 'react-native';
 import { Text, IconButton, HelperText } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
 import SplashScreen from "react-native-splash-screen";
+import { 
+  GoogleSigninButton, 
+  statusCodes, 
+  GoogleSignin } 
+  from "@react-native-google-signin/google-signin";
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as loginActions from '../actions'; 
@@ -72,7 +77,7 @@ export default function Login(props) {
   }
 
   const onRegister = () => {
-    navigate("Register");
+    navigate("RegisterNext");
   }
 
   useEffect(() => {
@@ -87,7 +92,7 @@ export default function Login(props) {
   }, [registerSelector.errorMsg.error])
 
   // Button or Input function
-  const googleLogin = () => { console.log(selector) }
+  
 
   return (
     <ScrollView style={styles.login} keyboardShouldPersistTaps="handled">
@@ -163,14 +168,8 @@ export default function Login(props) {
 
       </View>
       <View style={styles.textRegistration}>
-        <Text style={styles.text}>Tidak punya akun?</Text>
-        <Text style={styles.textRegist} onPress={ (e) => onRegister() }>Buat akun</Text>
-        {/* <Text style={[styles.text, {top: 10}]}>Or</Text> */}
-          {/* <GoogleSigninButton
-            style={{ width: 200, height: 58, top: 17 }}
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Light}
-            onPress={googleLogin} /> */}
+        <Text style={styles.text}>Ingin Menjadi Bagian Dari Seller?</Text>
+        <Text style={styles.textRegist} onPress={ (e) => onRegister() }>Daftar Sebagai Seller</Text>
       </View>
     </View>
     </ScrollView>

@@ -157,8 +157,11 @@ export function onChangeDetailAddress(data) {
     }
 }
 
-export function submitAddress(){
+export function submitAddress(subdistId, postalCode, detailAddress){
     return {
-        type: types.SET_ADDRESS
+        type: types.SET_ADDRESS,
+        subdistId,
+        postalCode,
+        detailAddress
     }
 }

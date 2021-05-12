@@ -23,29 +23,26 @@ let registerState = state => state.registerReducer;
 let loginState = state => state.loginReducer;
 
 // Our worker Saga that logins the user
-export default function* loginFromRegister() {
+export default function* loginFromRegister(props) {
     // init state from reducer
     yield put(registerActions.setLoader(true, "loadingNext"))
     const state = yield select(registerState);
     const getLoginState = yield select(loginState);
-    const emailTrimmed = trimString(getLoginState.emailForm);
+    // const emailTrimmed = trimString(getLoginState.emailForm);
 
     const paramLogin = {
         email: emailTrimmed,
         password: getLoginState.passwordForm,
     }
     const param = {
-        subdistrict: state.userData.subdistrict,
+        subdistrict: props.subdistId,
         user_id: state.loginResponse.id,
-        postal_code: state.userData.postalCode,
-        detail: state.userData.detailAddress
+        postal_code: props.postalCode,
+        detail: props.detailAddress
     }
-    try {
-        // const _response = yield call(apiService.POST, 
-        //     API.BASE_URL + API.ENDPOINT.REGISTER + "/address", 
-        //     param, 
-        //     Header());
 
+    console.log(param, "this is param")
+    try {
         const [ sendAddress, login ] = yield all([
             call(apiService.POST,
                 API.BASE_URL + API.ENDPOINT.REGISTER + "/address",
@@ -58,6 +55,7 @@ export default function* loginFromRegister() {
             // set token for async storage
             console.log(sendAddress.data, "REESSPONSE ----- ")
             if (login.status === 200) {
+                console.log(login.data, "Data Login")
                 yield put(loginActions.clearForm())
                 yield put(loginActions.setToken(login.data.token))
                 yield put(loginActions.onLoginResponse(login.data.user))

@@ -9,6 +9,8 @@ export const LOGIN_RESPONSE = 'LOGIN_RESPONSE';
 export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const LOG_OUT = 'LOG_OUT';
 export const SET_TOKEN = 'SET_TOKEN';
+export const LOGIN_GOOGLE_AUTH = 'LOGIN_GOOGLE_AUTH';
+export const LOGIN_GOOGLE_AUTH_SUCCESS = 'LOGIN_GOOGLE_AUTH_SUCCESS';
 
 // input
 export const SET_USERNAME = 'SET_USERNAME';
@@ -17,3 +19,9 @@ export const CLEAR_FORM = 'CLEAR_FORM';
 
 // register
 export const LOGIN_FROM_REGISTER = 'LOGIN_FROM_REGISTER';
+
+// set new user
+export const SET_NEW_USER = 'SET_NEW_USER';
+export const SET_USER_REGISTERED = 'SET_USER_REGISTERED';
+export const SET_EXPLORE = 'SET_EXPLORE';
+export const SET_USER_ALREADY_EXPLORED = 'SET_USER_ALREADY_EXPLORED';

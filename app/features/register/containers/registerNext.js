@@ -5,12 +5,14 @@ import {
     ScrollView,
     Alert,
     BackHandler,
-    StatusBar
+    StatusBar,
+    KeyboardAvoidingView
 } from 'react-native';
 import {
     Text,
     Button
  } from 'react-native-elements';
+import { Snackbar } from "react-native-paper"
 import { Picker } from '@react-native-picker/picker';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from "react-native-loading-spinner-overlay";
@@ -19,6 +21,7 @@ import { KpnInput, KpnErrorDialog, KpnButton } from "../../../components"
 import City from "../../../assets/images/svg/City";
 import { COLORS } from "../../../utils/colors";
 import * as registerActions from "../actions";
+import { navigate } from '../../../navigation/NavigationService';
 
 export default function RegisterNext(props){
     const [selectedProvince, setSelectedProvince] = useState();
@@ -28,12 +31,13 @@ export default function RegisterNext(props){
     const [detail, setDetail] = useState('');
     const [postalCode, setPostalCode] = useState('');
     const [validButton, setValidButton] = useState(false);
-    const [error, setError] = useState(1);
+    const [validatorErrorMsg, setValidatorErrorMsg] = useState('');
+    const [errVisible, setErrVisible] = useState(false);
+    const [isError, setIsError] = useState(false);
     
     const dispatch = useDispatch();
     const addressSelector = useSelector(state => state.registerReducer.address);
     const registerSelector = useSelector(state => state.registerReducer);
-    const bottomSheetRef = (ref) => useRef(ref);
 
     const onChangePicker = (data, id) => {
         try{
@@ -67,31 +71,70 @@ export default function RegisterNext(props){
     }
 
     const onChangePostalCode = (data) => {
-        setPostalCode(data)
+        console.log(registerSelector.userData.postalCode)
         dispatch(registerActions.onChangePostalCode(data))
+        setPostalCode(data)
     }
 
     const onChangeSubdist = (data) => {
-        console.log(data, "SUBDIST");
-        setSubdistrict(data)
         dispatch(registerActions.onChangeSubdistrict(data))
+        setSubdistrict(data)
     }
 
-    const onNextRegistration = (data) => {
-        dispatch(registerActions.submitAddress())
+    const validator = () => {
+        if (detail === "" && postalCode === "") {
+            setValidatorErrorMsg("Detail dan Kode Post tidak boleh kosong")
+            setIsError(true)
+            setErrVisible(true)
+            return false
+        } else if (detail === "") {
+            setValidatorErrorMsg("Detail tidak boleh kosong")
+            setIsError(true)
+            setErrVisible(true)
+            return false
+        } else if (postalCode === "") {
+            setValidatorErrorMsg("Kode Pos tidak boleh kosong")
+            setIsError(true)
+            setErrVisible(true)
+            return false
+        } else if (detail.length < 5) {
+            setValidatorErrorMsg("Tuliskan alamat detail secara rinci")
+            setIsError(true)
+            setErrVisible(true)
+            return false
+        } else if (isNaN(postalCode)) {
+            setValidatorErrorMsg("Kode pos harus terisi dengan benar")
+            setIsError(true)
+            setErrVisible(true)
+            return false
+        } else {
+            return true
+        }
+    }
+
+    const onNextRegistration = async () => {
+        console.log(subdistrict, "sub")
+        const isValidate = validator();
+        if(isValidate){
+            dispatch(registerActions.submitAddress(subdistrict, postalCode, detail))
+        }else{
+
+        }
     }
 
     useEffect( () => {
         console.log("hit use Effect!")
-        dispatch(registerActions.getAddress())
+        const fetchAddress = async () => {
+            await dispatch(registerActions.getAddress())
+        }
         const backAction = () => {
             Alert.alert("Keeponic", "Batalkan Registrasi ?", [
                 {
-                    text: "Cancel",
+                    text: "Lanjut",
                     onPress: () => null,
                     style: "cancel"
                 },
-                { text: "YES", onPress: () => BackHandler.exitApp() }
+                { text: "Batalkan", onPress: () => navigate("Login") }
             ]);
             return true;
         };
@@ -101,11 +144,22 @@ export default function RegisterNext(props){
             backAction
         );
 
+        fetchAddress()
+
         return () => backHandler.remove();
     }, [null])
 
+    const onDismissSnackBar = () => {
+        setErrVisible(false)
+    }
+
+    const onPressAction = () => {
+        setErrVisible(false)
+    }
+
     return (
         <>
+        <KeyboardAvoidingView>
         <ScrollView style={{ backgroundColor: COLORS.white }}>
             <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
             <Spinner
@@ -184,17 +238,36 @@ export default function RegisterNext(props){
                 }
             </View>
         </ScrollView>
+        </KeyboardAvoidingView>
             <View style={styles.button}>
                 {/* <KpnErrorDialog title="Gagal Registrasi" msg="yayaya" snap={error} ref={ref => bottomSheetRef(ref)}/> */}
                 <KpnButton
                     text="Daftar Akun"
                     isRounded
-                    disabled={!validButton}
-                    style={{ marginTop: 10, opacity: 0.7, bottom: 15 }}
+                    // disabled={!validButton}
+                    style={{ marginTop: 10 }}
+                    // color={{ color: COLORS.primaryColor }}
                     color={COLORS.secondColor}
                     onPress={(e) => onNextRegistration(e)}
                 />
             </View>
+                <Snackbar
+                    visible={errVisible}
+                    onDismiss={onDismissSnackBar}
+                    style={{ backgroundColor: isError ? COLORS.red : COLORS.primaryOpacity, borderRadius: 16 }}
+                    theme={{
+                        colors: {
+                            primary: COLORS.white,
+                            onBackground: COLORS.white,
+                            accent: COLORS.white,
+                        }
+                    }}
+                    action={{
+                        label: `Oke`,
+                        onPress: () => onPressAction(),
+                    }}>
+                    {validatorErrorMsg}
+                </Snackbar>
         </>
     );
 }

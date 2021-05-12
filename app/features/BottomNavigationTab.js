@@ -6,6 +6,7 @@ import SearchPage from "./search/containers/index";
 import OrderPage from "./order/containers/index";
 import ProfilePage from "./profile/containers/index";
 import { COLORS } from '../utils/colors';
+import { useDispatch, useSelector } from "react-redux";
 
 const HomeRoute = () => <HomePage />;
 
@@ -20,7 +21,7 @@ const BottomNavTabs = () => {
     const [routes] = React.useState([
         { key: 'beranda', title: 'Beranda', icon: 'home', color: COLORS.white },
         { key: 'pesanan', title: 'Pesanan', icon: 'cart', color: COLORS.white },
-        { key: 'artikel', title: 'Artikel', icon: 'feature-search-outline', color: COLORS.white },
+        { key: 'artikel', title: 'Artikel', icon: 'book-variant', color: COLORS.white },
         { key: 'akun', title: 'Akun', icon: 'account', color: COLORS.white }
     ]);
 

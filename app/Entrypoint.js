@@ -2,7 +2,7 @@
  * React Native App
  * Everthing starts from the entrypoint
  */
-import React from 'react';
+import React, {useEffect} from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/es/integration/react';
@@ -24,6 +24,13 @@ const theme = {
 };
 
 export default function Entrypoint() {
+
+  useEffect(() => {
+
+    
+
+  }, [])
+
   return (
     <Provider store={store}>
       <PersistGate loading={<ActivityIndicator />} persistor={persistor}>

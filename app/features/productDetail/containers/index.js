@@ -11,8 +11,10 @@ import {
   ScrollView,
   Animated,
   FlatList,
-  RefreshControl
+  RefreshControl,
+  Dimensions
 } from 'react-native';
+import Swiper from 'react-native-swiper';
 import { Chip, IconButton, Text, Button } from 'react-native-paper';
 import { ExpandingDot } from "react-native-animated-pagination-dots";
 import SnackBar from 'react-native-snackbar-component';
@@ -27,10 +29,11 @@ import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
 import { goBack, navigate } from "../../../navigation/NavigationService";
 import { searchProduct, imageData } from "../constants";
 import { truncate } from "../../../utils/stringUtils";
-import { widthScreen, width } from "../../../utils/theme";
+import { widthScreen, width, heightScreen } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
+import FooterButton from '../components/FooterButton';
 import CommentProduct from '../components/CommentProduct';
-import { KpnCardProducts } from "../../../components";
+import { KpnButton, KpnCardProducts } from "../../../components";
 import * as detailProductAction from "../actions";
 
 const imageW = widthScreen;
@@ -43,35 +46,18 @@ export default function Home(props) {
   const [isLove, setIsLove] = useState(false);
   const [readableDesc, setReadableDesc] = useState(false);
   const [description, setDescription] = useState("");
+  const [bottomAction, setBottomAction] = useState(null);
 
   const dispatch = useDispatch();
   const homeSelector = useSelector(state => state.homeReducer)
   const detailProductSelector = useSelector(state => state.detailProductReducer);
   const textInputRef = useRef(null);
   let scrollX = React.useRef(new Animated.Value(0)).current;
-  const flatListRef = useRef(null)
-  const keyExtractor = useCallback((_, index) => index.toString(), []);
   const { mProducts } = detailProductSelector;
   const loading = detailProductSelector.loading
+  const scrollY = useRef(new Animated.Value(0)).current;
+
   const debugginLoader = true;
-
-  const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold : 50 });
-
-  const renderItem = useCallback(({ item }) => {
-    return (
-      <View style={[styles.itemContainer]}>
-        <Animated.Image
-          style={{
-            width: imageW,
-            height: imageH,
-            // borderRadius: 20,
-            resizeMode: 'cover',
-          }}
-          source={{ uri: item }}
-        />
-      </View>
-    );
-  }, []);
 
   const onTextInputFocus = () => {
     setIsFocus(true)
@@ -118,11 +104,11 @@ export default function Home(props) {
 
   const fetchProductDetail = async () => {
     const {
-      userId,
+      // userId,
       productId
     } = props.route.params;
     const param = {
-      user_id: userId,
+      // user_id: userId,
       product_id: productId
     }
     await dispatch(detailProductAction.getDetailProduct(param));
@@ -133,19 +119,15 @@ export default function Home(props) {
     setDescription(truncate(mProducts.description, 200))
   }, []);
 
+  const { height } = Dimensions.get('screen')
+  const topEdge = (bottomAction?.y - height + bottomAction?.height) * -1;
+  console.log(topEdge, "TOP")
+
   return (
     <>
-    <ScrollView style={styles.container} refreshControl={
-      <RefreshControl
-        refreshing={loading}
-        onRefresh={fetchProductDetail}
-      />}
-      scrollEnabled={!loading}
-      >
-      <StatusBar backgroundColor={COLORS.primaryOpacity} />
       {/* SearchBar */}
       <View style={styles.containerInput}>
-        <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={onBackPressed}/>
+        <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={onBackPressed} />
         <AvoidKeyboard>
           <TextInput
             ref={textInputRef}
@@ -161,8 +143,22 @@ export default function Home(props) {
           />
         </AvoidKeyboard>
         <IconButton icon="cart-outline" color={COLORS.white} onPress={() => onPressCart} />
-        <IconButton icon="bell-outline" color={COLORS.white} onPress={ () => onPressBell }/>
+        <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell} />
       </View>
+    <Animated.ScrollView style={styles.container} refreshControl={
+      <RefreshControl
+        refreshing={loading}
+        onRefresh={fetchProductDetail}
+      />}
+      scrollEnabled={!loading}
+      onScroll={
+        Animated.event(
+          [{nativeEvent: { contentOffset: {y: scrollY}}}],
+          { useNativeDriver: true }
+        )
+      }
+      >
+      <StatusBar backgroundColor={COLORS.primaryOpacity} />
       {/* Focused */}
       {
         isFocus ? 
@@ -241,25 +237,58 @@ export default function Home(props) {
                 </View>
                 {
                   detailProductSelector.avatar ? 
-                      <Animated.FlatList
-                        ref={flatListRef}
-                        // onViewableItemsChanged={onViewRef.current}
-                        viewabilityConfig={viewConfigRef.current}
-                        data={detailProductSelector.avatar}
-                        renderItem={renderItem}
-                        keyExtractor={keyExtractor}
-                        showsHorizontalScrollIndicator={false}
-                        pagingEnabled
-                        horizontal
-                        decelerationRate={'normal'}
-                        scrollEventThrottle={16}
-                        onScroll={Animated.event(
-                          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-                          {
-                            useNativeDriver: false,
-                          }
-                        )}
-                      /> : 
+                      <Swiper
+                        style={styles.wrapper}
+                        height={340}
+                        dot={
+                          <View
+                            style={{
+                              backgroundColor: COLORS.colorC4,
+                              width: 5,
+                              height: 5,
+                              borderRadius: 4,
+                              marginLeft: 3,
+                              marginRight: 3,
+                              marginTop: 3,
+                              marginBottom: 3
+                            }}
+                          />
+                        }
+                        activeDot={
+                          <View
+                            style={{
+                              backgroundColor: COLORS.primaryColor,
+                              width: 8,
+                              height: 8,
+                              borderRadius: 4,
+                              marginLeft: 3,
+                              marginRight: 3,
+                              marginTop: 3,
+                              marginBottom: 3
+                            }}
+                          />
+                        }
+                        paginationStyle={{
+                          
+                        }}
+                        loop={false}
+                      >
+                        {
+                          detailProductSelector.avatar.map((x,i) => (
+                            <View
+                              style={styles.slide}
+                              key={i}
+                            >
+                              <Image
+                                resizeMode="stretch"
+                                style={styles.image}
+                                source={{ uri: x}}
+                              />
+                            </View>
+                          ))
+                        }
+                      </Swiper>
+                      :
                       <View style={[styles.itemContainer]}>
                         <Animated.Image
                           style={{
@@ -275,26 +304,6 @@ export default function Home(props) {
                 <IconButton icon="share-variant" style={{ position: 'absolute', top: 10 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
                 <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 50 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={() => onPressLove()} />
                 <IconButton icon="information-outline" style={{ position: 'absolute', top: 90 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
-                {
-                  detailProductSelector.avatar ? 
-                      <ExpandingDot
-                        data={detailProductSelector.avatar}
-                        expandingDotWidth={30}
-                        scrollX={scrollX}
-                        inActiveDotOpacity={0.6}
-                        dotStyle={{
-                          width: 10,
-                          height: 10,
-                          backgroundColor: COLORS.primaryColor,
-                          borderRadius: 5,
-                          marginHorizontal: 5
-                        }}
-                        containerStyle={{
-                          bottom: 10,
-                        }}
-                      /> : 
-                      null
-                }
               </View>
               <View style={styles.price}>
                 {
@@ -332,8 +341,7 @@ export default function Home(props) {
                           }}
                         />
                     </View> : <View style={styles.chip}>
-                          <Chip onPress={() => console.log("aaa")}>Diskusi(20)</Chip>
-                          <Chip icon="star" onPress={() => console.log('Pressed')}>{mProducts.rating}(40)</Chip>
+                          <Chip icon="star" onPress={() => console.log('Pressed')}>Rating Produk : {mProducts.rating} (40)</Chip>
                         </View>
                   }
               </View>
@@ -380,15 +388,24 @@ export default function Home(props) {
                           {"Terjual" + " "}
                         </Text>
                         <Text style={{ fontWeight: "bold" }}>
-                          20
+                          { detailProductSelector.mProducts.is_sold }
                         </Text>
+                      </Text>
+                      <Text style={{ marginTop: 10 }}>
+                        <Text>
+                          {"Berat" + " "}
+                        </Text>
+                        <Text style={{ fontWeight: "bold" }}>
+                          {detailProductSelector.mProducts.weight}
+                        </Text>
+                        {" Gram / Produk"}
                       </Text>
                       <Text style={{ marginTop: 10 }}>
                         <Text>
                           {'Stok' + ' '}
                         </Text>
                         <Text style={{ fontWeight: "bold" }}>
-                          30
+                          {detailProductSelector.mProducts.stock - detailProductSelector.mProducts.is_sold }
                         </Text>
                       </Text>
                     </View>
@@ -531,6 +548,11 @@ export default function Home(props) {
               <View>
                 {/* End */}
                 <View style={styles.lineProducts} />
+                  <View style={{ height: 0, backgroundColor: 'white' }}
+                  onLayout={ev => { 
+                    setBottomAction(ev.nativeEvent.layout)
+                  }}
+                  />
                 {/* Deskripsi Barang */}
                   <Text style={styles.title}>Deskripsi Barang</Text>
                 {
@@ -616,17 +638,49 @@ export default function Home(props) {
                 }
                 <View style={styles.lineProducts} />
                 {/* Ulasan */}
-                <Text style={styles.title}>Ulasan</Text>
+                {/* <Text style={styles.title}>Ulasan</Text>
                 <View>
                   <CommentProduct />
-                </View>
+                </View> */}
               </View>
               {/*  */}
           </View>
             {/* End */}
           </SafeAreaView>
       }
-      </ScrollView>
+      <View style={{ height: 45, backgroundColor: COLORS.white }} />
+      </Animated.ScrollView>
+      {/* {bottomAction && (<Animated.View style={[styles.containerSticky], {
+        transform: [{ 
+          translateY: scrollY.interpolate({
+            inputRange: [-1, 0, topEdge -1, topEdge, topEdge + 1],
+            outputRange: [0, 0, 0, 0, -1],
+          })
+        }],
+        position: 'absolute',
+        // opacity: 0.5,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 40,
+        backgroundColor: COLORS.white,
+        flexDirection: "row",
+        justifyContent: "center"
+      }}>
+        <KpnButton
+          text="Beli Sekarang"
+          // mode="outlined"
+          icon="package-down"
+          style={styles.buttonSticky}
+        />
+        <KpnButton
+          text={"Keranjang" + " " + "0"}
+          mode="outlined"
+          icon="cart-plus"
+          style={styles.buttonSticky}
+        />
+      </Animated.View>)} */}
+      <FooterButton cart={"0"} />
             <View>
               <SnackBar
                 visible={activeIndex}
@@ -640,7 +694,11 @@ export default function Home(props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
+    height: heightScreen
+  },
+  wrapper: {
+
   },
   input: {
     // flex: 1,
@@ -717,5 +775,62 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 10,
     marginTop: 10
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'transparent'
+  },
+
+  slide1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#9DD6EB'
+  },
+
+  slide2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#97CAE5'
+  },
+
+  slide3: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#92BBD9'
+  },
+
+  text: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold'
+  },
+
+  image: {
+    width: width,
+    flex: 1
+  },
+  containerSticky: {
+    position: 'absolute',
+    // opacity: 0.5,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // marginHorizontal: 20,
+    backgroundColor: COLORS.white,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  buttonSticky: {
+    height: 35,
+    marginHorizontal: 10,
+    marginBottom: 10,
+    width: 220,
+    // alignSelf: "center",
   }
 })

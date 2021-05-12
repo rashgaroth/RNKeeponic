@@ -34,8 +34,8 @@ export default function MarketInfo(){
                         {/* <Chip onPress={() => console.log('Pressed')}>Bandung</Chip> */}
                     </View>
                     <View style={[styles.rowChips,{  }]}>
-                        <Chip icon="star" onPress={() => console.log('Pressed')}>3.6</Chip>
-                        <Chip onPress={() => console.log('Pressed')}>{marketSelector.followers + " " + "Pengikut"}</Chip>
+                        <Chip icon="truck" onPress={() => console.log('Pressed')}><Text> Dikirim Dari <Text style={{ fontWeight: "bold" }} >Bandung</Text> </Text> </Chip>
+                        {/* <Chip onPress={() => console.log('Pressed')}>{marketSelector.followers + " " + "Pengikut"}</Chip> */}
                     </View>
                     {/* <Button 
                     mode="outlined" 
