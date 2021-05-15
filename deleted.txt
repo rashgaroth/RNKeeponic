@@ -1,0 +1,31 @@
+          {/* <View style={styles.menuButton}>
+            {menu.icons.map((a, b) => (
+              <TouchableOpacity key={b} onPress={(e) => onPressMenuDivider(a[2])}>
+                <View>
+                  <KpnDivider
+                    style={styles.dividerMenuButton}
+                    height={55}
+                    width={55}
+                    radius={50}
+                    color={COLORS.colorC4}
+                  />
+                  <IconButton icon={a[0]} style={styles.iconMenuButton} size={30} color={COLORS.white} />
+                  <Text style={
+                    a[1] === "Keranjang" ? {
+                      position: 'absolute',
+                      alignSelf: "flex-start",
+                      top: 85,
+                      left: 10,
+                      color: COLORS.fontColor,
+                    }
+                      : a[1] === "Notifikasi" ? {
+                        position: 'absolute',
+                        alignSelf: "flex-start",
+                        top: 85,
+                        left: 10,
+                        color: COLORS.fontColor,
+                      } : styles.textMenuButtonInside}>{a[1]}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View> */}

@@ -3,7 +3,7 @@ import { Avatar, Button, Card, Title, Paragraph, Text } from 'react-native-paper
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
-const KpnCardProducts = ({rating, title, price, image, userId, productId, onPress}) => {
+const KpnCardProducts = ({rating, title, price, image, userId, productId, onPress, onPressAvatar}) => {
     const totalRating = 5;
     const Cart = props => <Avatar.Icon 
     {...props} 
@@ -18,7 +18,9 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId, onPres
 
     return(
         <Card style={styles.cardContainer}>
-            <Card.Cover style={styles.cardCover} source={{ uri: image || 'https://picsum.photos/200' }} />
+            <TouchableOpacity onPress={onPressAvatar}>
+                <Card.Cover style={styles.cardCover} source={{ uri: image || 'https://picsum.photos/200' }} />
+            </TouchableOpacity>
             <Card.Content style={styles.cardContent}>
                 <View style={styles.cardTitle}>
                     <TouchableOpacity onPress={onPress}>

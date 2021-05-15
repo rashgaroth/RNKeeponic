@@ -12,7 +12,8 @@ import {
   Animated,
   FlatList,
   RefreshControl,
-  Dimensions
+  Dimensions,
+  Easing
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { Chip, IconButton, Text, Button } from 'react-native-paper';
@@ -31,8 +32,6 @@ import { searchProduct, imageData } from "../constants";
 import { truncate } from "../../../utils/stringUtils";
 import { widthScreen, width, heightScreen } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
-import FooterButton from '../components/FooterButton';
-import CommentProduct from '../components/CommentProduct';
 import { KpnButton, KpnCardProducts } from "../../../components";
 import * as detailProductAction from "../actions";
 
@@ -52,10 +51,10 @@ export default function Home(props) {
   const homeSelector = useSelector(state => state.homeReducer)
   const detailProductSelector = useSelector(state => state.detailProductReducer);
   const textInputRef = useRef(null);
-  let scrollX = React.useRef(new Animated.Value(0)).current;
   const { mProducts } = detailProductSelector;
   const loading = detailProductSelector.loading
-  const scrollY = useRef(new Animated.Value(0)).current;
+  let scrollX = React.useRef(new Animated.Value(0)).current;
+  let scrollY = useRef(new Animated.Value(0)).current;
 
   const debugginLoader = true;
 
@@ -92,6 +91,10 @@ export default function Home(props) {
     }
   }
 
+  const onPressBuy = () => {
+    console.log("Pressed")
+  }
+
   const onRead = () => {
     if(!readableDesc){
       setDescription(mProducts.description);
@@ -119,14 +122,31 @@ export default function Home(props) {
     setDescription(truncate(mProducts.description, 200))
   }, []);
 
-  const { height } = Dimensions.get('screen')
-  const topEdge = (bottomAction?.y - height + bottomAction?.height) * -1;
-  console.log(topEdge, "TOP")
+  const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
+  const diffClampButtonGroup = Animated.diffClamp(scrollY, 0, 60);
+
+  const translateSearchContainer = diffClampSearchContainer.interpolate({
+    inputRange: [0, 60],
+    outputRange: [0, -60]
+  });
+
+  const translateButtonGroup = diffClampButtonGroup.interpolate({
+    inputRange: [0, 50],
+    outputRange: [0, -50],
+  })
+
+  const timingAnimatedScrollY = () => {
+    Animated.timing(scrollY, {
+      toValue: 50,
+      useNativeDriver: true,
+      duration: 1000
+    })
+  }
 
   return (
     <>
       {/* SearchBar */}
-      <View style={styles.containerInput}>
+      <Animated.View style={[styles.containerInput, { transform: [ { translateY: translateSearchContainer } ] }]}>
         <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={onBackPressed} />
         <AvoidKeyboard>
           <TextInput
@@ -144,19 +164,17 @@ export default function Home(props) {
         </AvoidKeyboard>
         <IconButton icon="cart-outline" color={COLORS.white} onPress={() => onPressCart} />
         <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell} />
-      </View>
+      </Animated.View>
     <Animated.ScrollView style={styles.container} refreshControl={
       <RefreshControl
         refreshing={loading}
         onRefresh={fetchProductDetail}
       />}
       scrollEnabled={!loading}
-      onScroll={
-        Animated.event(
-          [{nativeEvent: { contentOffset: {y: scrollY}}}],
-          { useNativeDriver: true }
-        )
-      }
+      onScroll={ (e) => {
+        scrollY.setValue(e.nativeEvent.contentOffset.y)
+        console.log(scrollY, "Scroll Y")
+      } }
       >
       <StatusBar backgroundColor={COLORS.primaryOpacity} />
       {/* Focused */}
@@ -192,49 +210,6 @@ export default function Home(props) {
             {/* ImageCarousel Start */}
           <View>
               <View>
-                <View style={[StyleSheet.absoluteFillObject]}>
-                  {
-                      detailProductSelector.avatar ? detailProductSelector.avatar.map((item, index) => {
-                        const inputRange = [
-                          (index - 1) * widthScreen,
-                          index * widthScreen,
-                          (index + 1) * widthScreen,
-                        ];
-                        const colorFade = scrollX.interpolate({
-                          inputRange,
-                          outputRange: [0, 1, 0],
-                        });
-                        return (
-                          <Animated.View
-                            key={index}
-                            style={[
-                              StyleSheet.absoluteFillObject,
-                              { opacity: colorFade },
-                            ]}
-                          />
-                        );
-                      }) : imageData.map((item, index) => {
-                        const inputRange = [
-                          (index - 1) * widthScreen,
-                          index * widthScreen,
-                          (index + 1) * widthScreen,
-                        ];
-                        const colorFade = scrollX.interpolate({
-                          inputRange,
-                          outputRange: [0, 1, 0],
-                        });
-                        return (
-                          <Animated.View
-                            key={index}
-                            style={[
-                              StyleSheet.absoluteFillObject,
-                              { opacity: colorFade },
-                            ]}
-                          />
-                        );
-                      })
-                  }
-                </View>
                 {
                   detailProductSelector.avatar ? 
                       <Swiper
@@ -650,37 +625,25 @@ export default function Home(props) {
       }
       <View style={{ height: 45, backgroundColor: COLORS.white }} />
       </Animated.ScrollView>
-      {/* {bottomAction && (<Animated.View style={[styles.containerSticky], {
-        transform: [{ 
-          translateY: scrollY.interpolate({
-            inputRange: [-1, 0, topEdge -1, topEdge, topEdge + 1],
-            outputRange: [0, 0, 0, 0, -1],
-          })
-        }],
-        position: 'absolute',
-        // opacity: 0.5,
-        bottom: 0,
-        left: 0,
+      <Animated.View style={{
+        transform: [{ translateY: translateButtonGroup }], 
+        position: "absolute",
+        bottom: -50,
         right: 0,
-        height: 40,
-        backgroundColor: COLORS.white,
-        flexDirection: "row",
-        justifyContent: "center"
+        left: 0,
+        flex: 1,
+        elevation: 10,
+        zIndex: 10,
       }}>
+        {/* <FooterButton cart={"0"} /> */}
         <KpnButton
           text="Beli Sekarang"
           // mode="outlined"
           icon="package-down"
           style={styles.buttonSticky}
+          onPress={(e) => onPressBuy(e)}
         />
-        <KpnButton
-          text={"Keranjang" + " " + "0"}
-          mode="outlined"
-          icon="cart-plus"
-          style={styles.buttonSticky}
-        />
-      </Animated.View>)} */}
-      <FooterButton cart={"0"} />
+      </Animated.View>
             <View>
               <SnackBar
                 visible={activeIndex}
@@ -695,7 +658,8 @@ export default function Home(props) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
-    height: heightScreen
+    height: heightScreen,
+    zIndex: 0,
   },
   wrapper: {
 
@@ -703,18 +667,24 @@ const styles = StyleSheet.create({
   input: {
     // flex: 1,
     height: 40,
-    marginTop: 5,
     width: 270,
     backgroundColor: '#e4e6eb',
     borderRadius: 16,
     paddingHorizontal: 16,
+    justifyContent: 'center',
+    marginBottom: 10
     // fontSize: 15
   },
   containerInput:{
+    position: "absolute",
+    top:0,
+    left:0,
+    right: 0,
     backgroundColor: COLORS.primaryOpacity,
     flexDirection: "row",
-    flexWrap: "wrap",
-    paddingBottom: 10,
+    height: 60,
+    elevation: 4,
+    zIndex: 100
   },
   onFocusContainer: {
     // flex: 1,
@@ -828,9 +798,8 @@ const styles = StyleSheet.create({
   },
   buttonSticky: {
     height: 35,
+    width: Dimensions.get('screen').width - 20,
     marginHorizontal: 10,
-    marginBottom: 10,
-    width: 220,
     // alignSelf: "center",
   }
 })

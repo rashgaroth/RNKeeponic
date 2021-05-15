@@ -3,7 +3,8 @@ package com.keeponicrn;
 import android.app.Application;
 import android.content.Context;
 
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
+import com.airbnb.android.react.lottie.LottiePackage;
+//import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
@@ -37,9 +38,10 @@ public class MainApplication extends Application implements ReactApplication {
           // packages.add(new MyReactNativePackage());
 //            new SplashScreenReactPackage();
 //            packages.add(new SplashScreenReactPackage());
-            new ReactNativePushNotificationPackage();
+//            new ReactNativePushNotificationPackage();
             new SplashScreenReactPackage();
             new RNGoogleSigninPackage();
+            new LottiePackage();
           return packages;
         }
 

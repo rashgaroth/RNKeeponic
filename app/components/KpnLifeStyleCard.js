@@ -5,38 +5,16 @@ import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
 import { navigationRef } from "../navigation/NavigationStack";
 
-const KpnLifeStyleCard = ({ onPress }) => {
-
-    const totalRating = 5;
-    const Cart = props => <Avatar.Icon
-        {...props}
-        icon="cart-plus"
-        size={25}
-        style={{
-            alignSelf: "flex-end",
-            right: 0,
-            backgroundColor: COLORS.white
-        }}
-        color={COLORS.black} />
-
+const KpnLifeStyleCard = ({ uri, onPress }) => {
     return (
         <Card style={styles.cardContainer}>
-            <Card.Cover style={styles.cardCover} source={{ uri: 'https://picsum.photos/200/300' }} />
-            <Card.Content style={styles.cardContent}>
-                <View style={styles.cardTitle}>
-                    <TouchableOpacity style={styles.touchable} onPress={onPress}>
-                        <Title style={styles.title}>{'Card Title'}</Title>
-                        <Paragraph style={styles.paragraph}>{'Card Paragraph'}</Paragraph>
-                    </TouchableOpacity>
-                </View>
-            </Card.Content>
+            <Card.Cover style={styles.cardCover} source={{ uri: uri ? uri : 'https://picsum.photos/200/300' }} />
         </Card>
     )
 };
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: 170,
         // height: 200,
         borderWidth: 1,
         borderColor: COLORS.colorC4,

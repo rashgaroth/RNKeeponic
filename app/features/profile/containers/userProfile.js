@@ -102,6 +102,16 @@ export default function Profile() {
     }
 
     useEffect(() => {
+
+        const configureGoogleSignin = async () => {
+            await GoogleSignin.configure({
+                webClientId: '871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com',
+                offlineAccess: true,
+            });
+        }
+
+        configureGoogleSignin()
+
         if (userProfile.avatar) {
             setProfileImages(userProfile.avatar)
         } else {

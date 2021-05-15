@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   item_icon: {
     marginRight: 15
-  }
+  },
 });
 
 export default styles;
