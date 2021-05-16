@@ -3,6 +3,7 @@ import { BottomNavigation } from 'react-native-paper';
 import { StyleSheet } from "react-native";
 import HomePage from "./home/containers/index";
 import SearchPage from "./search/containers/index";
+import LifeStyleDetail from "./lifestyleDetail/containers";
 import OrderPage from "./order/containers/index";
 import ProfilePage from "./profile/containers/index";
 import { COLORS } from '../utils/colors';
@@ -10,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const HomeRoute = () => <HomePage />;
 
-const SearchRoute = () => <SearchPage />;
+const SearchRoute = () => <LifeStyleDetail />;
 
 const OrderRoute = () => <OrderPage />;
 

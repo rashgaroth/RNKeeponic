@@ -57,11 +57,11 @@ export default class App extends Component {
           <LogoRounded style={styles.logo} width={30} height={40} />
         </View>
       <View style={styles.container}>
-        <View style={{ height: 20 + height / 2 }}>
+        <View style={{ height: 20 + height / 2, backgroundColor: COLORS.white }}>
           <Text style={[styles.heading, { fontSize: 20, color: COLORS.blackSans, fontWeight: "bold" }]}>Gaya Hidup Hidroponik</Text>
           {this.renderScroll()}
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: COLORS.white }}>
           <Text style={styles.heading}>Trending</Text>
           <ScrollView contentContainerStyle={{ alignItems: 'flex-start' }} style={{ paddingHorizontal: 10, flex: 1, width: width }}>
             {SMALL_ITEMS.map((image, i) => {
@@ -129,8 +129,8 @@ export default class App extends Component {
           outputRange: [itemHeight * .8, itemHeight, itemHeight],
         })
       }]}>
-        <ImageBackground key={i} source={{ uri: image }} style={[StyleSheet.AbsoluteFill, { height: itemHeight, width: itemWidth, opacity: 1, resizeMode: 'cover', borderRadius: 15 }]}>
-          <View style={[StyleSheet.AbsoluteFill, { opacity: 0.4, backgroundColor: COLORS_LIFESTYLE[i], width: itemWidth, height: itemHeight, borderRadius: 15 }]}></View>
+        <ImageBackground key={i} source={{ uri: image }} style={[StyleSheet.AbsoluteFill, { height: itemHeight, width: itemWidth, opacity: 1, resizeMode: 'cover' }]}>
+          <View style={[StyleSheet.AbsoluteFill, { opacity: 0.4, backgroundColor: COLORS_LIFESTYLE[i], width: itemWidth, height: itemHeight }]}></View>
           <Animated.View
             style={[{
               width: itemWidth,
@@ -138,7 +138,6 @@ export default class App extends Component {
               justifyContent: 'flex-end',
               flex: 1,
               position: 'relative',
-              borderRadius: 15,
               height: itemHeight,
               opacity: this.state.scrollX.interpolate({
                 inputRange,
@@ -177,7 +176,6 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     width: itemWidth,
     backgroundColor: 'transparent',
-    borderRadius: 15
   },
   heading: {
     fontSize: 22,

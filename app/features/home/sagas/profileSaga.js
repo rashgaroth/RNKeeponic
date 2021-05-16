@@ -30,6 +30,7 @@ export default function* homeGetProfile(state) {
 
     try {
         yield put(homeAction.showLoading())
+        console.log(getLoginState.isUserRegistered)
         if(getLoginState.isUserRegistered){
             if (token) {
                 let sha;
@@ -52,8 +53,9 @@ export default function* homeGetProfile(state) {
 
                 if (_response.data.error < 1) {
                     yield put(homeAction.getUserProfileSuccess(_response.data.data))
+                    console.log(_response.data.data + ":", "address")
                     setTimeout(() => {
-                        console.log(getHomeState.userProfile + ":", "profile")
+                        console.log(getHomeState.address + ":", "profile")
                     }, 5000);
                 } else {
                     yield put(homeAction.hideLoading())

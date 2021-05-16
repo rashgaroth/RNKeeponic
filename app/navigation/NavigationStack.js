@@ -21,7 +21,9 @@ import {
   RegisterPassword,
   RegisterPhoneName,
   RegisterVerification,
-  WelcomePage
+  WelcomePage,
+  SellerRegistration,
+  SellerRegistrationNext
 } from "../features";
 
 enableScreens(false);
@@ -127,6 +129,20 @@ function App() {
           options={{
             headerShown: true,
             title: "Masukkan Kode Verifikasi"
+          }}
+        />
+        <Stack.Screen
+          name="SellerRegistration"
+          component={SellerRegistration}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="SellerRegistrationNext"
+          component={SellerRegistrationNext}
+          options={{
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

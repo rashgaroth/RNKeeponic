@@ -12,7 +12,8 @@ const SwiperComponent = () => {
                 autoplay
                 horizontal={false}
                 height={200}
-                activeDotColor={ COLORS.primaryColor } >
+                autoplayTimeout={2000}
+                activeDotColor={ COLORS.primaryColor }>
                 { SwiperData.map((x, i) => (
                     <View style={styles.slide} key={i}>
                         <Image

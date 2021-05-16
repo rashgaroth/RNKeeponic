@@ -1,23 +1,72 @@
-import React from 'react';
-import { View, StatusBar } from 'react-native';
-import { Button } from 'react-native-paper';
+// React Native Tab - Example using React Navigation V5 //
+// https://aboutreact.com/react-native-tab //
+import 'react-native-gesture-handler';
 
-import { useDispatch } from 'react-redux';
-import * as loginActions from 'app/features/login/actions';
-import styles from './styles';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+//import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { COLORS } from "../../../utils/colors";
+import Ordered from './Ordered';
+import OrderCart from './OrderCart';
+import { COLORS } from '../../../utils/colors';
 
-export default function Home() {
-  const dispatch = useDispatch();
-  const onLogout = () => dispatch(loginActions.logOut());
+const Stack = createStackNavigator();
+const Tab = createMaterialTopTabNavigator();
 
+function TabStack() {
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primaryOpacity} />
-      <Button icon="logout" mode="outlined" onPress={onLogout}>
-        Logout
-      </Button>
-    </View>
+    <Tab.Navigator
+      initialRouteName="Feed"
+      tabBarOptions={{
+        activeTintColor: '#FFFFFF',
+        inactiveTintColor: '#F8F8F8',
+        style: {
+          backgroundColor: COLORS.sans,
+        },
+        labelStyle: {
+          textAlign: 'center',
+        },
+        indicatorStyle: {
+          borderBottomColor: COLORS.white,
+          borderBottomWidth: 2,
+        },
+      }}>
+      <Tab.Screen
+        name="Ordered"
+        component={Ordered}
+        options={{
+          tabBarLabel: 'Pesanan Terbeli',
+          // tabBarIcon: ({ color, size }) => (
+          //   <MaterialCommunityIcons name="home" color={color} size={size} />
+          // ),
+        }} />
+      <Tab.Screen
+        name="OrderCart"
+        component={OrderCart}
+        options={{
+          tabBarLabel: 'Pesanan',
+          // tabBarIcon: ({ color, size }) => (
+          //   <MaterialCommunityIcons name="settings" color={color} size={size} />
+          // ),
+        }} />
+    </Tab.Navigator>
   );
 }
+
+function App() {
+  return (
+      <Stack.Navigator
+        initialRouteName="Settings"
+        screenOptions={{
+          headerStyle: { backgroundColor: COLORS.sans },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' }
+        }}>
+        <Stack.Screen name="TabStack" component={TabStack} options={{ title: 'Order' }} />
+      </Stack.Navigator>
+  );
+}
+
+export default App;

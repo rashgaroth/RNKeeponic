@@ -30,6 +30,7 @@ import { truncate, getInitials } from "../../../utils/stringUtils";
 import LogoRounded from "../../../assets/images/svg/LogoRounded";
 import * as loginActions from "../../login/actions";
 import { removeAllItems } from "../../../services/asyncStorage";
+import { navigate } from '../../../navigation/NavigationService';
 
 export default function Profile() {
     const [notificationSwitch, setNotificationSwitch] = useState(false);
@@ -150,6 +151,13 @@ export default function Profile() {
         });
     }
 
+    const onPressDaftarToko = () => {
+        const param = {
+            email: userProfile.email
+        }
+        navigate("SellerRegistration", param)
+    }
+
     // Render Bottom Sheet
 
     const renderHeader = () => (
@@ -256,7 +264,7 @@ export default function Profile() {
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
                                 <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.sans}>Ubah Password</Button>
-                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.sans}>Daftar Toko</Button>
+                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={COLORS.sans}>Daftar Toko</Button>
                             </View>
                             {/* View Setting ON/OFF */}
                             <View>

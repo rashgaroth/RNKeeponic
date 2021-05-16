@@ -12,6 +12,9 @@ import RegisterPassword from "./register/containers/registerPassword";
 import RegisterPhoneName from "./register/containers/registerPhoneName";
 import RegisterVerification from "./register/containers/registerVerification";
 import WelcomePage from "./login/containers/welcomePage";
+import LifestyleDetail from "./lifestyleDetail/containers";
+import SellerRegistration from "./profile/containers/sellerRegistration";
+import SellerRegistrationNext from "./profile/containers/sellerRegistrationNext";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -30,5 +33,8 @@ export {
     RegisterPassword,
     RegisterPhoneName,
     RegisterVerification,
-    WelcomePage
+    WelcomePage,
+    LifestyleDetail,
+    SellerRegistration,
+    SellerRegistrationNext
 }

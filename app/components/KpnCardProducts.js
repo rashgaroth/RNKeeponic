@@ -3,6 +3,7 @@ import { Avatar, Button, Card, Title, Paragraph, Text } from 'react-native-paper
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
+import NoRating from "../assets/images/svg/NoRating";
 const KpnCardProducts = ({rating, title, price, image, userId, productId, onPress, onPressAvatar}) => {
     const totalRating = 5;
     const Cart = props => <Avatar.Icon 
@@ -15,6 +16,13 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId, onPres
         backgroundColor: COLORS.white
     }} 
     color={COLORS.black} />
+
+    const convertToIdr = (angka) => {
+        var rupiah = '';
+        var angkarev = angka.toString().split('').reverse().join('');
+        for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + '.';
+        return 'Rp. ' + rupiah.split('', rupiah.length - 1).reverse().join('');
+    }
 
     return(
         <Card style={styles.cardContainer}>
@@ -35,7 +43,7 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId, onPres
                     <Rating key={i} height={13} width={13} />
                 ) : (
                     // TODO: Ini untuk membuat rating kosong
-                    null
+                    <NoRating height={13} width ={13} />
                 )
                 ) }
                 {/* <TouchableOpacity>
@@ -43,7 +51,7 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId, onPres
                 </TouchableOpacity> */}
             </View>
             <View style={styles.cardPrice}>
-                <Text style={styles.textPrice}>{price || 'Rp 20.000'}</Text>
+                <Text style={styles.textPrice}>{convertToIdr(price) || 'Rp 20.000'}</Text>
                 <TouchableOpacity>
                     <Cart />
                 </TouchableOpacity>

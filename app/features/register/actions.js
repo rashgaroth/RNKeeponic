@@ -165,3 +165,10 @@ export function submitAddress(subdistId, postalCode, detailAddress){
         detailAddress
     }
 }
+
+export function submitSellerRegistration(data){
+    return{
+        type: types.SUMBIT_SELLER_REGISTRATION,
+        data
+    }
+} 

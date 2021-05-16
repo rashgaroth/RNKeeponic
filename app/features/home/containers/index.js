@@ -16,7 +16,7 @@ import Spinner from "react-native-loading-spinner-overlay";
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import SplashScreen from 'react-native-splash-screen';
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
@@ -44,10 +44,11 @@ export default function Home({ navigation }) {
   const [productAvatar, setProductAvatar] = useState("");
   const [productDescription, setProductDescription] = useState("");
 
-  const textInputRef = useRef(null);
   let scrollX = useRef(new Animated.Value(0)).current;
   let scrollY = useRef(new Animated.Value(0)).current;
+  const textInputRef = useRef(null);
   const bottomSheetRef = useRef(null);
+  // const fall = new Animated.Value(1);
 
   const snapPoints = useMemo(() => [0, '60%'], []);
 
@@ -62,7 +63,6 @@ export default function Home({ navigation }) {
   
   async function fetchAllHomeRequest(){
       dispatch(homeAction.showLoading())
-      await setIndexBottomSheet(0)
       if(loginSelector.isUserRegistered){
         await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0))
         await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
@@ -80,6 +80,7 @@ export default function Home({ navigation }) {
   useEffect(() => {
     SplashScreen.hide();
     fetchAllHomeRequest();
+    setIndexBottomSheet(0);
   }, [])
 
   const onNavigateToDetail = (user_id, product_id) => {
@@ -114,22 +115,26 @@ export default function Home({ navigation }) {
     setProductTitle(title)
     setProductAvatar(avatar)
     setProductDescription(description)
-    console.log(indexBottomSheet)
+    console.log(homeSelector.userAddress, "scroll")
   }
 
-  const handleSheetChanges = useCallback((index) => {
-    console.log('handleSheetChanges', index);
-    if(index === 0){
-      setIndexBottomSheet(0)
-    }
-  }, []);
+  const handleSheetChanges = useCallback( async (index) => {
+      // setIndexBottomSheet(0)
+      // setProductTitle("")
+      // await setProductAvatar("")
+      // setProductDescription("")
+      console.log(scrollY, "scroll after")
+  }, [null]);
 
   const RenderBottomSheet = () => {
     return <BottomSheet
       ref={bottomSheetRef}
       index={indexBottomSheet}
       snapPoints={snapPoints}
-      onChange={handleSheetChanges}
+      // onChange={handleSheetChanges}
+      backdropComponent={ (backdropProps) => (
+        <BottomSheetBackdrop {...backdropProps} enableTouchThrough={true} />
+      ) }
     >
     <BottomSheetScrollView>
       <View>
@@ -142,22 +147,26 @@ export default function Home({ navigation }) {
             borderRadius: 16
           }}
         />
-        <Text style={{ alignSelf: "center", fontWeight: "bold", fontSize: 20, marginTop: 10, marginHorizontal: 10 }}>{ productTitle ? productTitle : "-------"}</Text>
-        <View style={{ height: 1, marginHorizontal: 20, backgroundColor: COLORS.colorC4, marginTop: 10, marginBottom: 10}} />
+        <Text style={{
+           alignSelf: "center", 
+           fontWeight: "bold", 
+           fontSize: 20, 
+           marginTop: 10, 
+           marginHorizontal: 10 
+           }}
+           >
+             { productTitle ? productTitle : "-------"}
+             </Text>
+        <View style={{ 
+          height: 1, 
+          marginHorizontal: 20, 
+          backgroundColor: COLORS.colorC4, 
+          marginTop: 10, 
+          marginBottom: 10}} 
+          />
         <Text style={styles.textLebihHemat}>{productDescription}</Text>
         <View style={{ height: 1, marginHorizontal: 20, backgroundColor: COLORS.colorC4, marginTop: 10, marginBottom: 10}} />
       </View>
-        <KpnButton
-          text="Beli Produk"
-          isRounded
-          color={COLORS.sans}
-          style={{
-            height: 35,
-            width: width - 20,
-            marginTop: 10,
-            marginHorizontal: 10
-           }}
-        />
         <KpnButton
           text="Lihat Detail Produk"
           isRounded
@@ -170,6 +179,17 @@ export default function Home({ navigation }) {
             width: width - 20,
             marginHorizontal: 10
           }}
+        />
+        <KpnButton
+          text="Beli Produk"
+          isRounded
+          color={COLORS.sans}
+          style={{
+            height: 35,
+            width: width - 20,
+            marginTop: 10,
+            marginHorizontal: 10
+           }}
         />
     </BottomSheetScrollView>
     </BottomSheet>
@@ -325,15 +345,16 @@ export default function Home({ navigation }) {
         </AvoidKeyboard>
         <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell()} style={{ marginRight: 20 }} />
       </Animated.View>
-    <Animated.ScrollView style={styles.container} refreshControl={
+      <Animated.ScrollView style={[styles.container, /* { opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)), } */]} 
+      refreshControl={
       <RefreshControl 
       refreshing={homeSelector.isLoading}
       onRefresh={onRefreshAll} 
+      style={{ paddingTop: 60 }}
       />
     }
     onScroll={(e) => {
       scrollY.setValue(e.nativeEvent.contentOffset.y)
-      console.log(scrollY, "Scroll Y")
     }}
     scrollEnabled={!homeSelector.isLoading}
     >
@@ -369,6 +390,7 @@ export default function Home({ navigation }) {
                       rating={item.rating}
                       title={truncate(item.name, 30)}
                       image={item.avatar}
+                      price={item.price}
                       onPress={() => onNavigateToDetail(0, item.id) }
                       onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
                     />
@@ -422,6 +444,7 @@ export default function Home({ navigation }) {
                     rating={item.rating}
                     title={truncate(item.name, 30)}
                     image={item.avatar}
+                    price={item.price}
                     onPress={() => onNavigateToDetail(0, item.id)}
                     onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
                   />
@@ -482,6 +505,7 @@ export default function Home({ navigation }) {
                     rating={item.rating}
                     title={truncate(item.name, 30)}
                     image={item.avatar}
+                    price={item.price}
                     onPress={() => onNavigateToDetail(0, item.id)}
                     onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
                   />
@@ -504,14 +528,16 @@ export default function Home({ navigation }) {
                       rating={data.rating}
                       title={truncate(data.name, 30)}
                       image={data.avatar}
+                      price={data.price}
                       onPress={() => onNavigateToDetail(0, data.id)}
-                      onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
+                      onPressAvatar={() => onPressBottomAvatar(data.name, data.avatar, truncate(data.description, 200))}
                     />
                   </View>
                 )) : null
                 }
             </View>
           </View>
+          <View style={{ height: 60, width: width }}></View>
       </View>
     </Animated.ScrollView>
     {/* {renderBottomSheet()} */}

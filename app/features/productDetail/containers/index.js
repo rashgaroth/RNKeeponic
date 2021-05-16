@@ -1,4 +1,4 @@
-import React, {useState, useRef, useCallback, useEffect} from 'react';
+import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import { 
   View, 
   StatusBar, 
@@ -29,11 +29,12 @@ import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
 import { goBack, navigate } from "../../../navigation/NavigationService";
 import { searchProduct, imageData } from "../constants";
-import { truncate } from "../../../utils/stringUtils";
+import { convertToIdr, truncate } from "../../../utils/stringUtils";
 import { widthScreen, width, heightScreen } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
 import { KpnButton, KpnCardProducts } from "../../../components";
 import * as detailProductAction from "../actions";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 const imageW = widthScreen;
 const imageH = imageW * 1;
@@ -46,6 +47,10 @@ export default function Home(props) {
   const [readableDesc, setReadableDesc] = useState(false);
   const [description, setDescription] = useState("");
   const [bottomAction, setBottomAction] = useState(null);
+  const [indexBottomSheet, setIndexBottomSheet] = useState(0);
+  const [productTitle, setProductTitle] = useState("");
+  const [productAvatar, setProductAvatar] = useState("");
+  const [productDescription, setProductDescription] = useState("");
 
   const dispatch = useDispatch();
   const homeSelector = useSelector(state => state.homeReducer)
@@ -55,6 +60,9 @@ export default function Home(props) {
   const loading = detailProductSelector.loading
   let scrollX = React.useRef(new Animated.Value(0)).current;
   let scrollY = useRef(new Animated.Value(0)).current;
+  const bottomSheetRef = useRef(null);
+  // const fall = new Animated.Value(1);
+  const snapPoints = useMemo(() => [0, '60%'], []);
 
   const debugginLoader = true;
 
@@ -119,7 +127,6 @@ export default function Home(props) {
 
   useEffect(() => {
     fetchProductDetail()
-    setDescription(truncate(mProducts.description, 200))
   }, []);
 
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
@@ -135,12 +142,95 @@ export default function Home(props) {
     outputRange: [0, -50],
   })
 
-  const timingAnimatedScrollY = () => {
+  const onNavigateToDetail = (user_id, product_id) => {
+    const param = {
+      // userId: user_id, 
+      productId: product_id
+    }
+    navigate("ProductDetail", param)
+  }
+
+  const onPressBottomAvatar = (title, avatar, description) => {
+    setIndexBottomSheet(1)
+    setProductTitle(title)
+    setProductAvatar(avatar)
+    setProductDescription(description)
     Animated.timing(scrollY, {
-      toValue: 50,
+      toValue: 0,
       useNativeDriver: true,
       duration: 1000
-    })
+    }).start();
+    console.log(scrollY, "scroll")
+  }
+
+  const RenderBottomSheet = () => {
+    return <BottomSheet
+      ref={bottomSheetRef}
+      index={indexBottomSheet}
+      snapPoints={snapPoints}
+      // onChange={handleSheetChanges}
+      backdropComponent={(backdropProps) => (
+        <BottomSheetBackdrop {...backdropProps} enableTouchThrough={true} />
+      )}
+    >
+      <BottomSheetScrollView>
+        <View>
+          <Image
+            source={{ uri: productAvatar ? productAvatar : "https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles.png" }}
+            style={{
+              // width: width,
+              height: 200,
+              marginHorizontal: 10,
+              borderRadius: 16
+            }}
+          />
+          <Text style={{
+            alignSelf: "center",
+            fontWeight: "bold",
+            fontSize: 20,
+            marginTop: 10,
+            marginHorizontal: 10
+          }}
+          >
+            {productTitle ? productTitle : "-------"}
+          </Text>
+          <View style={{
+            height: 1,
+            marginHorizontal: 20,
+            backgroundColor: COLORS.colorC4,
+            marginTop: 10,
+            marginBottom: 10
+          }}
+          />
+          <Text style={styles.textLebihHemat}>{productDescription}</Text>
+          <View style={{ height: 1, marginHorizontal: 20, backgroundColor: COLORS.colorC4, marginTop: 10, marginBottom: 10 }} />
+        </View>
+        <KpnButton
+          text="Lihat Detail Produk"
+          isRounded
+          mode="outlined"
+          labelStyle={COLORS.primaryColor}
+          color={COLORS.sans}
+          style={{
+            height: 35,
+            marginTop: 10,
+            width: width - 20,
+            marginHorizontal: 10
+          }}
+        />
+        <KpnButton
+          text="Beli Produk"
+          isRounded
+          color={COLORS.sans}
+          style={{
+            height: 35,
+            width: width - 20,
+            marginTop: 10,
+            marginHorizontal: 10
+          }}
+        />
+      </BottomSheetScrollView>
+    </BottomSheet>
   }
 
   return (
@@ -291,7 +381,7 @@ export default function Home(props) {
                         borderRadius: 16,
                         marginLeft: 10
                       }}
-                    /> : <Text style={styles.priceText}>Rp.{mProducts.price}</Text>
+                    /> : <Text style={styles.priceText}>{convertToIdr(mProducts.price)}</Text>
                 }
                   {
                       loading ? <View style={{ flexDirection: "row" }}> 
@@ -556,7 +646,7 @@ export default function Home(props) {
                       />
                     </View> :
                     <View style={{ marginHorizontal: 10 }}>
-                      <Text style={{ marginBottom: 10, marginTop: 10 }}> { description } </Text>
+                      <Text style={{ marginBottom: 10, marginTop: 10 }}> { description ? description : truncate(mProducts.description, 200) } </Text>
                       <Text style={{ color: COLORS.blue }} onPress={(e) => onRead()}>{ readableDesc ? "Minimalkan" : "Baca Selengkapnya" }</Text>
                     </View>
                 }
@@ -602,9 +692,13 @@ export default function Home(props) {
                           data={homeSelector.products}
                           renderItem={({ item }) => (
                             <KpnCardProducts
+                              key={item.id}
                               rating={item.rating}
                               title={truncate(item.name, 30)}
                               image={item.avatar}
+                              price={item.price}
+                              onPress={() => onNavigateToDetail(0, item.id)}
+                              onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
                             />
                           )}
                           keyExtractor={(item) => item.id}
@@ -623,7 +717,7 @@ export default function Home(props) {
             {/* End */}
           </SafeAreaView>
       }
-      <View style={{ height: 45, backgroundColor: COLORS.white }} />
+      <View style={{ height: 95, backgroundColor: COLORS.white }} />
       </Animated.ScrollView>
       <Animated.View style={{
         transform: [{ translateY: translateButtonGroup }], 
@@ -651,6 +745,7 @@ export default function Home(props) {
                 actionHandler={() => { setActiveIndex(false) }}
                 actionText="Tutup" />
             </View>
+            <RenderBottomSheet />
       </>
   );
 }
@@ -660,6 +755,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     height: heightScreen,
     zIndex: 0,
+    paddingTop: 50,
   },
   wrapper: {
 
@@ -801,5 +897,10 @@ const styles = StyleSheet.create({
     width: Dimensions.get('screen').width - 20,
     marginHorizontal: 10,
     // alignSelf: "center",
+  },
+  textLebihHemat: {
+    fontSize: 13,
+    color: COLORS.fontColor,
+    left: 10
   }
 })

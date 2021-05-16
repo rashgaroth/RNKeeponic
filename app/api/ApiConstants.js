@@ -11,6 +11,7 @@ const API_ENDPOINT = {
   GOOGLE_LOGIN: 'client/user/login/oauth2',
   // register
   REGISTER: 'client/user/registration',
+  SELLER_REGISTER: 'client/seller/registration',
   // dapat digunakan untuk mendapatkan pagination atau detail, atau tidak dengan pagin
   GET_PRODUCT: 'client/product',
   GET_PRODUCT_DETAIL: 'client/product/findOne',
