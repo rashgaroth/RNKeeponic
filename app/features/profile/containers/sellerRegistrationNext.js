@@ -133,7 +133,7 @@ export default function RegisterNext(props) {
                 setValidatorErrorMsg(_data.data.message)
                 setErrVisible(true)
                 setLoading(false)
-                navigate("Home")
+                navigate("SellerRegistrationSuccess")
             } else {
                 setLoading(false)
                 setValidatorErrorMsg(_data.message)

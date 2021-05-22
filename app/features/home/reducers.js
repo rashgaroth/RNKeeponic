@@ -3,12 +3,14 @@
  */
 import createReducer from 'app/lib/createReducer';
 import * as types from "./types";
+import { IHome } from "../interfaces";
 
 const initialState = {
     isLoading: true,
     spinnerLoading: false,
     isSkeleton: false,
     isError: false,
+    isSeller: false,
     userProfile: {
         name: "",
         email: "",
@@ -95,6 +97,18 @@ export const homeReducer = createReducer(initialState, {
             isError: true
         }
     },
+    [types.SET_SELLER](state) {
+        return {
+            ...state,
+            isSeller: true
+        }
+    },
+    [types.SET_SELLER_FALSE](state){
+        return{
+            ...state,
+            isSeller: false
+        }
+    },
     [types.GET_PROFILE_SUCCESS](state, action) {
         return {
             ...state,
@@ -113,6 +127,13 @@ export const homeReducer = createReducer(initialState, {
                 is_admin: action.data.is_admin,
                 status: action.data.status,
             },
+            userAddress: {
+                ...state.userAddress,
+                subdistrict: action.address.subdistrict,
+                city: action.address.city,
+                prov: action.address.province
+            }
         }
     },
+
 });

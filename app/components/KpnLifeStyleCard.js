@@ -4,6 +4,7 @@ import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
 import { navigationRef } from "../navigation/NavigationStack";
+import { width } from '../utils/theme';
 
 const KpnLifeStyleCard = ({ uri, onPress }) => {
     return (
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     cardCover: {
         borderRadius: 10,
         height: 90,
-        width: 200,
+        width: width / 2 - 20,
         borderTopEndRadius: 10,
         borderTopStartRadius: 10
     },

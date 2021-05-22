@@ -8,6 +8,7 @@ import KpnWideCard from "./KpnWideCard"
 import KpnErrorDialog from "./KpnErrorDialog"
 import CustomSearchBar from "./CustomSearchBar"
 import ToastMessage from "./ToastMessage"
+import KpnSnackBar from "./KpnSnackBar"
 
 export {
     KpnButton,
@@ -19,5 +20,6 @@ export {
     KpnWideCard,
     KpnErrorDialog,
     CustomSearchBar,
-    ToastMessage
+    ToastMessage,
+    KpnSnackBar
 }

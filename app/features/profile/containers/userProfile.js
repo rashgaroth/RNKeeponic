@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     View,
     StatusBar,
@@ -8,6 +8,7 @@ import {
     StyleSheet,
     KeyboardAvoidingView,
     Keyboard,
+    Linking
 } from 'react-native';
 import { Button, IconButton, Avatar, Switch, TextInput } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay"
@@ -29,6 +30,7 @@ import { ITEM_WIDTH, SPACING, width } from "../../../utils/theme";
 import { truncate, getInitials } from "../../../utils/stringUtils";
 import LogoRounded from "../../../assets/images/svg/LogoRounded";
 import * as loginActions from "../../login/actions";
+import * as homeActions from "../../home/actions";
 import { removeAllItems } from "../../../services/asyncStorage";
 import { navigate } from '../../../navigation/NavigationService';
 
@@ -40,12 +42,14 @@ export default function Profile() {
     const [fieldValue, setFieldValue] = useState('');
     const [profileImages, setProfileImages] = useState('https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg')
     const [isPhotoUpdated, setIsPhotoUpdated] = useState(false);
+    const [url, setUrl] = useState("https://development.d3rwng03cwc4kn.amplifyapp.com/login")
 
     const dispatch = useDispatch();
     const homeSelector = useSelector(state => state.homeReducer);
     const loginSelector = useSelector(state => state.loginReducer);
     const userProfile = homeSelector.userProfile;
     const userAddress = homeSelector.userAddress;
+    const isSeller = homeSelector.isSeller;
     const detailUser = [
         {
             title: "Nama",
@@ -76,6 +80,7 @@ export default function Profile() {
             await removeAllItems();
             await dispatch(loginActions.logOut());
             await dispatch(loginActions.setUserAlreadyExplored(true));
+            await dispatch(homeActions.setSellerFalse());
         } catch (error) {
             console.error(error);
         }
@@ -151,12 +156,21 @@ export default function Profile() {
         });
     }
 
-    const onPressDaftarToko = () => {
-        const param = {
-            email: userProfile.email
+    const onPressDaftarToko = useCallback(async () => {
+        if(isSeller){
+            const supported = await Linking.canOpenURL(url);
+            if (supported) {
+                await Linking.openURL(url);
+            } else {
+                Alert.alert(`Tidak Bisa Membuka Website: ${url}`);
+            }
+        }else{
+            const param = {
+                email: userProfile.email
+            }
+            navigate("SellerRegistrationMarketName", param)
         }
-        navigate("SellerRegistration", param)
-    }
+    }, [url]);
 
     // Render Bottom Sheet
 
@@ -264,7 +278,7 @@ export default function Profile() {
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
                                 <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.sans}>Ubah Password</Button>
-                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={COLORS.sans}>Daftar Toko</Button>
+                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller ? COLORS.blue : COLORS.sans}>{ isSeller ? "Login Seller" : "Daftar Toko"}</Button>
                             </View>
                             {/* View Setting ON/OFF */}
                             <View>
@@ -400,13 +414,13 @@ const stylesLocal = StyleSheet.create({
     },
     buttonGroup: {
         margin: 10,
-        flexWrap: 'wrap',
+        flexWrap: 'nowrap',
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
     button: {
         borderRadius: 15,
-        width: 200,
+        // width: 200,
         color: COLORS.white,
     },
     switch: {

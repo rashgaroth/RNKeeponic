@@ -23,6 +23,7 @@ export default function* getProductDetail(state) {
     const loginState = yield select(loginReducer);
     const token = loginState.user.token
     // if(token){
+        console.log(state)
         try {
             const product_id = state.payload.product_id;
             // const user_id = state.payload.user_id;
@@ -35,35 +36,34 @@ export default function* getProductDetail(state) {
                 url,
                 HeaderAuth(token))
             if (_response.status === 200) {
-                // yield put(detailProductAction.onSuccessGetDetail(_response.data.data))
                 const payload = _response.data.data;
-                const market = _response.data.market[0];
-                console.log("success")
+                const market = _response.data.market;
+                const category = _response.data.category;
                 let avatar = payload.avatar;
                 let second_avatar = payload.second_avatar;
                 let third_avatar = payload.third_avatar;
                 let fourth_avatar = payload.fourth_avatar;
                 const image = []
-                if (second_avatar&& third_avatar && fourth_avatar){
-                    image.push(avatar, second_avatar, third_avatar, fourth_avatar);
-                }else{
-                    image.push(avatar)
+                image.push(avatar)
+                if(second_avatar){
+                    image.push(second_avatar)
+                }
+                if(third_avatar){
+                    image.push(third_avatar)
+                }
+                if(fourth_avatar){
+                    image.push(fourth_avatar)
                 }
                 yield put(detailProductAction.setProductOnReducer(payload, image));
                 yield put(detailProductAction.setMarketOnReducer(market));
+                yield put(detailProductAction.setCategory(category));
                 yield put(detailProductAction.hideLoading());
             }
         } catch (error) {
+            console.log(error)
             yield put(detailProductAction.hideLoading());
             setTimeout(() => {
                 Alert.alert('Keeponic', "Error saat menerima data");
             }, 200);
         }
-    // }else{
-    //     yield put(detailProductAction.hideLoading());
-    //     setTimeout(() => {
-    //         Alert.alert('Keeponic', "Token Tidak Tersedia");
-    //     }, 200);
-    // }
-
 }

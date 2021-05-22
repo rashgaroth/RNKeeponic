@@ -1,6 +1,5 @@
 import * as React from "react"
 import { StyleSheet, View } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import { COLORS } from "../utils/colors"
 
 export default function KpnDivider({
@@ -57,7 +56,3 @@ export default function KpnDivider({
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-
-})

@@ -2,8 +2,6 @@ import * as React from 'react';
 import { TextInput, Text, IconButton } from 'react-native-paper';
 import { StyleSheet, View, KeyboardAvoidingView } from "react-native"
 import { COLORS } from '../utils/colors';
-import AvoidKeyboard from './KpnKeyboardAvoidView'
-import Icon from 'react-native-vector-icons/FontAwesome'
 
 const MyComponent = ({placeholder, 
     style, 
@@ -68,7 +66,7 @@ const MyComponent = ({placeholder,
                         underlineColor: COLORS.white,
                         primary: primaryColor || COLORS.primaryColor,
                         background: COLORS.white,
-                    }
+                    },
                 }}
                 onChangeText={onChangeText}
                 style={[{ ...style }]}

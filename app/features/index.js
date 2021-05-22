@@ -15,6 +15,8 @@ import WelcomePage from "./login/containers/welcomePage";
 import LifestyleDetail from "./lifestyleDetail/containers";
 import SellerRegistration from "./profile/containers/sellerRegistration";
 import SellerRegistrationNext from "./profile/containers/sellerRegistrationNext";
+import SellerRegistrationSuccess from "./profile/containers/sellerRegistrationSuccess";
+import SellerRegistrationMarketName from "./profile/containers/sellerRegistrationMarketName";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -36,5 +38,7 @@ export {
     WelcomePage,
     LifestyleDetail,
     SellerRegistration,
-    SellerRegistrationNext
+    SellerRegistrationNext,
+    SellerRegistrationSuccess,
+    SellerRegistrationMarketName
 }

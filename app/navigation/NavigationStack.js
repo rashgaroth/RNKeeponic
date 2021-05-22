@@ -23,7 +23,9 @@ import {
   RegisterVerification,
   WelcomePage,
   SellerRegistration,
-  SellerRegistrationNext
+  SellerRegistrationNext,
+  SellerRegistrationSuccess,
+  SellerRegistrationMarketName,
 } from "../features";
 
 enableScreens(false);
@@ -145,6 +147,20 @@ function App() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="SellerRegistrationSuccess"
+          component={SellerRegistrationSuccess}
+          options={{
+            headerShown: false,
+          }}
+        />
+      <Stack.Screen
+        name="SellerRegistrationMarketName"
+        component={SellerRegistrationMarketName}
+        options={{
+          headerShown: false,
+        }}
+      />
       </Stack.Navigator>
     </NavigationContainer>
   );

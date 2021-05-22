@@ -10,6 +10,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 
 import Ordered from './Ordered';
 import OrderCart from './OrderCart';
+import OrderBefore from './OrderBefore';
 import { COLORS } from '../../../utils/colors';
 
 const Stack = createStackNavigator();
@@ -34,21 +35,30 @@ function TabStack() {
         },
       }}>
       <Tab.Screen
-        name="Ordered"
-        component={Ordered}
+        name="OrderBefore"
+        component={OrderBefore}
         options={{
-          tabBarLabel: 'Pesanan Terbeli',
+          tabBarLabel: 'Pesanan',
           // tabBarIcon: ({ color, size }) => (
-          //   <MaterialCommunityIcons name="home" color={color} size={size} />
+          //   <MaterialCommunityIcons name="settings" color={color} size={size} />
           // ),
         }} />
       <Tab.Screen
         name="OrderCart"
         component={OrderCart}
         options={{
-          tabBarLabel: 'Pesanan',
+          tabBarLabel: 'Dikirim',
           // tabBarIcon: ({ color, size }) => (
           //   <MaterialCommunityIcons name="settings" color={color} size={size} />
+          // ),
+        }} />
+      <Tab.Screen
+        name="Ordered"
+        component={Ordered}
+        options={{
+          tabBarLabel: 'Selesai',
+          // tabBarIcon: ({ color, size }) => (
+          //   <MaterialCommunityIcons name="home" color={color} size={size} />
           // ),
         }} />
     </Tab.Navigator>
@@ -64,7 +74,7 @@ function App() {
           headerTintColor: '#fff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}>
-        <Stack.Screen name="TabStack" component={TabStack} options={{ title: 'Order' }} />
+        <Stack.Screen name="TabStack" component={TabStack} options={{ title: 'Pesanan' }} />
       </Stack.Navigator>
   );
 }

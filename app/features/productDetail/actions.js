@@ -53,3 +53,10 @@ export const setMarketOnReducer = (data) => {
         data
     }
 }
+
+export const setCategory = (data) => {
+    return {
+        type: types.SET_CATEGORY,
+        data
+    }
+}

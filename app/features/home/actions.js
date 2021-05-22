@@ -54,10 +54,11 @@ export function getUserProfile(key, userId) {
     }
 }
 
-export function getUserProfileSuccess(data) {
+export function getUserProfileSuccess(data, address) {
     return {
         type: types.GET_PROFILE_SUCCESS,
-        data
+        data,
+        address
     }
 }
 
@@ -65,5 +66,17 @@ export function getAllProducts(data) {
     return {
         type: types.GET_ALL_PRODUCTS,
         data
+    }
+}
+
+export function setSeller() {
+    return {
+        type: types.SET_SELLER
+    }
+}
+
+export function setSellerFalse() {
+    return {
+        type: types.SET_SELLER_FALSE
     }
 }

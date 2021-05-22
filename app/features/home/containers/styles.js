@@ -93,10 +93,9 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   cardLifestyle: {
-    flex: 1,
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     // marginTop: 20,
   },
   cardLifestyle1: {
@@ -138,7 +137,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
   },
   slide: {
     flex: 1,
@@ -217,7 +215,7 @@ const styles = StyleSheet.create({
   input: {
     // flex: 1,
     height: 40,
-    width: 320,
+    // width: 300,
     backgroundColor: '#e4e6eb',
     borderRadius: 16,
     justifyContent: 'center',

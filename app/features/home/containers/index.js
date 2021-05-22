@@ -9,7 +9,7 @@ import {
   Animated,
   TextInput,
   Keyboard,
-  Image
+  Image, 
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
@@ -43,6 +43,7 @@ export default function Home({ navigation }) {
   const [productTitle, setProductTitle] = useState("");
   const [productAvatar, setProductAvatar] = useState("");
   const [productDescription, setProductDescription] = useState("");
+  const [productId, setProductId] = useState(0);
 
   let scrollX = useRef(new Animated.Value(0)).current;
   let scrollY = useRef(new Animated.Value(0)).current;
@@ -110,11 +111,12 @@ export default function Home({ navigation }) {
     outputRange: [0, 0, 0, -60]
   });
 
-  const onPressBottomAvatar = (title, avatar, description) => {
+  const onPressBottomAvatar = (title, avatar, description, id) => {
     setIndexBottomSheet(1)
     setProductTitle(title)
     setProductAvatar(avatar)
     setProductDescription(description)
+    setProductId(id)
     console.log(homeSelector.userAddress, "scroll")
   }
 
@@ -131,6 +133,7 @@ export default function Home({ navigation }) {
       ref={bottomSheetRef}
       index={indexBottomSheet}
       snapPoints={snapPoints}
+      key={productId}
       // onChange={handleSheetChanges}
       backdropComponent={ (backdropProps) => (
         <BottomSheetBackdrop {...backdropProps} enableTouchThrough={true} />
@@ -172,6 +175,7 @@ export default function Home({ navigation }) {
           isRounded
           mode="outlined"
           labelStyle={COLORS.primaryColor}
+          onPress={console.log("test")}
           color={COLORS.sans}
           style={{
             height: 35,
@@ -361,7 +365,7 @@ export default function Home({ navigation }) {
         <StatusBar backgroundColor={COLORS.sans} />
         <Spinner
           visible={homeSelector.spinnerLoading}
-          textContent={'Mohon Tunggu ...'}
+          textContent={''}
           textStyle={{ color: COLORS.white }}
         />
         {/* <Text style={styles.textMenuButton}>Selamat datang, {name}!</Text> */}
@@ -392,7 +396,7 @@ export default function Home({ navigation }) {
                       image={item.avatar}
                       price={item.price}
                       onPress={() => onNavigateToDetail(0, item.id) }
-                      onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
+                      onPressAvatar={() => onNavigateToDetail(0, item.id)}
                     />
                   )}
                   keyExtractor={(item) => item.id}
@@ -402,10 +406,10 @@ export default function Home({ navigation }) {
             </View>
             <View style={styles.textMenuHidroponik}>
               <Text style={styles.textPaketHidroponik}>Galeri Hidroponik & Kreativitas</Text>
-              <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
               <TouchableOpacity onPress={(e) => console.log("aa")}>
                 <Text style={styles.textLihatSemua}>Lihat Semua</Text>
               </TouchableOpacity>
+              <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
             </View>
             <View style={styles.cardLifestyle}>
               {
@@ -446,7 +450,7 @@ export default function Home({ navigation }) {
                     image={item.avatar}
                     price={item.price}
                     onPress={() => onNavigateToDetail(0, item.id)}
-                    onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
+                    onPressAvatar={() => onNavigateToDetail(0, item.id)}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -458,8 +462,8 @@ export default function Home({ navigation }) {
               <TouchableOpacity>
                 <Text style={styles.textLihatSemua}>Lihat Semua</Text>
               </TouchableOpacity>
-              <Text style={styles.textLebihHemat}>Ide Hidroponik yang menginspirasi anda!</Text>
             </View>
+              <Text style={styles.textLebihHemat}>Ide Hidroponik yang menginspirasi anda!</Text>
             <View style={styles.wideCards}>
               {/* <KpnWideCard /> */}
               {/* FlatList Inspirasi */}
@@ -488,8 +492,8 @@ export default function Home({ navigation }) {
               <TouchableOpacity>
                 <Text style={styles.textLihatSemua}>Lihat Semua</Text>
               </TouchableOpacity>
-              <Text style={styles.textLebihHemat}>Malas menunggu? Ini Solusinya!</Text>
             </View>
+              <Text style={styles.textLebihHemat}>Malas menunggu? Ini Solusinya!</Text>
             {/* Flatlist untuk terdekat */}
             <View style={styles.cardProducts}>
               <FlatList
@@ -507,7 +511,7 @@ export default function Home({ navigation }) {
                     image={item.avatar}
                     price={item.price}
                     onPress={() => onNavigateToDetail(0, item.id)}
-                    onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
+                    onPressAvatar={() => onNavigateToDetail(0, item.id)}
                   />
                 )}
                 keyExtractor={(item) => item.id}
@@ -530,7 +534,7 @@ export default function Home({ navigation }) {
                       image={data.avatar}
                       price={data.price}
                       onPress={() => onNavigateToDetail(0, data.id)}
-                      onPressAvatar={() => onPressBottomAvatar(data.name, data.avatar, truncate(data.description, 200))}
+                      onPressAvatar={() => onNavigateToDetail(0, data.id)}
                     />
                   </View>
                 )) : null
@@ -541,7 +545,7 @@ export default function Home({ navigation }) {
       </View>
     </Animated.ScrollView>
     {/* {renderBottomSheet()} */}
-      <RenderBottomSheet />
+      {/* <RenderBottomSheet /> */}
     </View>
   );
 }

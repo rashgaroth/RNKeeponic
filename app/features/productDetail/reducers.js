@@ -8,6 +8,11 @@ const initialState = {
     loading: true,
     market_id: null,
     avatar: null,
+    category: {
+        id: null,
+        name: "",
+        status: null,
+    },
     mMarket: {
         id: null,
         owner_sec_user_id: null,
@@ -151,6 +156,17 @@ export const detailProductReducer = createReducer(initialState, {
             ...state,
             loading: action.loader,
             avatar: null
+        };
+    },
+    [types.SET_CATEGORY](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                id: action.data.id,
+                name: action.data.name,
+                status: action.data.status,
+            }
         };
     },
 });

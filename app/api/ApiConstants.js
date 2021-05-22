@@ -17,7 +17,8 @@ const API_ENDPOINT = {
   GET_PRODUCT_DETAIL: 'client/product/findOne',
   GET_PROFILE: 'client/user',
   GET_PROFILE_ADDRESS: 'client/user/address',
-  GET_ALL_ADDRESS: 'client/address/all'
+  GET_ALL_ADDRESS: 'client/address/all',
+  WISHLIST: 'client/product'
 };
 
 const API = {

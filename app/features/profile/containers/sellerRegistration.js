@@ -27,6 +27,7 @@ export default function RegisterPassword(props) {
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
+    const userAddressSelector = useSelector(state => state.homeReducer.userAddress); 
 
     const checkValidation = () => {
         if (password === '') {
@@ -68,14 +69,9 @@ export default function RegisterPassword(props) {
 
     }, [null])
 
-    const postSellerRegistration = async (emailUser, password) => {
+    const postSellerRegistration = async (param) => {
         try {
             setLoading(true)
-            const param = {
-                email: emailUser,
-                password: password
-            }
-            console.log(param, "param");
             const _data = await apiServices.POST(API.BASE_URL + API.ENDPOINT.SELLER_REGISTER, param)
             if (_data.status === 200 && _data.data.error < 1) {
                 const param = {
@@ -84,9 +80,12 @@ export default function RegisterPassword(props) {
                 setIsError(false)
                 setValidatorErrorMsg(_data.data.message)
                 setErrVisible(true)
-                setLoading(false)
-                console.log(param, "param user")
-                navigate("SellerRegistrationNext", param)
+                setLoading(false) 
+                if (userAddressSelector.subdistrict){
+                    navigate("SellerRegistrationSuccess")
+                }else{
+                    navigate("SellerRegistrationNext", param)
+                }
             } else {
                 setLoading(false)
                 setValidatorErrorMsg(_data.message)
@@ -101,10 +100,16 @@ export default function RegisterPassword(props) {
 
     const onRegistrationSubmit = async () => {
         const validator = checkValidation();
-        const { email } = props.route.params
+        const { email, market_avatar, market_name, market_description } = props.route.params
         if (validator) {
-            await postSellerRegistration(email, password)
-            // await dispatch(registerActions.submitRegistration())
+            const param = {
+                email: email,
+                password: password,
+                market_avatar: market_avatar,
+                market_name: market_name,
+                market_description: market_description
+            }
+            await postSellerRegistration(param)
         } else {
             setErrVisible(true)
         }

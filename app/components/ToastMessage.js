@@ -1,26 +1,24 @@
-import React, { useEffect } from 'react';
-import Toast from 'react-native-toast-message';
+import Toast, { BaseToast } from 'react-native-toast-message';
+import { View, Text } from 'react-native';
 
-const ToastMessage = ({ title, text, type, visible }) => {
+const toastConfig = {
+    success: ({ text1, props, ...rest }) => (
+        <BaseToast
+            {...rest}
+            style={{ borderLeftColor: 'pink' }}
+            contentContainerStyle={{ paddingHorizontal: 15 }}
+            text1Style={{
+                fontSize: 15,
+                fontWeight: '400'
+            }}
+            text1={text1}
+            text2={props.uuid}
+        />
+    ),
 
-    useEffect(() =>{
-        if(visible){
-            Toast.show({
-                type: type,
-                position: 'bottom',
-                text1: title,
-                text2: text,
-                visibilityTime: 4000,
-                autoHide: true,
-                topOffset: 30,
-                bottomOffset: 40,
-            })
-        }
-    }, [null])
-
-    return (
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+    my_custom_type: ({ text1, props, ...rest }) => (
+        <View style={{ height: 60, width: '100%', backgroundColor: 'tomato' }}>
+            <Text>{text1}</Text>
+        </View>
     )
-}
-
-export default ToastMessage;
+};

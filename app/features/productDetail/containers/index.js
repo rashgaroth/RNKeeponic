@@ -13,7 +13,8 @@ import {
   FlatList,
   RefreshControl,
   Dimensions,
-  Easing
+  Easing,
+  TouchableNativeFeedback
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { Chip, IconButton, Text, Button } from 'react-native-paper';
@@ -32,7 +33,7 @@ import { searchProduct, imageData } from "../constants";
 import { convertToIdr, truncate } from "../../../utils/stringUtils";
 import { widthScreen, width, heightScreen } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
-import { KpnButton, KpnCardProducts } from "../../../components";
+import { KpnButton, KpnCardProducts, KpnSnackBar } from "../../../components";
 import * as detailProductAction from "../actions";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
@@ -51,6 +52,9 @@ export default function Home(props) {
   const [productTitle, setProductTitle] = useState("");
   const [productAvatar, setProductAvatar] = useState("");
   const [productDescription, setProductDescription] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [validatorErrorMsg, setValidatorErrorMsg] = useState("");
+  const [errVisible, setErrVisible] = useState(false);
 
   const dispatch = useDispatch();
   const homeSelector = useSelector(state => state.homeReducer)
@@ -62,7 +66,7 @@ export default function Home(props) {
   let scrollY = useRef(new Animated.Value(0)).current;
   const bottomSheetRef = useRef(null);
   // const fall = new Animated.Value(1);
-  const snapPoints = useMemo(() => [0, '60%'], []);
+  const snapPoints = useMemo(() => [0, '80%'], []);
 
   const debugginLoader = true;
 
@@ -86,7 +90,8 @@ export default function Home(props) {
   const onPressLove = () => {
     console.log(detailProductSelector);
     setIsLove(!isLove);
-    setActiveIndex(true);
+    setValidatorErrorMsg("Produk Disukai Ditambahkan");
+    setErrVisible(true);
   }
 
   const onBackPressed = async () => {
@@ -101,6 +106,14 @@ export default function Home(props) {
 
   const onPressBuy = () => {
     console.log("Pressed")
+  }
+
+  const onPressSnackBarAction = () => {
+    setErrVisible(false)
+  }
+
+  const onDissmissSnackBar = () => {
+    setErrVisible(false)
   }
 
   const onRead = () => {
@@ -160,7 +173,6 @@ export default function Home(props) {
       useNativeDriver: true,
       duration: 1000
     }).start();
-    console.log(scrollY, "scroll")
   }
 
   const RenderBottomSheet = () => {
@@ -263,7 +275,6 @@ export default function Home(props) {
       scrollEnabled={!loading}
       onScroll={ (e) => {
         scrollY.setValue(e.nativeEvent.contentOffset.y)
-        console.log(scrollY, "Scroll Y")
       } }
       >
       <StatusBar backgroundColor={COLORS.primaryOpacity} />
@@ -366,9 +377,9 @@ export default function Home(props) {
                         />
                       </View>
                 }
-                <IconButton icon="share-variant" style={{ position: 'absolute', top: 10 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
-                <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 50 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={() => onPressLove()} />
-                <IconButton icon="information-outline" style={{ position: 'absolute', top: 90 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
+                  <IconButton rippleColor={COLORS.blackSans} icon="share-variant" style={{ position: 'absolute', top: 10, left: 0, backgroundColor:COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
+                  <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 60, left: 0, backgroundColor: COLORS.colorC4 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={() => onPressLove()} />
+                  <IconButton icon="information-outline" style={{ position: 'absolute', top: 110, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
               </View>
               <View style={styles.price}>
                 {
@@ -381,7 +392,7 @@ export default function Home(props) {
                         borderRadius: 16,
                         marginLeft: 10
                       }}
-                    /> : <Text style={styles.priceText}>{convertToIdr(mProducts.price)}</Text>
+                    /> : <Text style={styles.priceText}>{mProducts.price ? convertToIdr(mProducts.price) : "0"}</Text>
                 }
                   {
                       loading ? <View style={{ flexDirection: "row" }}> 
@@ -722,30 +733,43 @@ export default function Home(props) {
       <Animated.View style={{
         transform: [{ translateY: translateButtonGroup }], 
         position: "absolute",
-        bottom: -50,
+        bottom: -60,
+        paddingTop: 20,
+        backgroundColor: COLORS.white,
         right: 0,
         left: 0,
         flex: 1,
         elevation: 10,
         zIndex: 10,
+        flexDirection: "row"
       }}>
+        <Text style={{ 
+          justifyContent: "center",
+          marginHorizontal: 10,
+          alignSelf: "flex-start",
+          marginBottom: 10,
+          color: COLORS.red,
+          textDecorationLine: "underline",
+          fontWeight: "bold",
+          fontSize: 20
+        }}>{mProducts.price ? convertToIdr(mProducts.price) : "0"}</Text>
         {/* <FooterButton cart={"0"} /> */}
-        <KpnButton
-          text="Beli Sekarang"
-          // mode="outlined"
-          icon="package-down"
+        <Button
+          color={COLORS.primaryColor}
+          icon="check-circle-outline"
+          mode="outlined"
           style={styles.buttonSticky}
           onPress={(e) => onPressBuy(e)}
-        />
+        > Order Produk </Button>
       </Animated.View>
-            <View>
-              <SnackBar
-                visible={activeIndex}
-                textMessage={isLove ? "Produk Disukai Ditambahkan" : "Produk Disukai Dibatalkan"}
-                actionHandler={() => { setActiveIndex(false) }}
-                actionText="Tutup" />
-            </View>
-            <RenderBottomSheet />
+            <KpnSnackBar 
+            errVisible={errVisible}
+            isError={isError}
+            onDismissSnackBar={() => onDissmissSnackBar()}
+            onPressAction={() => onPressSnackBarAction()}
+            validatorErrorMsg={validatorErrorMsg}
+            />
+            {/* <RenderBottomSheet /> */}
       </>
   );
 }
@@ -763,7 +787,7 @@ const styles = StyleSheet.create({
   input: {
     // flex: 1,
     height: 40,
-    width: 270,
+    // width: 270,
     backgroundColor: '#e4e6eb',
     borderRadius: 16,
     paddingHorizontal: 16,
@@ -778,6 +802,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: COLORS.primaryOpacity,
     flexDirection: "row",
+    justifyContent: "space-between",
     height: 60,
     elevation: 4,
     zIndex: 100
@@ -894,9 +919,11 @@ const styles = StyleSheet.create({
   },
   buttonSticky: {
     height: 35,
-    width: Dimensions.get('screen').width - 20,
+    width: Dimensions.get('screen').width - 150,
+    justifyContent: "center",
     marginHorizontal: 10,
-    // alignSelf: "center",
+    alignSelf: "flex-end",
+    marginBottom: 10
   },
   textLebihHemat: {
     fontSize: 13,

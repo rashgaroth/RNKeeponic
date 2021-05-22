@@ -39,7 +39,7 @@ export function GET(url, header) {
 
 export function POST(url, body, header) {
     return axios
-        .post(url, body)
+        .post(url, body, header)
         .then(res => {
             return res;
         })

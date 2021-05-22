@@ -52,10 +52,16 @@ export default function* homeGetProfile(state) {
                 )
 
                 if (_response.data.error < 1) {
-                    yield put(homeAction.getUserProfileSuccess(_response.data.data))
-                    console.log(_response.data.data + ":", "address")
+                    const address = _response.data.userAddress;
+                    console.log(address[0] + ":", "address")
+                    const userAddress = {
+                        subdistrict: address[0],
+                        city: address[1],
+                        province: address[2]
+                    }
+                    yield put(homeAction.getUserProfileSuccess(_response.data.data, userAddress))
                     setTimeout(() => {
-                        console.log(getHomeState.address + ":", "profile")
+                        console.log(getHomeState.userAddress, ": Address");
                     }, 5000);
                 } else {
                     yield put(homeAction.hideLoading())

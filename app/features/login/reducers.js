@@ -77,6 +77,14 @@ export const loginReducer = createReducer(initialState, {
     return {
       ...state,
       isLoggedIn: false,
+      user: {
+        ...state.user,
+        user_id: 0,
+        email: "",
+        name: "",
+        is_email_validated: null,
+        token: ""
+      },
     };
   },
   [types.SET_USERNAME](state, action){
@@ -154,7 +162,16 @@ export const loginReducer = createReducer(initialState, {
   [types.SET_USER_ALREADY_EXPLORED](state, action) {
     return {
       ...state,
-      isUserAlreadyExplore: action.data
+      isUserAlreadyExplore: action.data,
+      isUserRegistered: false,
+      user: {
+        ...state.user,
+        user_id: null,
+        email: "",
+        name: "",
+        is_email_validated: null,
+        token: ""
+      },
     }
   },
 });
