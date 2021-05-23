@@ -1,11 +1,12 @@
 import * as types from './types';
 
-export function requestHome(name, userId, page) {
+export function requestHome(name, userId, page, isFromWishlist) {
     return {
         type: types.HOME_REQUEST,
         name,
         userId,
-        page
+        page,
+        isFromWishlist
     };
 }
 

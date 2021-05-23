@@ -65,7 +65,7 @@ export default function Home({ navigation }) {
   async function fetchAllHomeRequest(){
       dispatch(homeAction.showLoading())
       if(loginSelector.isUserRegistered){
-        await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0))
+        await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
         await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
         setName(loginSelector.user.name)
       }else{

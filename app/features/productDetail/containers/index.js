@@ -202,23 +202,22 @@ export default function Home(props) {
   useEffect(() => {
     const checkProductOnWishlist = (data: IData[] = []) => {
       const productId = detailProductSelector.mProducts.id
-
-      // const map = data.map((x, i) => {
-      //   console.log(x.product_id, "map")
-      //   console.log(productId, "prid")
-      // })
       let arrIsLoved = [];
-      data.filter((v, i, a) => {
-        if (v.product_id === productId) {
-          arrIsLoved.push(a[i].isFavorite, a[i].product_id)
-          return a[i].product_id === productId
+      if(data){
+        data.filter((v, i, a) => {
+          if (v.product_id === productId) {
+            arrIsLoved.push(a[i].isFavorite, a[i].product_id)
+            return a[i].product_id === productId
+          } else {
+            return []
+          }
+        });
+        if (arrIsLoved.length) {
+          return true
         } else {
-          return []
+          return false
         }
-      });
-      if (arrIsLoved.length) {
-        return true
-      } else {
+      }else{
         return false
       }
     }

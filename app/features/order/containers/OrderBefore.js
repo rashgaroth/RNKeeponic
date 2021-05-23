@@ -14,6 +14,7 @@ import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProduct
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
 import * as productDetailActions from "../../productDetail/actions";
+import * as homeAction from "../../home/actions";
 
 export default function OrderBefore() {
     const [loading, setLoading] = useState(false)
@@ -29,6 +30,8 @@ export default function OrderBefore() {
     const tokenUser = loginSelector.user.token
     const userId = loginSelector.user.user_id
     const wishlistData = detailProductSelector.productWishlistData;
+    const loadingReducer = homeSelector.isLoading
+    const name = loginSelector.user.name
 
     const onDismissSnackBar = () => {
         setErrVisible(false)
@@ -107,7 +110,8 @@ export default function OrderBefore() {
                         setLoading(true)
                         const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/delete`, param, HeaderAuth(tokenUser))
                         if (_onFavorite.status === 200) {
-                            await getWishlistData(null)
+                            setLoading(false)
+                            await dispatch(homeAction.requestHome(name, userId, 0, true))
                         } else {
                             Alert.alert("Terjadi Kesalahan")
                             setValidatorErrorMsg(_onFavorite.data.msg)
@@ -218,7 +222,6 @@ export default function OrderBefore() {
     useEffect(() => {
         // effect
         console.log("useEffect Order")
-        // getWishlistData(null)
     }, [null]);
 
     return (
@@ -228,6 +231,11 @@ export default function OrderBefore() {
             visible={loading}
             textContent={''}
             textStyle={{ color: COLORS.white }}
+            />
+            <Spinner
+                visible={loadingReducer}
+                textContent={''}
+                textStyle={{ color: COLORS.white }}
             />
             <ScrollView style={styles.container}>
                 { wishlistData ? wishlistData.map((x, i) => (
