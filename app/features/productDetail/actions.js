@@ -60,3 +60,10 @@ export const setCategory = (data) => {
         data
     }
 }
+
+export const setWishlistData = (data) => {
+    return{
+        type: types.SET_WISHLIST_DATA,
+        data
+    }
+}

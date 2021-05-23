@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, Button, Dialog, Portal } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
 
@@ -10,22 +10,25 @@ import OrderList from '../components/OrderList';
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import { Alert } from 'react-native';
-import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome } from "../../interfaces";
+import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProductDetail } from "../../interfaces";
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
+import * as productDetailActions from "../../productDetail/actions";
 
 export default function OrderBefore() {
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState(null)
-    const [validatorErrorMsg, setValidatorErrorMsg] = useState('');
-    const [errVisible, setErrVisible] = useState(false);
-    const [isError, setIsError] = useState(false);
-    const [dialogVisible, setDialogVisible] = React.useState(false);
+    const [validatorErrorMsg, setValidatorErrorMsg] = useState('')
+    const [errVisible, setErrVisible] = useState(false)
+    const [isError, setIsError] = useState(false)
 
+    const dispatch = useDispatch();
     const loginSelector = useSelector(state => state.loginReducer)
     const homeSelector:IHome = useSelector(state => state.homeReducer)
+    const detailProductSelector: IProductDetail = useSelector(state => state.detailProductReducer);
     const tokenUser = loginSelector.user.token
     const userId = loginSelector.user.user_id
+    const wishlistData = detailProductSelector.productWishlistData;
 
     const onDismissSnackBar = () => {
         setErrVisible(false)
@@ -162,9 +165,10 @@ export default function OrderBefore() {
         }
     }
 
-    const getWishlistData = async (data) => {
-        setData(data)
+    const getWishlistData = async (dataParams) => {
+        setData(dataParams)
         setLoading(true)
+        console.log(tokenUser, userId)
         try {
             const _resultData = await apiServices.GET(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list?user_id=${userId}`, HeaderAuth(tokenUser))
             if (_resultData.status === 200 && _resultData.data.error < 1) {
@@ -199,7 +203,7 @@ export default function OrderBefore() {
                     }
                     setData(dataArr)
                 }
-
+                // await dispatch(productDetailActions.setWishlistData(data))
                 setLoading(false)
             } else {
                 setLoading(false)
@@ -213,8 +217,8 @@ export default function OrderBefore() {
 
     useEffect(() => {
         // effect
-        console.log("useEffect")
-        getWishlistData(null)
+        console.log("useEffect Order")
+        // getWishlistData(null)
     }, [null]);
 
     return (
@@ -226,7 +230,7 @@ export default function OrderBefore() {
             textStyle={{ color: COLORS.white }}
             />
             <ScrollView style={styles.container}>
-                { data ? data.map((x, i) => (
+                { wishlistData ? wishlistData.map((x, i) => (
                     <OrderList 
                     key={i}
                     address={x.address}

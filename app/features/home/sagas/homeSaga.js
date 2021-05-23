@@ -5,7 +5,6 @@
  * pwd - password
  */
 import { all, takeEvery, put, select, call, fork } from 'redux-saga/effects';
-import { delay } from 'redux-saga';
 
 import API from '../../../api/ApiConstants';
 import * as apiService from "../../../services/index";
@@ -14,12 +13,10 @@ import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as homeAction from '../actions';
 import * as loginAction from "../../login/actions";
-import { getToken, setToken, storeData, getStore } from "../../../services/asyncStorage";
-import { trimString } from "../../../utils/stringUtils";
+import * as productDetailAction from "../../productDetail/actions";
 
-import { HeaderAuth, Header } from '../../../services/header';
-import { navigate } from "../../../navigation/NavigationService";
-import * as logger from "../../../utils/logging";
+import { HeaderAuth } from '../../../services/header';
+import { ICategory, IHome, IData, IMarket, IWishList, IProductWishList, IProductDetail } from "../../interfaces";
 
 let homeState = state => state.homeReducer;
 let loginState = state => state.loginReducer;
@@ -27,9 +24,10 @@ let loginState = state => state.loginReducer;
 export default function* homeGetProducts(state){
 
     // state home
-    const getHomeState = yield select(homeState)
+    const getHomeState:IHome = yield select(homeState)
     const getLoginState = yield select(loginState)
     const token = getLoginState.user.token
+    const userId = getLoginState.user.user_id
 
     try {
         yield put(homeAction.showLoading())
@@ -43,7 +41,7 @@ export default function* homeGetProducts(state){
                 }
             }
 
-            const [productList, allProduct] = yield all([
+            const [productList, allProduct, wishListData] = yield all([
                 call(apiService.GET,
                     API.BASE_URL +
                     API.ENDPOINT.GET_PRODUCT +
@@ -54,14 +52,60 @@ export default function* homeGetProducts(state){
                     API.BASE_URL +
                     API.ENDPOINT.GET_PRODUCT,
                     HeaderAuth(token)
-                )
+                ),
+                call(apiService.GET,
+                    API.BASE_URL +
+                    API.ENDPOINT.WISHLIST +
+                    `/order_list?user_id=${userId}`,
+                    HeaderAuth(token)
+                ),
             ])
-
             if(productList.data.error < 1){
                 const productData = productList.data.response.product
                 yield put(homeAction.getProductSuccess(productData))
                 if(allProduct.data.error < 1){
                     const productAll = allProduct.data.response.product
+                    if (wishListData.status === 200 && wishListData.data.error < 1) {
+                        console.log("200 masuk")
+                        yield put(productDetailAction.setWishlistData(null))
+                        const wishList: IWishList[] = wishListData.data.data
+                        const productList: IProductWishList[] = wishListData.data.product
+                        const marketList: IMarket[] = wishListData.data.market
+                        const categoryList: ICategory[] = wishListData.data.category
+                        // ======================================================== //
+                        let dataArr: IData[] = [];
+                        if (wishList && productList && marketList && categoryList) {
+                            const wishListFiltered = wishList.filter((v, i, a) => {
+                                return v.status === 1
+                            })
+                            for (let i in wishListFiltered) {
+                                let dataObj: IData = {}
+                                dataObj.id = wishListFiltered[i].id
+                                dataObj.product_id = wishListFiltered[i].t_product_id
+                                dataObj.t_category_product_id = wishListFiltered[i].t_category_product_id
+                                dataObj.quantity = wishListFiltered[i].quantity
+                                dataObj.isFavorite = wishListFiltered[i].is_favorite
+                                // product
+                                dataObj.productTitle = productList[i].name
+                                dataObj.avatar = productList[i].avatar
+                                dataObj.price = productList[i].price * wishListFiltered[i].quantity
+                                // market
+                                dataObj.marketName = marketList[i].market_name
+                                dataObj.category = categoryList[i].name
+                                dataObj.address = getHomeState.userAddress.subdistrict ? getHomeState.userAddress.subdistrict : ""
+
+                                // console.log(productList[i].name, ": Title")
+                                dataArr.push(dataObj)
+                            }
+                            // TODO: tambah ke reducer
+                            yield put(productDetailAction.setWishlistData(dataArr))
+                            yield put(homeAction.hideLoading())
+                            console.log("added")
+                        }
+                    } else {
+                        console.log(wishListData.data)
+                        yield put(homeAction.hideLoading())
+                    }
                     yield put(homeAction.getAllProducts(productAll))
                     yield put(homeAction.hideLoading())
                 }else{
@@ -75,16 +119,8 @@ export default function* homeGetProducts(state){
                 }, 200);
                 yield put(loginAction.logOut())
             }
-        // }else{
-        //     yield put(homeAction.hideLoading())
-        //     setTimeout(() => {
-        //         Alert.alert('Keeponic', "Sesi anda sudah habis, silahkan Login kembali :)");
-        //     }, 200);
-        //     yield put(loginAction.logOut())
-        // }
     } catch (error) {
         yield put(homeAction.hideLoading())
-        console.log("INI CATCH", error.message)
     }
 
 }

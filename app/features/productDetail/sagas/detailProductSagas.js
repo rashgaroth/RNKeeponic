@@ -19,7 +19,7 @@ let loginReducer = state => state.loginReducer;
 
 // Our worker Saga that logins the user
 export default function* getProductDetail(state) {
-    yield put(detailProductAction.clearProduct())
+    yield put(detailProductAction.clearProduct());
     const loginState = yield select(loginReducer);
     const token = loginState.user.token
     // if(token){

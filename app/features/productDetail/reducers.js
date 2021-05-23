@@ -26,6 +26,7 @@ const initialState = {
         updated_date: null
     },
     mProducts: {
+        id: null,
         name: "",
         t_category_id : null,
         description: "",
@@ -42,13 +43,34 @@ const initialState = {
         created_date: "",
         updated_date: "",
         m_product_model : null
-    }
+    },
+    productWishlistData: null
 };
 
 export const detailProductReducer = createReducer(initialState, {
     [types.GET_DETAIL_PRODUCT](state, action) {
         return {
             ...state,
+            mProducts: {
+                ...state.mProducts,
+                id: null,
+                name: "",
+                t_category_id: null,
+                description: "",
+                price: null,
+                avatar: "",
+                second_avatar: "",
+                third_avatar: "",
+                fourth_avatar: "",
+                stock: null,
+                weight: null,
+                status: null,
+                rating: null,
+                is_sold: null,
+                created_date: "",
+                updated_date: "",
+                m_product_model: null
+            },
         };
     },
     [types.SHOW_LOADING](state, action) {
@@ -76,6 +98,7 @@ export const detailProductReducer = createReducer(initialState, {
             loading: true,
             mProducts: {
                 ...state.mProducts,
+                id: null,
                 name: "",
                 t_category_id: null,
                 description: "",
@@ -113,6 +136,7 @@ export const detailProductReducer = createReducer(initialState, {
             ...state,
             mProducts: {
                 ...state.mProducts,
+                id: action.data.id,
                 name: action.data.name,
                 t_category_id: action.data.t_category_id,
                 description: action.data.description,
@@ -167,6 +191,12 @@ export const detailProductReducer = createReducer(initialState, {
                 name: action.data.name,
                 status: action.data.status,
             }
+        };
+    },
+    [types.SET_WISHLIST_DATA](state, action) {
+        return {
+            ...state,
+            productWishlistData: action.data
         };
     },
 });

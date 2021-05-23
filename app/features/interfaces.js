@@ -103,3 +103,46 @@ export interface IData {
     quantity: number,
     price: string
 }
+
+export interface IProductDetail {
+    loading: boolean,
+    market_id: number,
+    avatar: string,
+    category: {
+        id: number,
+        name: string,
+        status: number,
+    },
+    mMarket: {
+        id: number,
+        owner_sec_user_id: number,
+        market_name: string,
+        description: string,
+        avatar: string,
+        banner: string,
+        followers: number,
+        status: number,
+        created_date: string,
+        updated_date: string
+    },
+    mProducts: {
+        id: number,
+        name: string,
+        t_category_id: number,
+        description: string,
+        price: number,
+        avatar: string,
+        second_avatar: string,
+        third_avatar: string,
+        fourth_avatar: string,
+        stock: number,
+        weight: number,
+        status: number,
+        rating: number,
+        is_sold: number,
+        created_date: string,
+        updated_date: string,
+        m_product_model: number
+    },
+    productWishlistData: IData[]
+}

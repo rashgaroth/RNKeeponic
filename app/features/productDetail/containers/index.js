@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
   Animated,
   FlatList,
   RefreshControl,
@@ -22,10 +23,12 @@ import { ExpandingDot } from "react-native-animated-pagination-dots";
 import SnackBar from 'react-native-snackbar-component';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
 import LinearGradient from 'react-native-linear-gradient';
+import Spinner from "react-native-loading-spinner-overlay";
 
 import { useDispatch, useSelector } from 'react-redux';
 // import styles from './styles';
 
+import { IProductDetail, IHome, IData } from '../../interfaces';
 import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
 import { goBack, navigate } from "../../../navigation/NavigationService";
@@ -35,7 +38,9 @@ import { widthScreen, width, heightScreen } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
 import { KpnButton, KpnCardProducts, KpnSnackBar } from "../../../components";
 import * as detailProductAction from "../actions";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import * as apiServices from "../../../services/index"
+import API from '../../../api/ApiConstants';
+import { HeaderAuth } from "../../../services/header";
 
 const imageW = widthScreen;
 const imageH = imageW * 1;
@@ -43,30 +48,31 @@ const imageH = imageW * 1;
 export default function Home(props) {
   const [word, setWord] = useState('');
   const [isFocus, setIsFocus] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(false);
   const [isLove, setIsLove] = useState(false);
   const [readableDesc, setReadableDesc] = useState(false);
   const [description, setDescription] = useState("");
   const [bottomAction, setBottomAction] = useState(null);
-  const [indexBottomSheet, setIndexBottomSheet] = useState(0);
-  const [productTitle, setProductTitle] = useState("");
-  const [productAvatar, setProductAvatar] = useState("");
-  const [productDescription, setProductDescription] = useState("");
   const [isError, setIsError] = useState(false);
   const [validatorErrorMsg, setValidatorErrorMsg] = useState("");
   const [errVisible, setErrVisible] = useState(false);
+  const [loadingProduct, setLoadingProduct] = useState(false);
+  const [isStoredWishlist, setIsStoredWishlist] = useState(false);
+  const [isWishList, setIsWishList] = useState(false);
+  const [isFav, setIsFav] = useState(false);
 
   const dispatch = useDispatch();
-  const homeSelector = useSelector(state => state.homeReducer)
-  const detailProductSelector = useSelector(state => state.detailProductReducer);
   const textInputRef = useRef(null);
-  const { mProducts } = detailProductSelector;
-  const loading = detailProductSelector.loading
-  let scrollX = React.useRef(new Animated.Value(0)).current;
   let scrollY = useRef(new Animated.Value(0)).current;
-  const bottomSheetRef = useRef(null);
-  // const fall = new Animated.Value(1);
-  const snapPoints = useMemo(() => [0, '80%'], []);
+  const {productId} = props.route.params;
+  
+  const loginSelector = useSelector(state => state.loginReducer)
+  const homeSelector:IHome = useSelector(state => state.homeReducer)
+  const detailProductSelector:IProductDetail = useSelector(state => state.detailProductReducer);
+  const category_id = detailProductSelector.category.id;
+  const userId = loginSelector.user.user_id
+  const {mProducts} = detailProductSelector;
+  const loading = detailProductSelector.loading;
+  const tokenUser = loginSelector.user.token
 
   const debugginLoader = true;
 
@@ -82,13 +88,42 @@ export default function Home(props) {
     Keyboard.dismiss();
   }
 
+  const onAddProductToWishlist = async () => {
+    setLoadingProduct(true)
+    const param = {
+      user_id: userId,
+      t_product_id: detailProductSelector.mProducts.id,
+      t_category_product_id: detailProductSelector.category.id,
+      is_favorite: isLove ? 1 : 0,
+      quantity: 1
+    }
+    try {
+      const _onAddChart = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/add`, param, HeaderAuth(tokenUser))
+      if (_onAddChart.status === 200) {
+        setLoadingProduct(false)
+        setIsStoredWishlist(true)
+        // await getWishlistData(data)
+        console.log(_onAddChart.data, "data param")
+      } else {
+        console.log(_onAddChart.data, "data param")
+        Alert.alert("Terjadi Kesalahan", "Terjadi Kesalahan Ketika Menambahkan Produk")
+        setValidatorErrorMsg(_onFavorite.data.msg)
+        setLoadingProduct(false)
+        setIsStoredWishlist(true)
+      }
+    } catch (error) {
+      console.log(error)
+      setLoadingProduct(false)
+      Alert.alert("Terjadi Kesalahan", "Gagal Saat Menambahkan Order" + error)
+    }
+  }
+
   const onPressBell = () => {
     Keyboard.dismiss();
     console.log(detailProductSelector);
   }
 
   const onPressLove = () => {
-    console.log(detailProductSelector);
     setIsLove(!isLove);
     setValidatorErrorMsg("Produk Disukai Ditambahkan");
     setErrVisible(true);
@@ -99,8 +134,9 @@ export default function Home(props) {
       setIsFocus(false);
       Keyboard.dismiss();
     }else{
-      goBack();
       await dispatch(detailProductAction.setLoading(true));
+      // await dispatch(detailProductAction.clearProduct());
+      goBack();
     }
   }
 
@@ -126,6 +162,26 @@ export default function Home(props) {
     }
   }
 
+  const checkProductOnWishlist = (data: IData[] = []) => {
+    const productId = detailProductSelector.mProducts.id
+    let arrIsLoved = [];
+    data.filter((v, i, a) => {
+      if (v.product_id === productId) {
+        arrIsLoved.push(a[i].isFavorite, a[i].product_id)
+        return a[i].product_id === productId
+      } else {
+        return []
+      }
+    });
+    if (arrIsLoved) {
+      setIsLove(true)
+      setIsStoredWishlist(true)
+    } else {
+      setIsLove(true)
+      setIsStoredWishlist(true)
+    }
+  }
+
   const fetchProductDetail = async () => {
     const {
       // userId,
@@ -140,7 +196,43 @@ export default function Home(props) {
 
   useEffect(() => {
     fetchProductDetail()
+    // checkProductOnWishlist(detailProductSelector.productWishlistData)
   }, []);
+
+  useEffect(() => {
+    const checkProductOnWishlist = (data: IData[] = []) => {
+      const productId = detailProductSelector.mProducts.id
+
+      // const map = data.map((x, i) => {
+      //   console.log(x.product_id, "map")
+      //   console.log(productId, "prid")
+      // })
+      let arrIsLoved = [];
+      data.filter((v, i, a) => {
+        if (v.product_id === productId) {
+          arrIsLoved.push(a[i].isFavorite, a[i].product_id)
+          return a[i].product_id === productId
+        } else {
+          return []
+        }
+      });
+      if (arrIsLoved.length) {
+        return true
+      } else {
+        return false
+      }
+    }
+    return () => {
+      const checker = checkProductOnWishlist(detailProductSelector.productWishlistData)
+      if(checker){
+        setIsLove(true)
+        setIsStoredWishlist(true)
+      }else{
+        setIsLove(false)
+        setIsStoredWishlist(false)
+      }
+    };
+  });
 
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
   const diffClampButtonGroup = Animated.diffClamp(scrollY, 0, 60);
@@ -164,10 +256,6 @@ export default function Home(props) {
   }
 
   const onPressBottomAvatar = (title, avatar, description) => {
-    setIndexBottomSheet(1)
-    setProductTitle(title)
-    setProductAvatar(avatar)
-    setProductDescription(description)
     Animated.timing(scrollY, {
       toValue: 0,
       useNativeDriver: true,
@@ -175,78 +263,13 @@ export default function Home(props) {
     }).start();
   }
 
-  const RenderBottomSheet = () => {
-    return <BottomSheet
-      ref={bottomSheetRef}
-      index={indexBottomSheet}
-      snapPoints={snapPoints}
-      // onChange={handleSheetChanges}
-      backdropComponent={(backdropProps) => (
-        <BottomSheetBackdrop {...backdropProps} enableTouchThrough={true} />
-      )}
-    >
-      <BottomSheetScrollView>
-        <View>
-          <Image
-            source={{ uri: productAvatar ? productAvatar : "https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles.png" }}
-            style={{
-              // width: width,
-              height: 200,
-              marginHorizontal: 10,
-              borderRadius: 16
-            }}
-          />
-          <Text style={{
-            alignSelf: "center",
-            fontWeight: "bold",
-            fontSize: 20,
-            marginTop: 10,
-            marginHorizontal: 10
-          }}
-          >
-            {productTitle ? productTitle : "-------"}
-          </Text>
-          <View style={{
-            height: 1,
-            marginHorizontal: 20,
-            backgroundColor: COLORS.colorC4,
-            marginTop: 10,
-            marginBottom: 10
-          }}
-          />
-          <Text style={styles.textLebihHemat}>{productDescription}</Text>
-          <View style={{ height: 1, marginHorizontal: 20, backgroundColor: COLORS.colorC4, marginTop: 10, marginBottom: 10 }} />
-        </View>
-        <KpnButton
-          text="Lihat Detail Produk"
-          isRounded
-          mode="outlined"
-          labelStyle={COLORS.primaryColor}
-          color={COLORS.sans}
-          style={{
-            height: 35,
-            marginTop: 10,
-            width: width - 20,
-            marginHorizontal: 10
-          }}
-        />
-        <KpnButton
-          text="Beli Produk"
-          isRounded
-          color={COLORS.sans}
-          style={{
-            height: 35,
-            width: width - 20,
-            marginTop: 10,
-            marginHorizontal: 10
-          }}
-        />
-      </BottomSheetScrollView>
-    </BottomSheet>
-  }
-
   return (
     <>
+      <Spinner
+        visible={loadingProduct}
+        textContent={''}
+        textStyle={{ color: COLORS.white }}
+      />
       {/* SearchBar */}
       <Animated.View style={[styles.containerInput, { transform: [ { translateY: translateSearchContainer } ] }]}>
         <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={onBackPressed} />
@@ -574,7 +597,7 @@ export default function Home(props) {
                     />
                   </View> :
                     <>
-                      <Text style={styles.title}>Informasi Toko</Text>
+                      <Text style={styles.title}>Informasi Pengiriman</Text>
                       <View style={styles.row}>
                         <IconButton
                           icon="truck-check"
@@ -604,7 +627,7 @@ export default function Home(props) {
                           <Text style={{ fontWeight: "bold" }}>{"JNE"}</Text>
                         </Text>
 
-                        <Button
+                        {/* <Button
                           mode="outlined"
                           color={COLORS.primaryOpacity}
                           onPress={() => console.log("aaa")}
@@ -617,7 +640,7 @@ export default function Home(props) {
                             alignSelf: "center",
                             right: 10,
                             position: "absolute"
-                          }}>Ganti Kurir</Button>
+                          }}>Ganti Kurir</Button> */}
                       </View>
                     </>
               }
@@ -709,7 +732,7 @@ export default function Home(props) {
                               image={item.avatar}
                               price={item.price}
                               onPress={() => onNavigateToDetail(0, item.id)}
-                              onPressAvatar={() => onPressBottomAvatar(item.name, item.avatar, truncate(item.description, 200))}
+                              onPressAvatar={() => onNavigateToDetail(0, item.id)}
                             />
                           )}
                           keyExtractor={(item) => item.id}
@@ -741,9 +764,10 @@ export default function Home(props) {
         flex: 1,
         elevation: 10,
         zIndex: 10,
-        flexDirection: "row"
+        flexDirection: "row",
+        justifyContent: "center"
       }}>
-        <Text style={{ 
+        {/* <Text style={{ 
           justifyContent: "center",
           marginHorizontal: 10,
           alignSelf: "flex-start",
@@ -752,8 +776,16 @@ export default function Home(props) {
           textDecorationLine: "underline",
           fontWeight: "bold",
           fontSize: 20
-        }}>{mProducts.price ? convertToIdr(mProducts.price) : "0"}</Text>
+        }}>{mProducts.price ? convertToIdr(mProducts.price) : "0"}</Text> */}
         {/* <FooterButton cart={"0"} /> */}
+        <Button
+          color={COLORS.orange}
+          icon="cart-outline"
+          mode={ isStoredWishlist ? "contained" : "outlined"}
+          disabled={ isStoredWishlist ? true : false }
+          style={styles.buttonSticky}
+          onPress={(e) => onAddProductToWishlist(e)}
+        > Keranjang </Button>
         <Button
           color={COLORS.primaryColor}
           icon="check-circle-outline"
@@ -919,7 +951,7 @@ const styles = StyleSheet.create({
   },
   buttonSticky: {
     height: 35,
-    width: Dimensions.get('screen').width - 150,
+    // width: Dimensions.get('screen').width - 150,
     justifyContent: "center",
     marginHorizontal: 10,
     alignSelf: "flex-end",
