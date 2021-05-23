@@ -49,9 +49,12 @@ export default function* homeGetProducts(state){
                 let dataArr: IData[] = [];
                 if (wishList && productList && marketList && categoryList) {
                     const wishListFiltered = wishList.filter((v, i, a) => {
+                        console.log(v.t_product_id, "tprod")
                         return v.status === 1
                     })
                     for (let i in wishListFiltered) {
+                        console.log(wishListFiltered[i].t_product_id, "produk id")
+                        console.log(wishListFiltered[i].status, "statusnya")
                         let dataObj: IData = {}
                         dataObj.id = wishListFiltered[i].id
                         dataObj.product_id = wishListFiltered[i].t_product_id
@@ -59,9 +62,13 @@ export default function* homeGetProducts(state){
                         dataObj.quantity = wishListFiltered[i].quantity
                         dataObj.isFavorite = wishListFiltered[i].is_favorite
                         // product
-                        dataObj.productTitle = productList[i].name
-                        dataObj.avatar = productList[i].avatar
-                        dataObj.price = productList[i].price * wishListFiltered[i].quantity
+                        for (let j in productList) {
+                            if (wishListFiltered[i].t_product_id == productList[j].id) {
+                                dataObj.productTitle = productList[j].name
+                                dataObj.avatar = productList[j].avatar
+                                dataObj.price = productList[j].price * wishListFiltered[i].quantity
+                            }
+                        }
                         // market
                         dataObj.marketName = marketList[i].market_name
                         dataObj.category = categoryList[i].name
@@ -131,9 +138,12 @@ export default function* homeGetProducts(state){
                         let dataArr: IData[] = [];
                         if (wishList && productList && marketList && categoryList) {
                             const wishListFiltered = wishList.filter((v, i, a) => {
+                                console.log(v.t_product_id, "tprod")
                                 return v.status === 1
                             })
                             for (let i in wishListFiltered) {
+                                console.log(wishListFiltered[i].t_product_id, "produk id")
+                                console.log(wishListFiltered[i].status, "statusnya")
                                 let dataObj: IData = {}
                                 dataObj.id = wishListFiltered[i].id
                                 dataObj.product_id = wishListFiltered[i].t_product_id
@@ -141,9 +151,13 @@ export default function* homeGetProducts(state){
                                 dataObj.quantity = wishListFiltered[i].quantity
                                 dataObj.isFavorite = wishListFiltered[i].is_favorite
                                 // product
-                                dataObj.productTitle = productList[i].name
-                                dataObj.avatar = productList[i].avatar
-                                dataObj.price = productList[i].price * wishListFiltered[i].quantity
+                                for (let j in productList){
+                                    if (wishListFiltered[i].t_product_id == productList[j].id){
+                                        dataObj.productTitle = productList[j].name
+                                        dataObj.avatar = productList[j].avatar
+                                        dataObj.price = productList[j].price * wishListFiltered[i].quantity
+                                    }
+                                }
                                 // market
                                 dataObj.marketName = marketList[i].market_name
                                 dataObj.category = categoryList[i].name
