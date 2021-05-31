@@ -13,6 +13,8 @@ const COLORS = {
     red: "#CF1F1F",
     colorF4: "#F3F4F5",
     orange: "#F79500",
+    greenSans: "#B8F0B8",
+    redOpacity: "#EEA7A7"
 }
 
 export {

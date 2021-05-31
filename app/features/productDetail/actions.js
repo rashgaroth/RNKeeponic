@@ -67,3 +67,19 @@ export const setWishlistData = (data) => {
         data
     }
 }
+
+// ---------------------------- new Action for wishlist ---------------------- //
+export const onAddWishlist = (data, productData) => {
+    return{
+        type: types.ON_ADD_WISHLIST,
+        data,
+        productData,
+    }
+}
+
+export const getProductLoves = (data) => {
+    return{
+        type: types.GET_PRODUCT_LOVE,
+        data
+    }
+}

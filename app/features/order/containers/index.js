@@ -19,7 +19,7 @@ const Tab = createMaterialTopTabNavigator();
 function TabStack() {
   return (
     <Tab.Navigator
-      initialRouteName="Feed"
+      initialRouteName="Order"
       tabBarOptions={{
         activeTintColor: '#FFFFFF',
         inactiveTintColor: '#F8F8F8',
@@ -37,6 +37,7 @@ function TabStack() {
       <Tab.Screen
         name="OrderBefore"
         component={OrderBefore}
+        // children={ () => <OrderBefore refresh={true} /> }
         options={{
           tabBarLabel: 'Pesanan',
           // tabBarIcon: ({ color, size }) => (
@@ -68,7 +69,7 @@ function TabStack() {
 function App() {
   return (
       <Stack.Navigator
-        initialRouteName="Settings"
+        initialRouteName="OrderBefore"
         screenOptions={{
           headerStyle: { backgroundColor: COLORS.sans },
           headerTintColor: '#fff',

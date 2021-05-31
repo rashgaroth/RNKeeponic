@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\features",
+    "\\app\\features\\order",
+    "\\app\\features\\order\\containers"
+  ],
+  "SelectedNode": "\\app\\features\\order\\containers\\OrderBefore.js",
+  "PreviewInSolutionExplorer": false
+}

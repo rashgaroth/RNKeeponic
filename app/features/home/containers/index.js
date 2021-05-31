@@ -16,21 +16,19 @@ import Spinner from "react-native-loading-spinner-overlay";
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import SplashScreen from 'react-native-splash-screen';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
-import * as loginAction from '../../login/actions';
 import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
 import { ITEM_WIDTH, SPACING, width } from "../../../utils/theme";
 import { truncate } from "../../../utils/stringUtils";
 import { KpnWideCard, KpnCardProducts, KpnLifeStyleCard, KpnButton } from "../../../components";
-import LogoRounded from "../../../assets/images/svg/LogoRounded";
 import { navigate, navigationRef } from "../../../navigation/NavigationService";
 import Swiper from "../components/Swiper";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
+import { IProductDetail } from "../../interfaces";
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
@@ -39,28 +37,16 @@ export default function Home({ navigation }) {
   const [name, setName] = useState(null);
   const [word, setWord] = useState('');
   const [isFocus, setIsFocus] = useState(false);
-  const [indexBottomSheet, setIndexBottomSheet] = useState(0);
-  const [productTitle, setProductTitle] = useState("");
-  const [productAvatar, setProductAvatar] = useState("");
-  const [productDescription, setProductDescription] = useState("");
-  const [productId, setProductId] = useState(0);
 
   let scrollX = useRef(new Animated.Value(0)).current;
   let scrollY = useRef(new Animated.Value(0)).current;
   const textInputRef = useRef(null);
-  const bottomSheetRef = useRef(null);
-  // const fall = new Animated.Value(1);
-
-  const snapPoints = useMemo(() => [0, '60%'], []);
 
   const homeSelector = useSelector(state => state.homeReducer)
   const loginSelector = useSelector(state => state.loginReducer)
+  const productDetailSelector: IProductDetail = useSelector(state => state.detailProductReducer)
 
   const allProducts = homeSelector.allProducts;
-
-  const onPressMenuDivider = (type) => {
-    navigationRef.current?.navigate(type)
-  }
   
   async function fetchAllHomeRequest(){
       dispatch(homeAction.showLoading())
@@ -81,7 +67,6 @@ export default function Home({ navigation }) {
   useEffect(() => {
     SplashScreen.hide();
     fetchAllHomeRequest();
-    setIndexBottomSheet(0);
   }, [])
 
   const onNavigateToDetail = (user_id, product_id) => {
@@ -110,94 +95,6 @@ export default function Home({ navigation }) {
     inputRange: [0, 0, 0, 60],
     outputRange: [0, 0, 0, -60]
   });
-
-  const onPressBottomAvatar = (title, avatar, description, id) => {
-    setIndexBottomSheet(1)
-    setProductTitle(title)
-    setProductAvatar(avatar)
-    setProductDescription(description)
-    setProductId(id)
-    console.log(homeSelector.userAddress, "scroll")
-  }
-
-  const handleSheetChanges = useCallback( async (index) => {
-      // setIndexBottomSheet(0)
-      // setProductTitle("")
-      // await setProductAvatar("")
-      // setProductDescription("")
-      console.log(scrollY, "scroll after")
-  }, [null]);
-
-  const RenderBottomSheet = () => {
-    return <BottomSheet
-      ref={bottomSheetRef}
-      index={indexBottomSheet}
-      snapPoints={snapPoints}
-      key={productId}
-      // onChange={handleSheetChanges}
-      backdropComponent={ (backdropProps) => (
-        <BottomSheetBackdrop {...backdropProps} enableTouchThrough={true} />
-      ) }
-    >
-    <BottomSheetScrollView>
-      <View>
-        <Image
-          source={{ uri: productAvatar ? productAvatar : "https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles.png"}}
-          style={{
-            // width: width,
-            height: 200,
-            marginHorizontal: 10,
-            borderRadius: 16
-          }}
-        />
-        <Text style={{
-           alignSelf: "center", 
-           fontWeight: "bold", 
-           fontSize: 20, 
-           marginTop: 10, 
-           marginHorizontal: 10 
-           }}
-           >
-             { productTitle ? productTitle : "-------"}
-             </Text>
-        <View style={{ 
-          height: 1, 
-          marginHorizontal: 20, 
-          backgroundColor: COLORS.colorC4, 
-          marginTop: 10, 
-          marginBottom: 10}} 
-          />
-        <Text style={styles.textLebihHemat}>{productDescription}</Text>
-        <View style={{ height: 1, marginHorizontal: 20, backgroundColor: COLORS.colorC4, marginTop: 10, marginBottom: 10}} />
-      </View>
-        <KpnButton
-          text="Lihat Detail Produk"
-          isRounded
-          mode="outlined"
-          labelStyle={COLORS.primaryColor}
-          onPress={console.log("test")}
-          color={COLORS.sans}
-          style={{
-            height: 35,
-            marginTop: 10,
-            width: width - 20,
-            marginHorizontal: 10
-          }}
-        />
-        <KpnButton
-          text="Beli Produk"
-          isRounded
-          color={COLORS.sans}
-          style={{
-            height: 35,
-            width: width - 20,
-            marginTop: 10,
-            marginHorizontal: 10
-           }}
-        />
-    </BottomSheetScrollView>
-    </BottomSheet>
-  }
 
   const renderSkeleton = (name, size=1) => {
     if(name === "paket"){
@@ -374,7 +271,7 @@ export default function Home({ navigation }) {
           <View>
             <View style={styles.textMenuHidroponik}>
               <Text style={styles.textPaketHidroponik}>Paket Hidroponik</Text>
-              <TouchableOpacity onPress={(e) => console.log("homeSelector")}>
+              <TouchableOpacity onPress={(e) => console.log("homeSelector", productDetailSelector.productInWishList)}>
                 <Text style={styles.textLihatSemua}>Lihat Semua</Text>
               </TouchableOpacity>
             </View>
@@ -544,8 +441,6 @@ export default function Home({ navigation }) {
           <View style={{ height: 60, width: width }}></View>
       </View>
     </Animated.ScrollView>
-    {/* {renderBottomSheet()} */}
-      {/* <RenderBottomSheet /> */}
     </View>
   );
 }

@@ -7,6 +7,7 @@ import com.airbnb.android.react.lottie.LottiePackage;
 //import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 
 import com.facebook.react.ReactInstanceManager;
@@ -42,6 +43,7 @@ public class MainApplication extends Application implements ReactApplication {
             new SplashScreenReactPackage();
             new RNGoogleSigninPackage();
             new LottiePackage();
+            new RNCWebViewPackage();
           return packages;
         }
 

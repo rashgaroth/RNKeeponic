@@ -3,8 +3,9 @@
  */
 import createReducer from 'app/lib/createReducer';
 import * as types from "./types";
+import { IProductDetail } from "../interfaces";
 
-const initialState = {
+const initialState:IProductDetail = {
     loading: true,
     market_id: null,
     avatar: null,
@@ -44,7 +45,9 @@ const initialState = {
         updated_date: "",
         m_product_model : null
     },
-    productWishlistData: null
+    productInWishList: [],
+    productWishlistData: null,
+    isFavorite: 0
 };
 
 export const detailProductReducer = createReducer(initialState, {
@@ -197,6 +200,19 @@ export const detailProductReducer = createReducer(initialState, {
         return {
             ...state,
             productWishlistData: action.data
+        };
+    },
+    // new reducer for wishlist
+    [types.ON_ADD_WISHLIST](state, action) {
+        return {
+            ...state,
+            productInWishList: [...state.productInWishList, action.data]
+        };
+    },
+    [types.GET_PRODUCT_LOVE](state, action) {
+        return {
+            ...state,
+            isFavorite: action.data
         };
     },
 });

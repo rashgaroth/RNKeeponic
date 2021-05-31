@@ -49,7 +49,8 @@ export interface IWishList {
     created_date: string,
     updated_date: string,
     created_by: string,
-    updated_by: string
+    updated_by: string,
+    sec_market_id: number
 }
 
 export interface IProductWishList {
@@ -101,7 +102,28 @@ export interface IData {
     marketName: string,
     isFavorite: number,
     quantity: number,
-    price: string
+    price: string,
+    sec_market_id: number,
+    owner_market_subdistrict: number,
+    owner_market_city: number,
+    owner_market_subdistrict_name: string,
+    owner_market_city_name: string
+}
+
+export interface IOrderDetailData {
+    productName: string,
+    marketName: string,
+    category: string,
+    productId: number,
+    marketId: number,
+    userId: number,
+    price: number,
+    quantity: number,
+    productAvatar: string,
+}
+
+export interface IWishlistReducer {
+    product: IData[],
 }
 
 export interface IProductDetail {
@@ -144,5 +166,7 @@ export interface IProductDetail {
         updated_date: string,
         m_product_model: number
     },
-    productWishlistData: IData[]
+    productInWishList: IData[],
+    productWishlistData: IData[],
+    isFavorite: number
 }

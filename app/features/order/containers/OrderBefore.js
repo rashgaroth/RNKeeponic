@@ -1,12 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, {useState, useEffect, useCallback} from 'react';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, Button, Dialog, Portal } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
+import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from '@react-navigation/native';
 
 import { COLORS } from '../../../utils/colors';
 import { convertToIdr } from '../../../utils/stringUtils';
 import OrderList from '../components/OrderList';
+import OnEmptyList from '../components/OnEmptyList';
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import { Alert } from 'react-native';
@@ -14,23 +17,24 @@ import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProduct
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
 import * as productDetailActions from "../../productDetail/actions";
-import * as homeAction from "../../home/actions";
 
-export default function OrderBefore() {
+export default function OrderBefore(navigation) {
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState(null)
     const [validatorErrorMsg, setValidatorErrorMsg] = useState('')
     const [errVisible, setErrVisible] = useState(false)
     const [isError, setIsError] = useState(false)
+    const [isEmpty, setIsEmpty] = useState(false)
 
     const dispatch = useDispatch();
+    const isFocused = useIsFocused();
+
     const loginSelector = useSelector(state => state.loginReducer)
     const homeSelector:IHome = useSelector(state => state.homeReducer)
     const detailProductSelector: IProductDetail = useSelector(state => state.detailProductReducer);
     const tokenUser = loginSelector.user.token
     const userId = loginSelector.user.user_id
     const wishlistData = detailProductSelector.productWishlistData;
-    const loadingReducer = homeSelector.isLoading
     const name = loginSelector.user.name
 
     const onDismissSnackBar = () => {
@@ -52,7 +56,9 @@ export default function OrderBefore() {
         try {
             const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/update`, param, HeaderAuth(tokenUser))
             if (_onFavorite.status === 200) {
+                setLoading(false)
                 await getWishlistData(data)
+                // await dispatch(homeAction.requestHome(name, userId, 0, true))
             } else {
                 Alert.alert("Terjadi Kesalahan", "Terjadi Kesalahan Ketika Mengurangi Produk")
                 setValidatorErrorMsg(_onFavorite.data.msg)
@@ -65,8 +71,12 @@ export default function OrderBefore() {
     }
 
     const onDecrease = async (id) => {
-        const dataIdFiltered:Array = data.filter((v, i, a) => {
-            return v.quantity <= 1
+        const dataIdFiltered: Array = data.filter((v, i, a) => {
+            if(v.id === id){
+                return v.quantity <= 1
+            }else{
+                return null
+            }
         })
 
         const param = {
@@ -75,6 +85,7 @@ export default function OrderBefore() {
             category: "kurang",
             update_type: "qty"
         }
+        console.log(dataIdFiltered.length, "panjang")
         if(dataIdFiltered.length){
             await onPressDelete(id)
         }else{
@@ -83,6 +94,7 @@ export default function OrderBefore() {
                 const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/update`, param, HeaderAuth(tokenUser))
                 if (_onFavorite.status === 200) {
                     console.log(_onFavorite.data)
+                    setLoading(false)
                     await getWishlistData(data)
                 } else {
                     console.log(_onFavorite.data)
@@ -94,6 +106,80 @@ export default function OrderBefore() {
                 setLoading(false)
                 Alert.alert("Terjadi Kesalahan", "Gagal Saat Mengurangi Order" + error)
             }
+        }
+    }
+
+    const onRefresh = async() => {
+        setLoading(true)
+        await getWishlistData(data, false)
+    }
+
+    const getWishlistData = async (data, loading) => {
+        setData(data)
+        setLoading(loading ? loading : true)
+        dispatch(productDetailActions.setWishlistData(null))
+        try {
+            const _resultData = await apiServices.GET(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list?user_id=${userId}`, HeaderAuth(tokenUser))
+            if (_resultData.status === 200 && _resultData.data.error < 1) {
+                const wishList: IWishList[] = _resultData.data.data
+                const productList: IProductWishList[] = _resultData.data.product
+                const marketList: IMarket[] = _resultData.data.market
+                const categoryList: ICategory[] = _resultData.data.category
+                // console.log(productList, "ARRAY2")
+                // ======================================================== //
+                let dataArr: IData[] = [];
+                if (wishList && productList && marketList && categoryList) {
+                    const wishListFiltered = wishList.filter((v, i, a) => {
+                        return v.status === 1
+                    })
+                    const productListFiltered = productList.filter((v,i,a) => {
+                        if(wishList[i].status === 1){
+                            return wishList[i].t_product_id === a[i].id
+                        }
+                    })
+                    for (let i in wishListFiltered) {
+                        let dataObj: IData = {}
+                        dataObj.id = wishListFiltered[i].id
+                        dataObj.product_id = wishListFiltered[i].t_product_id
+                        dataObj.t_category_product_id = wishListFiltered[i].t_category_product_id
+                        dataObj.quantity = wishListFiltered[i].quantity
+                        dataObj.isFavorite = wishListFiltered[i].is_favorite
+                        dataObj.owner_market_id = wishListFiltered[i].owner_market_id
+                        dataObj.owner_market_subdistrict = wishListFiltered[i].owner_market_subdistrict
+                        dataObj.owner_market_city = wishListFiltered[i].owner_market_city
+                        dataObj.owner_market_subdistrict_name = wishListFiltered[i].owner_market_subdistrict_name
+                        dataObj.owner_market_city_name = wishListFiltered[i].owner_market_city_name
+                        // product
+                        dataObj.productTitle = productListFiltered[i].name
+                        dataObj.avatar = productListFiltered[i].avatar
+                        dataObj.price = productListFiltered[i].price * wishListFiltered[i].quantity
+                        // market
+                        dataObj.marketName = marketList[i].market_name
+                        dataObj.category = categoryList[i].name
+                        dataObj.sec_market_id = wishListFiltered[i].sec_market_id
+                        dataObj.address = homeSelector.userAddress.subdistrict ? homeSelector.userAddress.subdistrict : ""
+                        dataArr.push(dataObj)
+                    }
+                    if(dataArr.length < 1){
+                        setIsEmpty(true)
+                    }else{
+                        setIsEmpty(false)
+                    }
+                    setData(dataArr)
+                    console.log(isEmpty, "isEmpty")
+                }
+
+                setLoading(false)
+                setLoading(false)
+            } else {
+                setLoading(false)
+                setLoading(false)
+            }
+        } catch (error) {
+            setLoading(false)
+            setLoading(false)
+            console.log(error, "error")
+            Alert.alert("Kesalahan Server", "Gagal Mengambil Daftar Produk")
         }
     }
 
@@ -110,8 +196,9 @@ export default function OrderBefore() {
                         setLoading(true)
                         const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/delete`, param, HeaderAuth(tokenUser))
                         if (_onFavorite.status === 200) {
+                            await getWishlistData(data)
                             setLoading(false)
-                            await dispatch(homeAction.requestHome(name, userId, 0, true))
+                            // await dispatch(homeAction.requestHome(name, userId, 0, true))
                         } else {
                             Alert.alert("Terjadi Kesalahan")
                             setValidatorErrorMsg(_onFavorite.data.msg)
@@ -129,7 +216,26 @@ export default function OrderBefore() {
     }
 
     const onPressBuy = async (id) => {
-        console.log("buyed")
+        const OrderDetailData:IData[] = data
+        const detailOrder = {}
+        for(let i in OrderDetailData) {
+            if(OrderDetailData[i].id === id){
+                detailOrder.productName = OrderDetailData[i].productTitle
+                detailOrder.marketName = OrderDetailData[i].marketName
+                detailOrder.category = OrderDetailData[i].category
+                detailOrder.productId = OrderDetailData[i].product_id
+                detailOrder.marketId = OrderDetailData[i].sec_market_id
+                detailOrder.userId = userId
+                detailOrder.price = OrderDetailData[i].price
+                detailOrder.quantity = OrderDetailData[i].quantity
+                detailOrder.productAvatar = OrderDetailData[i].avatar
+                detailOrder.ownerCityId = OrderDetailData[i].owner_market_city
+                detailOrder.ownerSubdistrictId = OrderDetailData[i].owner_market_subdistrict
+                detailOrder.ownerCityName = OrderDetailData[i].owner_market_city_name
+                detailOrder.ownerSubdistrictName = OrderDetailData[i].owner_market_subdistrict_name
+            }
+        }
+        navigate("OrderDetail", detailOrder)
     }
 
     const onPressItem = (id) => {
@@ -169,96 +275,56 @@ export default function OrderBefore() {
         }
     }
 
-    const getWishlistData = async (dataParams) => {
-        setData(dataParams)
-        setLoading(true)
-        console.log(tokenUser, userId)
-        try {
-            const _resultData = await apiServices.GET(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list?user_id=${userId}`, HeaderAuth(tokenUser))
-            if (_resultData.status === 200 && _resultData.data.error < 1) {
-                const wishList: IWishList[] = _resultData.data.data
-                const productList: IProductWishList[] = _resultData.data.product
-                const marketList: IMarket[] = _resultData.data.market
-                const categoryList: ICategory[] = _resultData.data.category
-                // ======================================================== //
-                let dataArr:IData[] = [];
-                if(wishList && productList && marketList && categoryList){
-                    const wishListFiltered = wishList.filter((v, i, a) => {
-                        return v.status === 1
-                    })
-                    for(let i in wishListFiltered){
-                        let dataObj:IData = {}
-                        dataObj.id = wishListFiltered[i].id
-                        dataObj.product_id = wishListFiltered[i].t_product_id
-                        dataObj.t_category_product_id = wishListFiltered[i].t_category_product_id
-                        dataObj.quantity = wishListFiltered[i].quantity
-                        dataObj.isFavorite = wishListFiltered[i].is_favorite
-                        // product
-                        dataObj.productTitle = productList[i].name
-                        dataObj.avatar = productList[i].avatar
-                        dataObj.price = productList[i].price * wishListFiltered[i].quantity
-                        // market
-                        dataObj.marketName = marketList[i].market_name
-                        dataObj.category = categoryList[i].name
-                        dataObj.address = homeSelector.userAddress.subdistrict ? homeSelector.userAddress.subdistrict : ""
-
-                        // console.log(productList[i].name, ": Title")
-                        dataArr.push(dataObj)
-                    }
-                    setData(dataArr)
-                }
-                // await dispatch(productDetailActions.setWishlistData(data))
-                setLoading(false)
-            } else {
-                setLoading(false)
-                
-            }
-        } catch (error) {
-            setLoading(false)
-            Alert.alert("Kesalahan Server", "Gagal Mengambil Daftar Produk")
-        }
-    }
-
     useEffect(() => {
-        // effect
-        console.log("useEffect Order")
-    }, [null]);
+        console.log("hit useEffect!", navigation.navigation.addListener)
+        const subscribe = navigation.navigation.addListener('focus', () => {
+            getWishlistData(null)
+        });
+        return subscribe
+    }, [navigation.navigation]);
+
 
     return (
         <>
-        <View>
-            <Spinner
-            visible={loading}
-            textContent={''}
-            textStyle={{ color: COLORS.white }}
-            />
-            <Spinner
-                visible={loadingReducer}
+            <ScrollView style={styles.container}
+            refreshControl={
+                <RefreshControl
+                    refreshing={loading}
+                    onRefresh={onRefresh}
+                    style={{ paddingTop: 60 }}
+                />
+            }
+            >
+            <View>
+                {/* <Spinner
+                visible={loading}
                 textContent={''}
                 textStyle={{ color: COLORS.white }}
-            />
-            <ScrollView style={styles.container}>
-                { wishlistData ? wishlistData.map((x, i) => (
-                    <OrderList 
-                    key={i}
-                    address={x.address}
-                    avatar={x.avatar}
-                    category={x.category}
-                    isFavorite={x.isFavorite === 1 ? true : false}
-                    marketName={x.marketName}
-                    price={convertToIdr(x.price)}
-                    title={x.productTitle}
-                    qty={x.quantity.toString()}
-                    onPressBuy={ () => onPressBuy(x.id) }
-                    onCheck={(e) => onPressFav(x.id, e)}
-                    onDecrease={() => onDecrease(x.id)}
-                    onIncrease={() => onIncrease(x.id)}
-                    onPressDelete={() => onPressDelete(x.id)}
-                    onPressProduct={() => onPressItem(x.product_id)}
-                    />
-                )) : null }
+                /> */}
+                    { isEmpty ? <OnEmptyList /> : data ? data.map((x, i) => (
+                        <OrderList 
+                        key={i}
+                        address={x.address}
+                        avatar={x.avatar}
+                        category={x.category}
+                        isFavorite={x.isFavorite === 1 ? true : false}
+                        marketName={x.marketName}
+                        price={convertToIdr(x.price)}
+                        title={x.productTitle}
+                        qty={x.quantity.toString()}
+                        onPressBuy={ () => onPressBuy(x.id) }
+                        onCheck={(e) => onPressFav(x.id, e)}
+                        onDecrease={() => onDecrease(x.id)}
+                        onIncrease={() => onIncrease(x.id)}
+                        onPressDelete={() => onPressDelete(x.id)}
+                        onPressProduct={() => onPressItem(x.product_id)}
+                        />
+                    )) : 
+                    <OnEmptyList
+                        onRefresh={ () => onRefresh() }
+                    />}
+                </View>
             </ScrollView>
-        </View>
             <Snackbar
                 visible={errVisible}
                 onDismiss={onDismissSnackBar}

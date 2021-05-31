@@ -3,6 +3,24 @@
  */
 import createReducer from 'app/lib/createReducer';
 
-const initialState = {};
+const initialState = {
+    loading: false,
+    userAddressList: null,
+    shipmentAddress: {
+        subdistrict: "",
+        city: "",
+        province: "",
+        detail: "",
+        postalCode: "",
+    },
+    shipmentDetail: {
+        courier: "",
+        reciever: "",
+        sender: "",
+        senderAddress: "",
+    }
+};
 
-export const homeReducer = createReducer(initialState, {});
+export const orderReducer = createReducer(initialState, {
+    
+});

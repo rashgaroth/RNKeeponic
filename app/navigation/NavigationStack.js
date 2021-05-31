@@ -26,6 +26,7 @@ import {
   SellerRegistrationNext,
   SellerRegistrationSuccess,
   SellerRegistrationMarketName,
+  OrderDetail
 } from "../features";
 
 enableScreens(false);
@@ -159,6 +160,16 @@ function App() {
         component={SellerRegistrationMarketName}
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="OrderDetail"
+        component={OrderDetail}
+        options={{
+          headerShown: true,
+          title: "Pengiriman",
+          gestureEnabled: true,
+          headerTitleAlign: "center"
         }}
       />
       </Stack.Navigator>

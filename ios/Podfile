@@ -91,6 +91,8 @@ target 'Keeponic' do
 
   pod 'RNCPicker', :path => '../node_modules/@react-native-picker/picker'
 
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
   target 'KeeponicTests' do
     inherit! :complete
     # Pods for testing

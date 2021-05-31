@@ -13,7 +13,7 @@ const HomeRoute = () => <HomePage />;
 
 const SearchRoute = () => <LifeStyleDetail />;
 
-const OrderRoute = () => <OrderPage />;
+const OrderRoute = () => <OrderPage refresh={true} />;
 
 const ProfileRoute = () => <ProfilePage />;
 

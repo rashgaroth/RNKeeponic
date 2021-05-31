@@ -38,6 +38,7 @@ import { widthScreen, width, heightScreen } from "../../../utils/theme";
 import MarketInfo from '../components/MarketInfo';
 import { KpnButton, KpnCardProducts, KpnSnackBar } from "../../../components";
 import * as detailProductAction from "../actions";
+import * as homeActions from "../../home/actions";
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import { HeaderAuth } from "../../../services/header";
@@ -57,22 +58,22 @@ export default function Home(props) {
   const [errVisible, setErrVisible] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [isStoredWishlist, setIsStoredWishlist] = useState(false);
-  const [isWishList, setIsWishList] = useState(false);
-  const [isFav, setIsFav] = useState(false);
+  const [scrollIndex, setScrollIndex] = useState(null);
 
   const dispatch = useDispatch();
   const textInputRef = useRef(null);
+  const scrollRef = useRef();
   let scrollY = useRef(new Animated.Value(0)).current;
-  const {productId} = props.route.params;
   
-  const loginSelector = useSelector(state => state.loginReducer)
-  const homeSelector:IHome = useSelector(state => state.homeReducer)
+  const loginSelector = useSelector(state => state.loginReducer);
+  const homeSelector:IHome = useSelector(state => state.homeReducer);
   const detailProductSelector:IProductDetail = useSelector(state => state.detailProductReducer);
   const category_id = detailProductSelector.category.id;
   const userId = loginSelector.user.user_id
-  const {mProducts} = detailProductSelector;
+  const { mProducts } = detailProductSelector;
   const loading = detailProductSelector.loading;
-  const tokenUser = loginSelector.user.token
+  const tokenUser = loginSelector.user.token;
+  const isFavorite = detailProductSelector.isFavorite;
 
   const debugginLoader = true;
 
@@ -88,45 +89,66 @@ export default function Home(props) {
     Keyboard.dismiss();
   }
 
-  const onAddProductToWishlist = async () => {
+  const onAddProductToWishlist = async (e) => {
     setLoadingProduct(true)
     const param = {
       user_id: userId,
       t_product_id: detailProductSelector.mProducts.id,
       t_category_product_id: detailProductSelector.category.id,
       is_favorite: isLove ? 1 : 0,
-      quantity: 1
-    }
+      quantity: 1,
+      action: "add"
+    };
     try {
       const _onAddChart = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/add`, param, HeaderAuth(tokenUser))
       if (_onAddChart.status === 200) {
         setLoadingProduct(false)
-        setIsStoredWishlist(true)
-        // await getWishlistData(data)
-        console.log(_onAddChart.data, "data param")
+        Alert.alert("Keeponic", "Produk Berhasil Ditambahkan!")
       } else {
-        console.log(_onAddChart.data, "data param")
-        Alert.alert("Terjadi Kesalahan", "Terjadi Kesalahan Ketika Menambahkan Produk")
-        setValidatorErrorMsg(_onFavorite.data.msg)
+        Alert.alert("Terjadi Kesalahan", _onAddChart.data.msg)
+        setValidatorErrorMsg(_onAddChart.data.msg)
         setLoadingProduct(false)
-        setIsStoredWishlist(true)
+        setIsStoredWishlist(false)
       }
     } catch (error) {
-      console.log(error)
       setLoadingProduct(false)
-      Alert.alert("Terjadi Kesalahan", "Gagal Saat Menambahkan Order" + error)
+      console.log(error, "error")
+      Alert.alert("Terjadi Kesalahan", "Gagal Saat Menambahkan Order " + error)
     }
   }
 
   const onPressBell = () => {
     Keyboard.dismiss();
-    console.log(detailProductSelector);
   }
 
-  const onPressLove = () => {
+  const onPressLove = async () => {
     setIsLove(!isLove);
-    setValidatorErrorMsg("Produk Disukai Ditambahkan");
-    setErrVisible(true);
+    setLoadingProduct(true);
+    const param = {
+      user_id: userId,
+      t_product_id: detailProductSelector.mProducts.id,
+      t_category_product_id: detailProductSelector.category.id,
+      is_favorite: isLove ? 0 : 1,
+      quantity: 1,
+      action: isLove ? "delete_favorite" : "add_favorite"
+    };
+    try {
+      const _onAddChart = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/add`, param, HeaderAuth(tokenUser))
+      if (_onAddChart.status === 200) {
+        setLoadingProduct(false)
+        setValidatorErrorMsg("Produk Disukai Ditambahkan");
+        setErrVisible(true);
+      } else {
+        Alert.alert("Terjadi Kesalahan", _onAddChart.data.msg)
+        setValidatorErrorMsg(_onAddChart.data.msg)
+        setLoadingProduct(false)
+        setIsStoredWishlist(false)
+      }
+    } catch (error) {
+      setLoadingProduct(false)
+      console.log(error, "error")
+      Alert.alert("Terjadi Kesalahan", "Gagal Saat Menambahkan Order" + error)
+    }
   }
 
   const onBackPressed = async () => {
@@ -135,7 +157,6 @@ export default function Home(props) {
       Keyboard.dismiss();
     }else{
       await dispatch(detailProductAction.setLoading(true));
-      // await dispatch(detailProductAction.clearProduct());
       goBack();
     }
   }
@@ -162,33 +183,11 @@ export default function Home(props) {
     }
   }
 
-  const checkProductOnWishlist = (data: IData[] = []) => {
-    const productId = detailProductSelector.mProducts.id
-    let arrIsLoved = [];
-    data.filter((v, i, a) => {
-      if (v.product_id === productId) {
-        arrIsLoved.push(a[i].isFavorite, a[i].product_id)
-        return a[i].product_id === productId
-      } else {
-        return []
-      }
-    });
-    if (arrIsLoved) {
-      setIsLove(true)
-      setIsStoredWishlist(true)
-    } else {
-      setIsLove(true)
-      setIsStoredWishlist(true)
-    }
-  }
-
   const fetchProductDetail = async () => {
     const {
-      // userId,
       productId
     } = props.route.params;
     const param = {
-      // user_id: userId,
       product_id: productId
     }
     await dispatch(detailProductAction.getDetailProduct(param));
@@ -196,42 +195,67 @@ export default function Home(props) {
 
   useEffect(() => {
     fetchProductDetail()
-    // checkProductOnWishlist(detailProductSelector.productWishlistData)
-  }, []);
+  }, [null]);
 
   useEffect(() => {
-    const checkProductOnWishlist = (data: IData[] = []) => {
-      const productId = detailProductSelector.mProducts.id
-      let arrIsLoved = [];
-      if(data){
-        data.filter((v, i, a) => {
-          if (v.product_id === productId) {
-            arrIsLoved.push(a[i].isFavorite, a[i].product_id)
-            return a[i].product_id === productId
-          } else {
-            return []
-          }
-        });
-        if (arrIsLoved.length) {
-          return true
-        } else {
-          return false
-        }
-      }else{
-        return false
+    console.log(isFavorite, "base")
+    const favoriteChecker = () => {
+      if (isFavorite === 1) {
+        setIsLove(true)
+      } else {
+        setIsLove(false)
       }
     }
+
+    return () => favoriteChecker()
+  }, [isFavorite, mProducts])
+
+  useEffect(() => {
     return () => {
-      const checker = checkProductOnWishlist(detailProductSelector.productWishlistData)
-      if(checker){
-        setIsLove(true)
-        setIsStoredWishlist(true)
-      }else{
-        setIsLove(false)
-        setIsStoredWishlist(false)
-      }
+      scrollRef.current?.scrollTo({
+        y: 0,
+        animated: true,
+        duration: 500,
+      });
     };
-  });
+  }, [mProducts]);
+
+  // useEffect(() => {
+    // const checkProductOnWishlist = (data: IData[] = []) => {
+    //   const productId = detailProductSelector.mProducts.id
+    //   let arrIsLoved = [];
+    //   if(data){
+    //     data.filter((v, i, a) => {
+    //       if (v.product_id === productId) {
+    //         arrIsLoved.push(a[i].isFavorite, a[i].product_id)
+    //         return a[i].product_id === productId
+    //       } else {
+    //         return []
+    //       }
+    //     });
+    //     if (arrIsLoved.length) {
+    //       if(arrIsLoved[0] === 1){
+    //         setIsLove(true)
+    //       }else{
+    //         setIsLove(false)
+    //       }
+    //       return true
+    //     } else {
+    //       return false
+    //     }
+    //   }else{
+    //     return false
+    //   }
+    // }
+    // return () => {
+    //   const checker = checkProductOnWishlist(detailProductSelector.productWishlistData)
+    //   if(checker){
+    //     setIsStoredWishlist(true)
+    //   }else{
+    //     setIsStoredWishlist(false)
+    //   }
+    // };
+  // });
 
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
   const diffClampButtonGroup = Animated.diffClamp(scrollY, 0, 60);
@@ -246,20 +270,11 @@ export default function Home(props) {
     outputRange: [0, -50],
   })
 
-  const onNavigateToDetail = (user_id, product_id) => {
-    const param = {
-      // userId: user_id, 
-      productId: product_id
-    }
-    navigate("ProductDetail", param)
-  }
-
-  const onPressBottomAvatar = (title, avatar, description) => {
-    Animated.timing(scrollY, {
-      toValue: 0,
-      useNativeDriver: true,
-      duration: 1000
-    }).start();
+  const onNavigateToDetail = async (id) => {
+      const param = {
+        product_id: id
+      }
+      await dispatch(detailProductAction.getDetailProduct(param));
   }
 
   return (
@@ -295,9 +310,13 @@ export default function Home(props) {
         onRefresh={fetchProductDetail}
       />}
       scrollEnabled={!loading}
-      onScroll={ (e) => {
+      onScroll={(e) => {
         scrollY.setValue(e.nativeEvent.contentOffset.y)
-      } }
+        if (e.nativeEvent.contentOffset.y === 0){
+          setScrollIndex(e.nativeEvent.contentOffset.y)
+        }
+      }}
+      ref={scrollRef}
       >
       <StatusBar backgroundColor={COLORS.primaryOpacity} />
       {/* Focused */}
@@ -399,9 +418,9 @@ export default function Home(props) {
                         />
                       </View>
                 }
-                  <IconButton rippleColor={COLORS.blackSans} icon="share-variant" style={{ position: 'absolute', top: 10, left: 0, backgroundColor:COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
-                  <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 60, left: 0, backgroundColor: COLORS.colorC4 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={() => onPressLove()} />
-                  <IconButton icon="information-outline" style={{ position: 'absolute', top: 110, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} />
+                  {!loading ? <IconButton rippleColor={COLORS.blackSans} icon="share-variant" style={{ position: 'absolute', top: 10, left: 0, backgroundColor:COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} /> : null}
+                  {!loading ? <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 60, left: 0, backgroundColor: COLORS.colorC4 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={() => onPressLove()} /> : null }
+                  {!loading ?<IconButton icon="information-outline" style={{ position: 'absolute', top: 110, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} />: null}
               </View>
               <View style={styles.price}>
                 {
@@ -439,7 +458,7 @@ export default function Home(props) {
                           }}
                         />
                     </View> : <View style={styles.chip}>
-                          <Chip icon="star" onPress={() => console.log('Pressed')}>Rating Produk : {mProducts.rating} (40)</Chip>
+                          <Chip icon="star" onPress={() => console.log(isLove, "IsLove")}>Rating Produk : {mProducts.rating} (40)</Chip>
                         </View>
                   }
               </View>
@@ -730,8 +749,8 @@ export default function Home(props) {
                               title={truncate(item.name, 30)}
                               image={item.avatar}
                               price={item.price}
-                              onPress={() => onNavigateToDetail(0, item.id)}
-                              onPressAvatar={() => onNavigateToDetail(0, item.id)}
+                              onPress={() => onNavigateToDetail(item.id)}
+                              onPressAvatar={() => onNavigateToDetail(item.id)}
                             />
                           )}
                           keyExtractor={(item) => item.id}

@@ -1,0 +1,1 @@
+export const GET_ADDRESS_LISTS = 'GET_ADDRESS_LISTS';
