@@ -26,7 +26,8 @@ import {
   SellerRegistrationNext,
   SellerRegistrationSuccess,
   SellerRegistrationMarketName,
-  OrderDetail
+  OrderDetail,
+  OrderSuccess
 } from "../features";
 
 enableScreens(false);
@@ -162,6 +163,13 @@ function App() {
           headerShown: false,
         }}
       />
+        <Stack.Screen
+          name="OrderSuccess"
+          component={OrderSuccess}
+          options={{
+            headerShown: false,
+          }}
+        />
       <Stack.Screen
         name="OrderDetail"
         component={OrderDetail}

@@ -12,11 +12,13 @@ import OrderList from '../components/OrderList';
 import OnEmptyList from '../components/OnEmptyList';
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
+import * as orderActions from '../actions';
 import { Alert } from 'react-native';
 import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProductDetail } from "../../interfaces";
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
 import * as productDetailActions from "../../productDetail/actions";
+import { KpnLoading } from '../../../components'
 
 export default function OrderBefore(navigation) {
     const [loading, setLoading] = useState(false)
@@ -31,11 +33,14 @@ export default function OrderBefore(navigation) {
 
     const loginSelector = useSelector(state => state.loginReducer)
     const homeSelector:IHome = useSelector(state => state.homeReducer)
+    const orderState = useSelector(state => state.orderReducer)
     const detailProductSelector: IProductDetail = useSelector(state => state.detailProductReducer);
+    
     const tokenUser = loginSelector.user.token
     const userId = loginSelector.user.user_id
     const wishlistData = detailProductSelector.productWishlistData;
     const name = loginSelector.user.name
+    const cartData = orderState.wishListData.cart
 
     const onDismissSnackBar = () => {
         setErrVisible(false)
@@ -57,7 +62,7 @@ export default function OrderBefore(navigation) {
             const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/update`, param, HeaderAuth(tokenUser))
             if (_onFavorite.status === 200) {
                 setLoading(false)
-                await getWishlistData(data)
+                await dispatch(orderActions.getWishlist())
                 // await dispatch(homeAction.requestHome(name, userId, 0, true))
             } else {
                 Alert.alert("Terjadi Kesalahan", "Terjadi Kesalahan Ketika Mengurangi Produk")
@@ -95,7 +100,7 @@ export default function OrderBefore(navigation) {
                 if (_onFavorite.status === 200) {
                     console.log(_onFavorite.data)
                     setLoading(false)
-                    await getWishlistData(data)
+                    await dispatch(orderActions.getWishlist())
                 } else {
                     console.log(_onFavorite.data)
                     Alert.alert("Terjadi Kesalahan", "Gagal Saat Mengurangi Order")
@@ -110,78 +115,78 @@ export default function OrderBefore(navigation) {
     }
 
     const onRefresh = async() => {
-        setLoading(true)
-        await getWishlistData(data, false)
+        await dispatch(orderActions.getWishlist())
     }
 
-    const getWishlistData = async (data, loading) => {
-        setData(data)
-        setLoading(loading ? loading : true)
-        dispatch(productDetailActions.setWishlistData(null))
-        try {
-            const _resultData = await apiServices.GET(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list?user_id=${userId}`, HeaderAuth(tokenUser))
-            if (_resultData.status === 200 && _resultData.data.error < 1) {
-                const wishList: IWishList[] = _resultData.data.data
-                const productList: IProductWishList[] = _resultData.data.product
-                const marketList: IMarket[] = _resultData.data.market
-                const categoryList: ICategory[] = _resultData.data.category
-                // console.log(productList, "ARRAY2")
-                // ======================================================== //
-                let dataArr: IData[] = [];
-                if (wishList && productList && marketList && categoryList) {
-                    const wishListFiltered = wishList.filter((v, i, a) => {
-                        return v.status === 1
-                    })
-                    const productListFiltered = productList.filter((v,i,a) => {
-                        if(wishList[i].status === 1){
-                            return wishList[i].t_product_id === a[i].id
-                        }
-                    })
-                    for (let i in wishListFiltered) {
-                        let dataObj: IData = {}
-                        dataObj.id = wishListFiltered[i].id
-                        dataObj.product_id = wishListFiltered[i].t_product_id
-                        dataObj.t_category_product_id = wishListFiltered[i].t_category_product_id
-                        dataObj.quantity = wishListFiltered[i].quantity
-                        dataObj.isFavorite = wishListFiltered[i].is_favorite
-                        dataObj.owner_market_id = wishListFiltered[i].owner_market_id
-                        dataObj.owner_market_subdistrict = wishListFiltered[i].owner_market_subdistrict
-                        dataObj.owner_market_city = wishListFiltered[i].owner_market_city
-                        dataObj.owner_market_subdistrict_name = wishListFiltered[i].owner_market_subdistrict_name
-                        dataObj.owner_market_city_name = wishListFiltered[i].owner_market_city_name
-                        // product
-                        dataObj.productTitle = productListFiltered[i].name
-                        dataObj.avatar = productListFiltered[i].avatar
-                        dataObj.price = productListFiltered[i].price * wishListFiltered[i].quantity
-                        // market
-                        dataObj.marketName = marketList[i].market_name
-                        dataObj.category = categoryList[i].name
-                        dataObj.sec_market_id = wishListFiltered[i].sec_market_id
-                        dataObj.address = homeSelector.userAddress.subdistrict ? homeSelector.userAddress.subdistrict : ""
-                        dataArr.push(dataObj)
-                    }
-                    if(dataArr.length < 1){
-                        setIsEmpty(true)
-                    }else{
-                        setIsEmpty(false)
-                    }
-                    setData(dataArr)
-                    console.log(isEmpty, "isEmpty")
-                }
+    // const getWishlistData = async (data, loading) => {
+        
+    //     setData(data)
+    //     setLoading(loading ? loading : true)
+    //     dispatch(productDetailActions.setWishlistData(null))
+    //     try {
+    //         const _resultData = await apiServices.GET(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list?user_id=${userId}`, HeaderAuth(tokenUser))
+    //         if (_resultData.status === 200 && _resultData.data.error < 1) {
+    //             const wishList: IWishList[] = _resultData.data.data
+    //             const productList: IProductWishList[] = _resultData.data.product
+    //             const marketList: IMarket[] = _resultData.data.market
+    //             const categoryList: ICategory[] = _resultData.data.category
+    //             // console.log(productList, "ARRAY2")
+    //             // ======================================================== //
+    //             let dataArr: IData[] = [];
+    //             if (wishList && productList && marketList && categoryList) {
+    //                 const wishListFiltered = wishList.filter((v, i, a) => {
+    //                     return v.status === 1
+    //                 })
+    //                 const productListFiltered = productList.filter((v,i,a) => {
+    //                     if(wishList[i].status === 1){
+    //                         return wishList[i].t_product_id === a[i].id
+    //                     }
+    //                 })
+    //                 for (let i in wishListFiltered) {
+    //                     let dataObj: IData = {}
+    //                     dataObj.id = wishListFiltered[i].id
+    //                     dataObj.product_id = wishListFiltered[i].t_product_id
+    //                     dataObj.t_category_product_id = wishListFiltered[i].t_category_product_id
+    //                     dataObj.quantity = wishListFiltered[i].quantity
+    //                     dataObj.isFavorite = wishListFiltered[i].is_favorite
+    //                     dataObj.owner_market_id = wishListFiltered[i].owner_market_id
+    //                     dataObj.owner_market_subdistrict = wishListFiltered[i].owner_market_subdistrict
+    //                     dataObj.owner_market_city = wishListFiltered[i].owner_market_city
+    //                     dataObj.owner_market_subdistrict_name = wishListFiltered[i].owner_market_subdistrict_name
+    //                     dataObj.owner_market_city_name = wishListFiltered[i].owner_market_city_name
+    //                     // product
+    //                     dataObj.productTitle = productListFiltered[i].name
+    //                     dataObj.avatar = productListFiltered[i].avatar
+    //                     dataObj.price = productListFiltered[i].price * wishListFiltered[i].quantity
+    //                     // market
+    //                     dataObj.marketName = marketList[i].market_name
+    //                     dataObj.category = categoryList[i].name
+    //                     dataObj.sec_market_id = wishListFiltered[i].sec_market_id
+    //                     dataObj.address = homeSelector.userAddress.subdistrict ? homeSelector.userAddress.subdistrict : ""
+    //                     dataArr.push(dataObj)
+    //                 }
+    //                 if(dataArr.length < 1){
+    //                     setIsEmpty(true)
+    //                 }else{
+    //                     setIsEmpty(false)
+    //                 }
+    //                 setData(dataArr)
+    //                 console.log(isEmpty, "isEmpty")
+    //             }
 
-                setLoading(false)
-                setLoading(false)
-            } else {
-                setLoading(false)
-                setLoading(false)
-            }
-        } catch (error) {
-            setLoading(false)
-            setLoading(false)
-            console.log(error, "error")
-            Alert.alert("Kesalahan Server", "Gagal Mengambil Daftar Produk")
-        }
-    }
+    //             setLoading(false)
+    //             setLoading(false)
+    //         } else {
+    //             setLoading(false)
+    //             setLoading(false)
+    //         }
+    //     } catch (error) {
+    //         setLoading(false)
+    //         setLoading(false)
+    //         console.log(error, "error")
+    //         Alert.alert("Kesalahan Server", "Gagal Mengambil Daftar Produk")
+    //     }
+    // }
 
     const onPressDelete = (id) => {
         const param = {
@@ -196,7 +201,7 @@ export default function OrderBefore(navigation) {
                         setLoading(true)
                         const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/delete`, param, HeaderAuth(tokenUser))
                         if (_onFavorite.status === 200) {
-                            await getWishlistData(data)
+                            await dispatch(orderActions.getWishlist())
                             setLoading(false)
                             // await dispatch(homeAction.requestHome(name, userId, 0, true))
                         } else {
@@ -216,7 +221,7 @@ export default function OrderBefore(navigation) {
     }
 
     const onPressBuy = async (id) => {
-        const OrderDetailData:IData[] = data
+        const OrderDetailData:IData[] = cartData
         const detailOrder = {}
         for(let i in OrderDetailData) {
             if(OrderDetailData[i].id === id){
@@ -275,33 +280,20 @@ export default function OrderBefore(navigation) {
         }
     }
 
-    useEffect(() => {
-        console.log("hit useEffect!", navigation.navigation.addListener)
-        const subscribe = navigation.navigation.addListener('focus', () => {
-            getWishlistData(null)
-        });
-        return subscribe
-    }, [navigation.navigation]);
-
 
     return (
         <>
             <ScrollView style={styles.container}
             refreshControl={
                 <RefreshControl
-                    refreshing={loading}
+                    refreshing={orderState.loading}
                     onRefresh={onRefresh}
                     style={{ paddingTop: 60 }}
                 />
             }
             >
             <View>
-                {/* <Spinner
-                visible={loading}
-                textContent={''}
-                textStyle={{ color: COLORS.white }}
-                /> */}
-                    { isEmpty ? <OnEmptyList /> : data ? data.map((x, i) => (
+                    { isEmpty ? <OnEmptyList /> : cartData.length > 0 ? cartData.map((x, i) => (
                         <OrderList 
                         key={i}
                         address={x.address}
@@ -318,6 +310,7 @@ export default function OrderBefore(navigation) {
                         onIncrease={() => onIncrease(x.id)}
                         onPressDelete={() => onPressDelete(x.id)}
                         onPressProduct={() => onPressItem(x.product_id)}
+                        status="Di Keranjang"
                         />
                     )) : 
                     <OnEmptyList
@@ -325,6 +318,7 @@ export default function OrderBefore(navigation) {
                     />}
                 </View>
             </ScrollView>
+            <KpnLoading visible={loading} />
             <Snackbar
                 visible={errVisible}
                 onDismiss={onDismissSnackBar}

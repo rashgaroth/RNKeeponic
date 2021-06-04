@@ -18,6 +18,7 @@ import SellerRegistrationNext from "./profile/containers/sellerRegistrationNext"
 import SellerRegistrationSuccess from "./profile/containers/sellerRegistrationSuccess";
 import SellerRegistrationMarketName from "./profile/containers/sellerRegistrationMarketName";
 import OrderDetail from "./order/containers/OrderDetail";
+import OrderSuccess from "./order/containers/OrderSuccess";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -42,5 +43,6 @@ export {
     SellerRegistrationNext,
     SellerRegistrationSuccess,
     SellerRegistrationMarketName,
-    OrderDetail
+    OrderDetail,
+    OrderSuccess
 }

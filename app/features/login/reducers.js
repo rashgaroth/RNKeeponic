@@ -19,7 +19,8 @@ const initialState = {
     email: "",
     name: "",
     is_email_validated: null,
-    token: ""
+    token: "",
+    phone: ""
   },
   isRegistrant: false
 };
@@ -31,38 +32,37 @@ export const loginReducer = createReducer(initialState, {
       loading: true,
     };
   },
-  [types.LOGIN_RESPONSE](state, action) {
-    return {
-      ...state,
-      user_id: action.user_id,
-      isLoggedIn: true,
-      isNewUser: false,
-      isUserRegistered: true,
-      isUserAlreadyExplore: true,
-      user:{
-        ...state.user,
-        user_id: action.response.user_id,
-        email: action.response.email,
-        name: action.response.name,
-        is_email_validated: action.response.is_email_validated,
-      }
-    };
-  },
+  // [types.LOGIN_RESPONSE](state, action) {
+  //   return {
+  //     ...state,
+  //     user_id: action.user_id,
+  //     isLoggedIn: true,
+  //     isNewUser: false,
+  //     isUserRegistered: true,
+  //     isUserAlreadyExplore: true,
+  //     user:{
+  //       ...state.user,
+  //       user_id: action.response.user_id,
+  //       email: action.response.email,
+  //       name: action.response.name,
+  //       is_email_validated: action.response.is_email_validated,
+  //     }
+  //   };
+  // },
   [types.LOGIN_GOOGLE_AUTH_SUCCESS](state, action) {
     return {
       ...state,
-      user_id: action.data.user.user_id,
       isLoggedIn: true,
       isNewUser: false,
       isUserRegistered: true,
       isUserAlreadyExplore: true,
       user: {
         ...state.user,
-        user_id: action.data.user.user_id,
-        email: action.data.user.email,
-        name: action.data.user.name,
-        is_email_validated: action.data.user.is_email_validated,
-        token: action.data.token
+        user_id: action.data.user_id,
+        email: action.data.email,
+        name: action.data.name,
+        is_email_validated: action.data.is_email_validated,
+        phone: action.data.phone
       }
     };
   },

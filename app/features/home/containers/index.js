@@ -8,8 +8,6 @@ import {
   RefreshControl,
   Animated,
   TextInput,
-  Keyboard,
-  Image, 
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
@@ -19,6 +17,7 @@ import SplashScreen from 'react-native-splash-screen';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
+import * as orderActions from '../../order/actions';
 import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
@@ -67,7 +66,15 @@ export default function Home({ navigation }) {
   useEffect(() => {
     SplashScreen.hide();
     fetchAllHomeRequest();
-  }, [])
+  }, [null])
+
+  useEffect(() => {
+    const fetchWishListData = async () => {
+      await dispatch(orderActions.getWishlist())
+    }
+    
+    fetchWishListData()
+  }, [null])
 
   const onNavigateToDetail = (user_id, product_id) => {
     const param = {

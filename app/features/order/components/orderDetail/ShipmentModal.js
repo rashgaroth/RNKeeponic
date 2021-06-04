@@ -15,6 +15,7 @@ import LottieView from 'lottie-react-native';
 
 import { useSelector, useDispatch } from "react-redux";
 import * as registerActions from '../../../register/actions';
+import * as orderActions from '../../actions';
 
 import { COLORS } from '../../../../utils/colors';
 import { IHome } from "../../../interfaces";
@@ -29,6 +30,7 @@ const RenderForm = ({
     onChangePhone,
     onChangeName,
     onChangeNote,
+    onAccept
 }) => {
 
     const onChangePicker = (v, i) => {
@@ -66,7 +68,7 @@ const RenderForm = ({
             />
             <Text style={[styles.textBold, { color: COLORS.blackSans }]} >Nomor Telepon</Text>
             <TextInput
-                label="+62"
+                label="08 ..."
                 value={phone}
                 keyboardType="number-pad"
                 // disabled
@@ -82,9 +84,9 @@ const RenderForm = ({
                 mode="outlined"
                 onChangeText={onChangePhone}
             />
-            <Text style={[styles.textBold, { color: COLORS.blackSans, marginTop: 10 }]} >Catatan Lainnya</Text>
+            <Text style={[styles.textBold, { color: COLORS.blackSans, marginTop: 10 }]} >Catatan Kurir <Text style={{ color: COLORS.colorC4 }}>(Opsional)</Text> </Text>
             <TextInput
-                label="Isi Catatan"
+                label="Catatan untuk kurir"
                 value={note}
                 // disabled
                 theme={{
@@ -104,7 +106,7 @@ const RenderForm = ({
             <Button
                 icon="check-all"
                 mode="outlined"
-                onPress={() => console.log('Pressed')}
+                onPress={onAccept}
                 style={{
                     marginTop: 10
                 }}
@@ -116,10 +118,30 @@ const RenderForm = ({
     )
 }
 
-const ModalView = ({ subdistrict, city, province }) => {
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
+const ModalView = ({ onComplete }) => {
+    const [errorMessage, setErrorMessage] = useState('')
+    const [isError, setIsError] = useState(false)
     const [scrollPadding, setScrollPadding] = useState(20)
+
+    const dispatch = useDispatch();
+    const shipmentSelector = useSelector(state => state.orderReducer)
+    const { 
+        phoneNumber,
+        note,
+        userName
+     } = shipmentSelector.shipmentDetail
+
+    const onAccept = (e) =>{
+        if (isNaN(phoneNumber)){
+            setIsError(true)
+            setErrorMessage('Nomor Telepon harus valid')
+        } else if (phoneNumber === ''){
+            setIsError(true)
+            setErrorMessage('Nomor Telepon Tidak Boleh Kosong')
+        } else{
+            onComplete()
+        }
+    }
 
     const scrollRef = useRef();
     return (
@@ -137,11 +159,21 @@ const ModalView = ({ subdistrict, city, province }) => {
             <View>
                 <Text style={styles.textBold}>Masukan Detail Pengiriman</Text>
                 <RenderForm
-                    name={name}
-                    phone={phone}
-                    onChangeName={(t) => setName(t)}
-                    onChangePhone={(t) => setPhone(t)}
+                    name={userName}
+                    phone={phoneNumber}
+                    note={note}
+                    onChangeName={(t) => dispatch(orderActions.setData(t, 'userName'))}
+                    onChangePhone={(t) => dispatch(orderActions.setData(t, 'phoneNumber'))}
+                    onAccept={(e) => onAccept(e)}
+                    onChangeNote={(t) => dispatch(orderActions.setData(t, 'note')) }
                 />
+                {
+                    isError ? 
+                    <View style={styles.errorMsg}>
+                        <Text style={styles.errorText}>{errorMessage}</Text>
+                    </View>
+                    : null
+                }
             </View>
         </ScrollView>
     )
@@ -170,12 +202,6 @@ const ModalHeader = ({ onPress }) => {
 const ModalContent = ({ onBackPressed }) => {
     const [loading, setLoading] = useState(false);
 
-    const dispatch = useDispatch();
-    const addressSelector = useSelector(state => state.registerReducer.address);
-    const subdistrict = addressSelector.subdistrict;
-    const city = addressSelector.city;
-    const province = addressSelector.province;
-
     return (
         <View style={styles.container}>
             <ModalHeader onPress={onBackPressed} />
@@ -183,9 +209,7 @@ const ModalContent = ({ onBackPressed }) => {
                 loading ?
                     <Loading /> :
                     <ModalView
-                        subdistrict={subdistrict ? subdistrict : null}
-                        city={city ? city : null}
-                        province={province ? province : null}
+                        onComplete={onBackPressed}
                     />
             }
         </View>
@@ -262,6 +286,21 @@ const styles = StyleSheet.create({
     textInput: {
         height: 40,
         fontSize: 12
+    },
+    errorMsg: {
+        height: 40,
+        marginHorizontal: 20,
+        borderRadius: 10,
+        marginTop: 10,
+        backgroundColor: COLORS.redOpacity,
+        justifyContent: 'center',
+    },
+    errorText: {
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 'bold',
+        color: COLORS.red
     }
 })
 

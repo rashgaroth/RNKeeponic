@@ -207,7 +207,7 @@ export default function Home(props) {
       }
     }
 
-    return () => favoriteChecker()
+    favoriteChecker()
   }, [isFavorite, mProducts])
 
   useEffect(() => {

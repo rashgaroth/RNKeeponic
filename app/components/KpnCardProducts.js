@@ -4,7 +4,7 @@ import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
 import NoRating from "../assets/images/svg/NoRating";
-const KpnCardProducts = ({rating, title, price, image, userId, productId, onPress, onPressAvatar}) => {
+const KpnCardProducts = ({ rating, title, price, image, userId, productId, onPress, onPressAvatar, isBottomSheet}) => {
     const totalRating = 5;
     const Cart = props => <Avatar.Icon 
     {...props} 
@@ -25,6 +25,41 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId, onPres
     }
 
     return(
+        isBottomSheet ? 
+        <Card style={stylesBottomSheet.cardContainer}>
+            <TouchableOpacity onPress={onPressAvatar}>
+                <Card.Cover style={stylesBottomSheet.cardCover} source={{ uri: image || 'https://picsum.photos/200' }} />
+            </TouchableOpacity>
+            <Card.Content style={stylesBottomSheet.cardContent}>
+                <View style={stylesBottomSheet.cardTitle}>
+                    <TouchableOpacity onPress={onPress}>
+                        <Paragraph>{title || 'Card Paragraph'}</Paragraph>
+                    </TouchableOpacity>
+                </View>
+            <View style={stylesBottomSheet.cardRating}>
+                {[...Array(totalRating)].map((x, i) => i < rating && i + 1 > rating ? (
+                    // TODO: Ini untuk membuat rating setengah dari bintang
+                    null
+                ) : i < rating ? (
+                    <Rating key={i} height={13} width={13} />
+                ) : (
+                    // TODO: Ini untuk membuat rating kosong
+                    <NoRating height={13} width ={13} />
+                )
+                ) }
+                {/* <TouchableOpacity>
+                    <Cart />
+                </TouchableOpacity> */}
+            </View>
+            <View style={stylesBottomSheet.cardPrice}>
+                <Text style={stylesBottomSheet.textPrice}>{convertToIdr(price) || 'Rp 20.000'}</Text>
+                <TouchableOpacity>
+                    <Cart />
+                </TouchableOpacity>
+            </View>
+            </Card.Content>
+        </Card>
+        :
         <Card style={styles.cardContainer}>
             <TouchableOpacity onPress={onPressAvatar}>
                 <Card.Cover style={styles.cardCover} source={{ uri: image || 'https://picsum.photos/200' }} />
@@ -60,6 +95,44 @@ const KpnCardProducts = ({rating, title, price, image, userId, productId, onPres
         </Card>
     )
 };
+
+const stylesBottomSheet = StyleSheet.create({
+    cardContainer: {
+        width: 170,
+        height: 240,
+        borderWidth: 1,
+        borderColor: COLORS.colorC4,
+        borderRadius: 10,
+        marginRight: 10,
+        marginVertical: 10
+    },
+    cardCover: {
+        borderRadius: 10,
+        height: 120,
+        borderTopEndRadius: 10,
+        borderTopStartRadius: 10
+    },
+    cardContent: {
+        marginTop: 5
+    },
+    cardRating: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        marginTop: 5
+    },
+    cardTitle: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+    },
+    cardPrice: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 5
+    },
+    textPrice: {
+        fontWeight: "bold"
+    }
+})
 
 const styles = StyleSheet.create({
     cardContainer: {

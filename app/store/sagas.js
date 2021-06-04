@@ -11,7 +11,7 @@ import { registerSagas } from 'app/features/register/sagas';
 import { submitRegistrationSagas } from 'app/features/register/sagas';
 import { submitVerificationSagas } from 'app/features/register/sagas';
 import { submitAddress } from 'app/features/register/sagas';
-import { orderSagas } from 'app/features/order/sagas';
+import wishlistSagas from '../features/order/sagas/wishlistSagas';
 
 // export default [loginSaga];
 
@@ -25,5 +25,5 @@ export default function* rootSaga() {
   yield all([...submitVerificationSagas]);
   yield all([...submitAddress]);
   yield all([...loginGoogleSagas]);
-  yield all([...orderSagas]);
+  yield all([wishlistSagas()]);
 }

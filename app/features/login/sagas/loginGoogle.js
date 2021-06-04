@@ -35,20 +35,9 @@ export default function* loginGoogle(state) {
         try {
             const googleResponse = yield call(apiService.POST, API.BASE_URL + API.ENDPOINT.GOOGLE_LOGIN, param, Header());
             if(googleResponse.status === 200){
-                const { user } = googleResponse.data
-                yield setToken(googleResponse.data.token)
-                yield storeData("email", user.email)
-                yield storeData("is_email_validated", user.is_email_validated)
-                yield storeData("name", user.name)
-                yield storeData("user_id", user.user_id)
-
-                // getStore("user_id").then((value) => (
-                //   console.log(value, "-----------VALUE---------------")
-                // )).catch((e) => console.log(e))
-
                 yield put(loginActions.clearForm())
                 yield put(loginActions.setToken(googleResponse.data.token))
-                yield put(loginActions.onLoginResponse(googleResponse.data.user))
+                yield put(loginActions.onSuccessGoogleAuth(googleResponse.data.user))
                 yield put(loginActions.disableLoading())
             }else{
                 yield put(loginActions.loginFailed())

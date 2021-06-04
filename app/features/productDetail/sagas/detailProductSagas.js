@@ -57,20 +57,6 @@ export default function* getProductDetail(state) {
                 let second_avatar = payload.second_avatar;
                 let third_avatar = payload.third_avatar;
                 let fourth_avatar = payload.fourth_avatar;
-                if (productFavorite.status === 200) {
-                    const productId = payload.id;
-                    const favData:Array = productFavorite.data.data;
-
-                    const isFavorite = favData.filter((v, i, a) => {
-                        return v.t_product_id === productId
-                    });
-
-                    yield put(detailProductAction.getProductLoves(isFavorite[0].is_favorite))
-                }else{
-                    setTimeout(() => {
-                        Alert.alert('Keeponic', "Server Tidak Dapat Mengambil Disukai");
-                    }, 200);
-                }
                 const image = []
                 image.push(avatar)
                 if(second_avatar){
@@ -86,6 +72,33 @@ export default function* getProductDetail(state) {
                 yield put(detailProductAction.setMarketOnReducer(market));
                 yield put(detailProductAction.setCategory(category));
                 yield put(detailProductAction.hideLoading());
+                if (productFavorite.status === 200) {
+                    const productId = payload.id;
+                    const favData: Array = productFavorite.data.data;
+
+                    const isFavorite = favData.filter((v, i, a) => {
+                        if(v.t_product_id){
+                            if (v.t_product_id === productId){
+                                return v.t_product_id === productId
+                            }else{
+                                return null
+                            }
+                        }else{
+                            return null
+                        }
+                    });
+
+                    if (isFavorite) {
+                        yield put(detailProductAction.getProductLoves(isFavorite[0].is_favorite))
+                    }else{
+                        console.log("tidak ada favorite")
+                    }
+
+                } else {
+                    setTimeout(() => {
+                        Alert.alert('Keeponic', "Server Tidak Dapat Mengambil Disukai");
+                    }, 200);
+                }
             }else{
                 setTimeout(() => {
                     Alert.alert('Keeponic', "Server Tidak Dapat Mengambil Data");

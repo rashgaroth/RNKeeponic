@@ -24,10 +24,10 @@ let loginState = state => state.loginReducer;
 export default function* homeGetProducts(state){
 
     // state home
-const getHomeState:IHome = yield select(homeState)
-const getLoginState = yield select(loginState)
-const token = getLoginState.user.token
-const userId = getLoginState.user.user_id
+    const getHomeState:IHome = yield select(homeState)
+    const getLoginState = yield select(loginState)
+    const token = getLoginState.user.token
+    const userId = getLoginState.user.user_id
 
     try {
         yield put(homeAction.showLoading())

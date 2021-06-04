@@ -8,6 +8,7 @@ import OrderPage from "./order/containers/index";
 import ProfilePage from "./profile/containers/index";
 import { COLORS } from '../utils/colors';
 import { useDispatch, useSelector } from "react-redux";
+import { Badge } from 'react-native-paper';
 
 const HomeRoute = () => <HomePage />;
 
@@ -42,6 +43,12 @@ const BottomNavTabs = () => {
             inactiveColor={COLORS.blackSans}
             keyboardHidesNavigationBar
             style={styles.bottomNav}
+            getBadge={(props) => {
+                console.log(props, "props")
+                if (props.route.key === "pesanan"){
+                    return (<Badge size={19} >3</Badge>)
+                }
+            }}
         />
     );
 };

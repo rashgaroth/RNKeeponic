@@ -6,6 +6,3 @@
  */
 import { takeEvery } from 'redux-saga/effects';
 import * as types from '../types';
-import GetLists from './orderSagas';
-
-export const orderSagas = [takeEvery(types.GET_ADDRESS_LISTS, GetLists)];

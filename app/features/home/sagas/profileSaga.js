@@ -29,7 +29,7 @@ export default function* homeGetProfile(state) {
     const token = getLoginState.user.token
 
     try {
-        yield put(homeAction.showLoading())
+        // yield put(homeAction.showLoading())
         console.log(getLoginState.isUserRegistered)
         if(getLoginState.isUserRegistered){
             if (token) {
@@ -64,7 +64,7 @@ export default function* homeGetProfile(state) {
                         console.log(getHomeState.userAddress, ": Address");
                     }, 5000);
                 } else {
-                    yield put(homeAction.hideLoading())
+                    // yield put(homeAction.hideLoading())
                     // yield put(loginAction.logOut())
                     console.log(_response);
                     setTimeout(() => {
@@ -73,16 +73,16 @@ export default function* homeGetProfile(state) {
                 }
 
             } else {
-                yield put(homeAction.hideLoading())
+                // yield put(homeAction.hideLoading())
                 setTimeout(() => {
                     Alert.alert('Keeponic', "Tidak dapat mengambil data profile");
                 }, 200);
             }
         }else{
-            yield put(homeAction.hideLoading())
+            // yield put(homeAction.hideLoading())
         }
     } catch (error) {
-        yield put(homeAction.hideLoading())
+        // yield put(homeAction.hideLoading())
         console.log("INI CATCH", error.message)
     }
 }

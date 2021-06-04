@@ -21,11 +21,25 @@ const OrderList = ({
     onIncrease,
     onDecrease,
     onPressDelete,
-    onPressProduct
+    onPressProduct,
+    status,
+    isOrdered
 }) => {
 
+    const [color, setColor] = useState(COLORS.red)
+
+    useEffect(() =>{
+        if(status === 'Di Keranjang'){
+            setColor(COLORS.orange)
+        }else if(status === 'Menunggu Konfirmasi') {
+            setColor(COLORS.blue)
+        }else{
+            setColor(COLORS.success)
+        }
+    }, [null])
+
     return (
-        <View style={styles.containerView}>
+        <View style={!isOrdered ? styles.containerView : [styles.containerView, {height: 230}]}>
             <View style={{ flexDirection: "row" }}>
                 <BouncyCheckbox
                     size={20}
@@ -55,47 +69,39 @@ const OrderList = ({
                     </View>
                 <View style={styles.count}>
                     <IconButton
-                        icon="minus-circle-outline"
-                        color={COLORS.primaryColor}
-                        onPress={onDecrease}
+                        icon="checkbox-multiple-marked-circle"
+                        color={COLORS.blackSans}
+                        size={15}
                     />
-
-                    <TextInput
-                        style={{
-                            height: 30,
-                            fontSize: 14,
-                            padding: 5,
-                            paddingLeft: 15,
-                            borderColor: 'gray',
-                            borderBottomWidth: 1
-                        }}
-                        defaultValue={qty || "0"}
-                    />
-                    <IconButton
-                        icon="plus-circle-outline"
-                        color={COLORS.primaryColor}
-                        onPress={onIncrease}
-                    />
+                    <Text style={{ fontWeight: "bold", marginTop: 5 }}>Status Pesanan : <Text style={{ fontWeight: "bold", color: color, textDecorationLine: 'underline' }}>{status || 'Di Keranjang'}</Text></Text>
                 </View>
                 </View>
             <Text style={styles.priceText}>{price || "Rp 000.000"}</Text>
-                <View style={{ flexDirection: "row", justifyContent: "flex-start"}}>
-                    <Button
-                        color={COLORS.primaryColor}
-                        icon="check-circle-outline"
-                        mode="outlined"
-                        style={styles.buttonHapus}
-                        onPress={onPressBuy}
-                    > Bayar </Button>
-                    <Button
-                        color={COLORS.red}
-                        icon="delete-outline"
-                        mode="outlined"
-                        style={styles.buttonHapus}
-                        onPress={onPressDelete}
-                    > Hapus </Button>
-                </View>
-                <View style={styles.lineLarge}></View>
+            {
+                !isOrdered ? 
+                <>
+                    <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
+                        <Button
+                            color={COLORS.primaryColor}
+                            icon="check-circle-outline"
+                            mode="outlined"
+                            style={styles.buttonHapus}
+                            onPress={onPressBuy}
+                            disabled={isOrdered ? true : false}
+                        > Bayar </Button>
+                        <Button
+                            color={COLORS.red}
+                            icon="delete-outline"
+                            mode="outlined"
+                            style={styles.buttonHapus}
+                            onPress={onPressDelete}
+                            disabled={isOrdered ? true : false}
+                        > Hapus </Button>
+                    </View>
+                    <View style={styles.lineLarge}></View>
+                </>
+                    : null
+            }
         </View>
     );
 }
@@ -170,10 +176,11 @@ const styles = StyleSheet.create({
     count: { 
         flexDirection: "row",
         position: "absolute",
-        left: 0,
+        left: 10,
         bottom: 0,
         alignSelf: "flex-end",
-        justifyContent: "flex-start"
+        justifyContent: "center",
+        // justifyContent: "flex-start"
     },
     line: {
         height: 1,

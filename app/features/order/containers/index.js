@@ -2,27 +2,33 @@
 // https://aboutreact.com/react-native-tab //
 import 'react-native-gesture-handler';
 
-import * as React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import Icon from 'react-native-vector-icons/FontAwesome';
 //import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Ordered from './Ordered';
 import OrderCart from './OrderCart';
 import OrderBefore from './OrderBefore';
+import OrderSuccess from './OrderSuccess';
 import { COLORS } from '../../../utils/colors';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
 function TabStack() {
+
+  const [iconColor, setIconColor] = useState(COLORS)
+
   return (
     <Tab.Navigator
       initialRouteName="Order"
+      tabBarPosition="top"
       tabBarOptions={{
-        activeTintColor: '#FFFFFF',
-        inactiveTintColor: '#F8F8F8',
+        activeTintColor: COLORS.white,
+        inactiveTintColor: COLORS.white,
         style: {
           backgroundColor: COLORS.sans,
         },
@@ -33,34 +39,35 @@ function TabStack() {
           borderBottomColor: COLORS.white,
           borderBottomWidth: 2,
         },
+        showIcon: true,
       }}>
       <Tab.Screen
         name="OrderBefore"
         component={OrderBefore}
-        // children={ () => <OrderBefore refresh={true} /> }
         options={{
-          tabBarLabel: 'Pesanan',
-          // tabBarIcon: ({ color, size }) => (
-          //   <MaterialCommunityIcons name="settings" color={color} size={size} />
-          // ),
+          tabBarBadge: 3,
+          tabBarLabel: 'Keranjang',
+          tabBarIcon: ({ tintColor }) => (
+            <Icon name="shopping-cart" size={20} color={COLORS.white} />
+          ),
         }} />
       <Tab.Screen
         name="OrderCart"
         component={OrderCart}
         options={{
-          tabBarLabel: 'Dikirim',
-          // tabBarIcon: ({ color, size }) => (
-          //   <MaterialCommunityIcons name="settings" color={color} size={size} />
-          // ),
+          tabBarLabel: 'Pesanan',
+          tabBarIcon: ({ tintColor }) => (
+            <Icon {...tintColor} name="send" size={20} color={COLORS.white} />
+          ),
         }} />
       <Tab.Screen
         name="Ordered"
         component={Ordered}
         options={{
-          tabBarLabel: 'Selesai',
-          // tabBarIcon: ({ color, size }) => (
-          //   <MaterialCommunityIcons name="home" color={color} size={size} />
-          // ),
+          tabBarLabel: 'Dikirim',
+          tabBarIcon: ({ tintColor }) => (
+            <Icon name="truck" size={20} color={COLORS.white} />
+          )
         }} />
     </Tab.Navigator>
   );
