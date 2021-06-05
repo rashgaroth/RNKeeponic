@@ -93,30 +93,30 @@ export default function WelcomePage({}){
                     <Text style={styles.innerText}>
                         Kami akan berikan rekomendasi terbaik untuk anda
                     </Text>
-                    <KpnButton
+                    {/* <KpnButton
                         text={"Lihat Beranda"}
                         isRounded
                         color={COLORS.primaryColor}
                         style={styles.button}
                         onPress={() => onPressExploration()}
                     >
-                    </KpnButton>
+                    </KpnButton> */}
                     {/* <KpnButton
                         text={"Login Keeponic Seller"}
                         isRounded
                         style={styles.button}
                         onPress={() => onPressLoginButton()}
                     /> */}
-                    <KpnButton
+                    {/* <KpnButton
                         text={"Daftar Seller"}
                         isRounded
                         style={styles.button}
                         color={COLORS.blue}
                         onPress={() => onPressRegisterSeller()}
-                    />
+                    /> */}
                     <View style={styles.loginGoogle}>
                         <View style={styles.line}></View>
-                        <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Atau Login Dengan</Text>
+                        <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Login Dengan</Text>
                         <View style={styles.line} ></View>
                     </View>
                     <GoogleSigninButton

@@ -12,7 +12,7 @@ const initialState = {
   password: null,
   email: "",
   emailForm: null,
-  passwordForm:null,
+  passwordForm: null,
   loading: false,
   user:{
     user_id: 0,
@@ -103,7 +103,6 @@ export const loginReducer = createReducer(initialState, {
   [types.CLEAR_FORM](state, action) {
     return {
       ...state,
-      isLoggedIn: false,
       password: null,
       email: "",
       emailForm: null,

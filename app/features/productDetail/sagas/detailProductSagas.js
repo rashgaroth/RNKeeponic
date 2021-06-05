@@ -107,8 +107,5 @@ export default function* getProductDetail(state) {
         } catch (error) {
             console.log(error)
             yield put(detailProductAction.hideLoading());
-            setTimeout(() => {
-                Alert.alert('Keeponic', "Error saat menerima data");
-            }, 200);
         }
 }

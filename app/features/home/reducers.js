@@ -11,6 +11,7 @@ const initialState = {
     isSkeleton: false,
     isError: false,
     isSeller: false,
+    scrollY: 0,
     userProfile: {
         name: "",
         email: "",
@@ -107,6 +108,12 @@ export const homeReducer = createReducer(initialState, {
         return{
             ...state,
             isSeller: false
+        }
+    },
+    [types.SET_SCROLL_Y](state, action) {
+        return {
+            ...state,
+            scrollY: action.data
         }
     },
     [types.GET_PROFILE_SUCCESS](state, action) {

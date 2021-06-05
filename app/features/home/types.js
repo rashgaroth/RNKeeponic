@@ -17,3 +17,4 @@ export const GET_PROFILE_SUCCESS = "GET_PROFILE_SUCCESS";
 export const GET_ALL_PRODUCTS = "GET_ALL_PRODUCTS";
 export const SET_SELLER = "SET_SELLER";
 export const SET_SELLER_FALSE = "SET_SELLER_FALSE";
+export const SET_SCROLL_Y = "SET_SCROLL_Y";

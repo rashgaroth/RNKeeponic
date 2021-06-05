@@ -255,7 +255,7 @@ export default function Profile() {
                                 {/* LOGO */}
                                 <LogoRounded style={stylesLocal.logo} width={30} height={40} />
                             </View>
-                            <TouchableOpacity onPress={() => bottomSheetEditPhoto(0)}>
+                            <TouchableOpacity>
                                 <View style={stylesLocal.avatar}>
                                     {/* uri di ambil dari be */}
                                     <Avatar.Image size={200} source={{ uri: profileImages }} />
@@ -265,7 +265,7 @@ export default function Profile() {
                             {
                                 detailUser.map((x, i) => (
                                     <View key={i}>
-                                        <TouchableOpacity onPress={(e) => bottomSheetEditField(0, x.title, x.content)}>
+                                        <TouchableOpacity>
                                             <View style={stylesLocal.detailUsers}>
                                                 <Text style={stylesLocal.textTitle}>{x.title}</Text>
                                                 <Text style={stylesLocal.textDesc}>{x.content}</Text>
@@ -277,7 +277,7 @@ export default function Profile() {
                             }
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
-                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.sans}>Ubah Password</Button>
+                            <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
                                 <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller ? COLORS.blue : COLORS.sans}>{ isSeller ? "Login Seller" : "Daftar Toko"}</Button>
                             </View>
                             {/* View Setting ON/OFF */}
@@ -292,7 +292,7 @@ export default function Profile() {
                                 <View style={stylesLocal.line}></View>
                             </View>
                             {/* skip */}
-                            <View>
+                            {/* <View>
                                 <View style={stylesLocal.detailUsers}>
                                     <Text style={stylesLocal.textTitle}>Rekomendasi</Text>
                                     <View style={stylesLocal.switch}>
@@ -301,15 +301,14 @@ export default function Profile() {
                                     </View>
                                 </View>
                                 <View style={stylesLocal.line}></View>
-                            </View>
+                            </View> */}
                             {/* View Button Update & Logout */}
-                            <View style={stylesLocal.buttonGroup}>
+                            {/* <View style={stylesLocal.buttonGroup}>
                                 <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} disabled color={COLORS.sans}>Ubah Profile</Button>
                                 <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
-                            </View>
+                            </View> */}
                             {/* View Tetang */}
                             <View>
-                                <Text>Tentang</Text>
                                 <View>
                                     <View style={stylesLocal.detailUsers}>
                                         <View style={stylesLocal.switch}>

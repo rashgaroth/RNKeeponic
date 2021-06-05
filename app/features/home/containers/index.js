@@ -1,18 +1,11 @@
-import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { 
   View, 
-  StatusBar, 
-  Text, 
-  TouchableOpacity, 
-  FlatList, 
   RefreshControl,
   Animated,
   TextInput,
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import Spinner from "react-native-loading-spinner-overlay";
-import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
-import LinearGradient from 'react-native-linear-gradient';
 import SplashScreen from 'react-native-splash-screen';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,34 +14,24 @@ import * as orderActions from '../../order/actions';
 import styles from './styles';
 
 import { COLORS } from "../../../utils/colors";
-import { ITEM_WIDTH, SPACING, width } from "../../../utils/theme";
-import { truncate } from "../../../utils/stringUtils";
-import { KpnWideCard, KpnCardProducts, KpnLifeStyleCard, KpnButton } from "../../../components";
-import { navigate, navigationRef } from "../../../navigation/NavigationService";
-import Swiper from "../components/Swiper";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
-import { IProductDetail } from "../../interfaces";
+import { IHome } from "../../interfaces";
+import HomeContainer from '../components/HomeContainer';
+import { KpnLoading } from "../../../components";
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
-  // const onLogout = () => dispatch(loginActions.logOut());
-  const [selectedId, setSelectedId] = useState(null);
+  const homeSelector:IHome = useSelector(state => state.homeReducer)
+  const loginSelector = useSelector(state => state.loginReducer)
+
   const [name, setName] = useState(null);
   const [word, setWord] = useState('');
   const [isFocus, setIsFocus] = useState(false);
 
-  let scrollX = useRef(new Animated.Value(0)).current;
   let scrollY = useRef(new Animated.Value(0)).current;
   const textInputRef = useRef(null);
-
-  const homeSelector = useSelector(state => state.homeReducer)
-  const loginSelector = useSelector(state => state.loginReducer)
-  const productDetailSelector: IProductDetail = useSelector(state => state.detailProductReducer)
-
-  const allProducts = homeSelector.allProducts;
   
   async function fetchAllHomeRequest(){
-      dispatch(homeAction.showLoading())
       if(loginSelector.isUserRegistered){
         await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
         await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
@@ -65,24 +48,26 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     SplashScreen.hide();
-    fetchAllHomeRequest();
   }, [null])
 
   useEffect(() => {
     const fetchWishListData = async () => {
       await dispatch(orderActions.getWishlist())
+      await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
+      await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
     }
-    
-    fetchWishListData()
-  }, [null])
 
-  const onNavigateToDetail = (user_id, product_id) => {
-    const param = {
-      // userId: user_id, 
-      productId: product_id
+    const fetchHomeData = async () => {
+      await dispatch(homeAction.requestHome(name, 0, 0))
     }
-    navigate("ProductDetail", param)
-  }
+
+    if (loginSelector.isUserRegistered) {
+      fetchWishListData()
+    }else{
+      fetchHomeData()
+    }
+
+  }, [loginSelector.user.user_id])
 
   const onTextInputFocus = () => {
     setIsFocus(true)
@@ -102,124 +87,6 @@ export default function Home({ navigation }) {
     inputRange: [0, 0, 0, 60],
     outputRange: [0, 0, 0, -60]
   });
-
-  const renderSkeleton = (name, size=1) => {
-    if(name === "paket"){
-      return (
-        <View style={{ flexDirection: "row" }}>
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 170,
-              borderRadius: 16,
-              marginLeft: 10
-            }}
-          />
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 170,
-              borderRadius: 16,
-              marginLeft: 10
-            }}
-          />
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 170,
-              borderRadius: 16,
-              marginLeft: 10
-            }}
-          />
-        </View>
-    )
-  }else if( name === "lifestyle"){
-    return (
-      <View style={{ flexDirection: "row", justifyContent: "space-between"}}>
-        <View style={{ marginHorizontal: 10 }}>
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 80,
-              borderRadius: 16,
-              marginTop: 10,
-              // marginLeft: 10
-            }}
-          />
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 80,
-              borderRadius: 16,
-              marginTop: 10,
-              // marginLeft: 10
-            }}
-          />
-        </View>
-        <View style={{}}>
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 80,
-              borderRadius: 16,
-              marginTop: 10,
-              // marginLeft: 10
-            }}
-          />
-          <ShimmerPlaceHolder
-            LinearGradient={LinearGradient}
-            // visible={homeSelector.isLoading}
-            style={{
-              width: 170,
-              height: 80,
-              marginTop: 10,
-              borderRadius: 16,
-              // marginLeft: 10
-            }}
-          />
-        </View>
-      </View>
-    )
-  }else{
-    return(
-      <View style={{ flexDirection: "row" }}>
-        <ShimmerPlaceHolder
-          LinearGradient={LinearGradient}
-          // visible={homeSelector.isLoading}
-          style={{
-            width: 170,
-            height: 170,
-            borderRadius: 16,
-            marginLeft: 10
-          }}
-        />
-        <ShimmerPlaceHolder
-          LinearGradient={LinearGradient}
-          // visible={homeSelector.isLoading}
-          style={{
-            width: 170,
-            height: 170,
-            borderRadius: 16,
-            marginLeft: 10
-          }}
-        />
-      </View>
-    )
-  }
-
-}
 
   return (
     <View style={styles.containerView}>
@@ -253,200 +120,19 @@ export default function Home({ navigation }) {
         </AvoidKeyboard>
         <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell()} style={{ marginRight: 20 }} />
       </Animated.View>
-      <Animated.ScrollView style={[styles.container, /* { opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)), } */]} 
+    <Animated.ScrollView style={[styles.container, /* { opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)), } */]} 
       refreshControl={
       <RefreshControl 
-      refreshing={homeSelector.isLoading}
-      onRefresh={onRefreshAll} 
-      style={{ paddingTop: 60 }}
+      onRefresh={onRefreshAll}
       />
-    }
-    onScroll={(e) => {
-      scrollY.setValue(e.nativeEvent.contentOffset.y)
-    }}
-    scrollEnabled={!homeSelector.isLoading}
+      }
+      onScroll={(e) => {
+        scrollY.setValue(e.nativeEvent.contentOffset.y)
+      }}
+      scrollEnabled={!homeSelector.isLoading}
     >
-        <StatusBar backgroundColor={COLORS.sans} />
-        <Spinner
-          visible={homeSelector.spinnerLoading}
-          textContent={''}
-          textStyle={{ color: COLORS.white }}
-        />
-        {/* <Text style={styles.textMenuButton}>Selamat datang, {name}!</Text> */}
-        <Swiper />
-        <View>
-          <View>
-            <View style={styles.textMenuHidroponik}>
-              <Text style={styles.textPaketHidroponik}>Paket Hidroponik</Text>
-              <TouchableOpacity onPress={(e) => console.log("homeSelector", productDetailSelector.productInWishList)}>
-                <Text style={styles.textLihatSemua}>Lihat Semua</Text>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
-            <View style={styles.cardProducts}>
-              {homeSelector.isLoading ? renderSkeleton ("paket") :
-                <FlatList
-                  horizontal
-                  data={homeSelector.products}
-                  snapToInterval={ITEM_WIDTH + SPACING * 1.6}
-                  contentContainerStyle={{
-                    paddingRight: width - ITEM_WIDTH - SPACING * 2,
-                  }}
-                  renderItem={({ item }) => (
-                    <KpnCardProducts
-                      key={item.id}
-                      rating={item.rating}
-                      title={truncate(item.name, 30)}
-                      image={item.avatar}
-                      price={item.price}
-                      onPress={() => onNavigateToDetail(0, item.id) }
-                      onPressAvatar={() => onNavigateToDetail(0, item.id)}
-                    />
-                  )}
-                  keyExtractor={(item) => item.id}
-                  extraData={selectedId}
-                />
-              }
-            </View>
-            <View style={styles.textMenuHidroponik}>
-              <Text style={styles.textPaketHidroponik}>Galeri Hidroponik & Kreativitas</Text>
-              <TouchableOpacity onPress={(e) => console.log("aa")}>
-                <Text style={styles.textLihatSemua}>Lihat Semua</Text>
-              </TouchableOpacity>
-              <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
-            </View>
-            <View style={styles.cardLifestyle}>
-              {
-                homeSelector.isLoading ? renderSkeleton("lifestyle") : 
-                <>
-                  <View style={styles.cardLifestyle1}>
-                    <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} uri="https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles.png" />
-                      <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} uri="https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles_2.jpg" />
-                  </View>
-                  <View style={styles.cardLifestyle2}>
-                      <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} uri="https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles_3.jpg" />
-                      <KpnLifeStyleCard onPress={() => navigationRef.current?.navigate("LifeStyleDetail")} uri="https://d1f31mzn1ab53p.cloudfront.net/images/hidroponik_lifestyles_4.jpg" />
-                  </View>
-              </>
-              }
-            </View>
-            <View style={styles.textMenuHidroponik}>
-              <Text style={styles.textPaketHidroponik}>Khusus Untuk John Doe</Text>
-              <TouchableOpacity>
-                <Text style={styles.textLihatSemua}>Lihat Semua</Text>
-              </TouchableOpacity>
-              <Text style={styles.textLebihHemat}>Barang yang direkomendasikan untuk anda!</Text>
-            </View>
-            {/* Flatlist untuk rekomendasi */}
-            <View style={styles.cardProducts}>
-              <FlatList
-                horizontal
-                data={homeSelector.products}
-                snapToInterval={ITEM_WIDTH + SPACING * 1.6}
-                contentContainerStyle={{
-                  paddingRight: width - ITEM_WIDTH - SPACING * 2,
-                }}
-                renderItem={({ item }) => (
-                  <KpnCardProducts
-                    key={item.id}
-                    rating={item.rating}
-                    title={truncate(item.name, 30)}
-                    image={item.avatar}
-                    price={item.price}
-                    onPress={() => onNavigateToDetail(0, item.id)}
-                    onPressAvatar={() => onNavigateToDetail(0, item.id)}
-                  />
-                )}
-                keyExtractor={(item) => item.id}
-                extraData={selectedId}
-              />
-            </View>
-            <View style={styles.textMenuHidroponik}>
-              <Text style={styles.textPaketHidroponik}>Inspirasi & Edukasi</Text>
-              <TouchableOpacity>
-                <Text style={styles.textLihatSemua}>Lihat Semua</Text>
-              </TouchableOpacity>
-            </View>
-              <Text style={styles.textLebihHemat}>Ide Hidroponik yang menginspirasi anda!</Text>
-            <View style={styles.wideCards}>
-              {/* <KpnWideCard /> */}
-              {/* FlatList Inspirasi */}
-              <View style={styles.cardProducts}>
-                <FlatList
-                  horizontal
-                  data={homeSelector.dummyProducts.flatListWideView}
-                  snapToInterval={ITEM_WIDTH + SPACING * 1.6}
-                  contentContainerStyle={{
-                    paddingRight: width - ITEM_WIDTH - SPACING * 2,
-                  }}
-                  renderItem={({ item }) => (
-                    <KpnWideCard
-                      title={item.name}
-                      image={item.image}
-                      paragraph={item.text}
-                    />
-                  )}
-                  keyExtractor={(item) => item.id}
-                  extraData={selectedId}
-                />
-              </View>
-            </View>
-            <View style={styles.textMenuHidroponik}>
-              <Text style={styles.textPaketHidroponik}>Terdekat dari rumah anda</Text>
-              <TouchableOpacity>
-                <Text style={styles.textLihatSemua}>Lihat Semua</Text>
-              </TouchableOpacity>
-            </View>
-              <Text style={styles.textLebihHemat}>Malas menunggu? Ini Solusinya!</Text>
-            {/* Flatlist untuk terdekat */}
-            <View style={styles.cardProducts}>
-              <FlatList
-                horizontal
-                data={homeSelector.products}
-                snapToInterval={ITEM_WIDTH + SPACING * 1.6}
-                contentContainerStyle={{
-                  paddingRight: width - ITEM_WIDTH - SPACING * 2,
-                }}
-                renderItem={({ item }) => (
-                  <KpnCardProducts
-                    key={item.id}
-                    rating={item.rating}
-                    title={truncate(item.name, 30)}
-                    image={item.avatar}
-                    price={item.price}
-                    onPress={() => onNavigateToDetail(0, item.id)}
-                    onPressAvatar={() => onNavigateToDetail(0, item.id)}
-                  />
-                )}
-                keyExtractor={(item) => item.id}
-                extraData={selectedId}
-              />
-            </View>
-            {/* Other Products */}
-            <View>
-              <Text style={styles.textPaketHidroponik}>Produk lainnya</Text>
-              <Text style={styles.textLebihHemat}>Produk lain nya, hanya di KEEPONIC</Text>
-            </View>
-            <View style={styles.otherProducts}>
-                { 
-                allProducts ? allProducts.map((data, index) => (
-                  <View key={index}>
-                    <KpnCardProducts
-                      key={data.id}
-                      rating={data.rating}
-                      title={truncate(data.name, 30)}
-                      image={data.avatar}
-                      price={data.price}
-                      onPress={() => onNavigateToDetail(0, data.id)}
-                      onPressAvatar={() => onNavigateToDetail(0, data.id)}
-                    />
-                  </View>
-                )) : null
-                }
-            </View>
-          </View>
-          <View style={{ height: 60, width: width }}></View>
-      </View>
+      <HomeContainer />
+      <KpnLoading visible={homeSelector.isLoading} />
     </Animated.ScrollView>
     </View>
   );

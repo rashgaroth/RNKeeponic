@@ -2,27 +2,13 @@ import React, {useState, useRef, useCallback, useEffect, useMemo} from 'react';
 import { 
   View, 
   StatusBar, 
-  StyleSheet, 
   TextInput, 
   Keyboard, 
   SafeAreaView,
-  Image,
-  TouchableOpacity,
-  ScrollView,
   Alert,
   Animated,
-  FlatList,
-  RefreshControl,
-  Dimensions,
-  Easing,
-  TouchableNativeFeedback
 } from 'react-native';
-import Swiper from 'react-native-swiper';
-import { Chip, IconButton, Text, Button } from 'react-native-paper';
-import { ExpandingDot } from "react-native-animated-pagination-dots";
-import SnackBar from 'react-native-snackbar-component';
-import ShimmerPlaceHolder from 'react-native-shimmer-placeholder'
-import LinearGradient from 'react-native-linear-gradient';
+import { IconButton, Text, Button } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,17 +17,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IProductDetail, IHome, IData } from '../../interfaces';
 import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
-import { goBack, navigate } from "../../../navigation/NavigationService";
-import { searchProduct, imageData } from "../constants";
-import { convertToIdr, truncate } from "../../../utils/stringUtils";
-import { widthScreen, width, heightScreen } from "../../../utils/theme";
-import MarketInfo from '../components/MarketInfo';
-import { KpnButton, KpnCardProducts, KpnSnackBar } from "../../../components";
+import { goBack } from "../../../navigation/NavigationService";
+import { truncate } from "../../../utils/stringUtils";
+import { widthScreen } from "../../../utils/theme";
+import { KpnSnackBar } from "../../../components";
 import * as detailProductAction from "../actions";
-import * as homeActions from "../../home/actions";
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import { HeaderAuth } from "../../../services/header";
+import styles from '../components/styles';
+
+import ProductAvatar from '../components/ProductAvatar';
+import SearchView from '../components/SearchView';
+import ProductName from '../components/ProductName';
+import CommonProduct from '../components/CommonProduct';
+import MarketComponent from '../components/MarketComponent';
+import ShipmentInfo from '../components/ShipmentInfo';
+import ProductDescription from '../components/ProductDescription';
+import ProductListComponent from '../components/ProductListComponent';
 
 const imageW = widthScreen;
 const imageH = imageW * 1;
@@ -52,13 +45,11 @@ export default function Home(props) {
   const [isLove, setIsLove] = useState(false);
   const [readableDesc, setReadableDesc] = useState(false);
   const [description, setDescription] = useState("");
-  const [bottomAction, setBottomAction] = useState(null);
   const [isError, setIsError] = useState(false);
   const [validatorErrorMsg, setValidatorErrorMsg] = useState("");
   const [errVisible, setErrVisible] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [isStoredWishlist, setIsStoredWishlist] = useState(false);
-  const [scrollIndex, setScrollIndex] = useState(null);
 
   const dispatch = useDispatch();
   const textInputRef = useRef(null);
@@ -66,16 +57,12 @@ export default function Home(props) {
   let scrollY = useRef(new Animated.Value(0)).current;
   
   const loginSelector = useSelector(state => state.loginReducer);
-  const homeSelector:IHome = useSelector(state => state.homeReducer);
   const detailProductSelector:IProductDetail = useSelector(state => state.detailProductReducer);
-  const category_id = detailProductSelector.category.id;
   const userId = loginSelector.user.user_id
   const { mProducts } = detailProductSelector;
   const loading = detailProductSelector.loading;
   const tokenUser = loginSelector.user.token;
   const isFavorite = detailProductSelector.isFavorite;
-
-  const debugginLoader = true;
 
   const onTextInputFocus = () => {
     setIsFocus(true)
@@ -220,43 +207,6 @@ export default function Home(props) {
     };
   }, [mProducts]);
 
-  // useEffect(() => {
-    // const checkProductOnWishlist = (data: IData[] = []) => {
-    //   const productId = detailProductSelector.mProducts.id
-    //   let arrIsLoved = [];
-    //   if(data){
-    //     data.filter((v, i, a) => {
-    //       if (v.product_id === productId) {
-    //         arrIsLoved.push(a[i].isFavorite, a[i].product_id)
-    //         return a[i].product_id === productId
-    //       } else {
-    //         return []
-    //       }
-    //     });
-    //     if (arrIsLoved.length) {
-    //       if(arrIsLoved[0] === 1){
-    //         setIsLove(true)
-    //       }else{
-    //         setIsLove(false)
-    //       }
-    //       return true
-    //     } else {
-    //       return false
-    //     }
-    //   }else{
-    //     return false
-    //   }
-    // }
-    // return () => {
-    //   const checker = checkProductOnWishlist(detailProductSelector.productWishlistData)
-    //   if(checker){
-    //     setIsStoredWishlist(true)
-    //   }else{
-    //     setIsStoredWishlist(false)
-    //   }
-    // };
-  // });
-
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
   const diffClampButtonGroup = Animated.diffClamp(scrollY, 0, 60);
 
@@ -301,20 +251,12 @@ export default function Home(props) {
             clearTextOnFocus
           />
         </AvoidKeyboard>
-        <IconButton icon="cart-outline" color={COLORS.white} onPress={() => onPressCart} />
         <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell} />
       </Animated.View>
-    <Animated.ScrollView style={styles.container} refreshControl={
-      <RefreshControl
-        refreshing={loading}
-        onRefresh={fetchProductDetail}
-      />}
+    <Animated.ScrollView style={styles.container}
       scrollEnabled={!loading}
       onScroll={(e) => {
         scrollY.setValue(e.nativeEvent.contentOffset.y)
-        if (e.nativeEvent.contentOffset.y === 0){
-          setScrollIndex(e.nativeEvent.contentOffset.y)
-        }
       }}
       ref={scrollRef}
       >
@@ -322,451 +264,27 @@ export default function Home(props) {
       {/* Focused */}
       {
         isFocus ? 
+        <SearchView />
+        : 
         <SafeAreaView>
-          {/* View Ketika Input Sedang Fokus */}
-          <View>
-            <View style={styles.onFocusContainer}>
-              {
-                searchProduct.map((x, i) => (
-                  <View key={i}>
-                  <TouchableOpacity>
-                    <View style={styles.onFocusItem}>
-                      <IconButton icon="close-circle-outline" color={COLORS.white} size={15} onPress={() => onPressCart} />
-                        <Text>{truncate(x.name, 40)}</Text>
-                    </View>
-                  </TouchableOpacity>
-                    <View style={styles.line}></View>
-                  </View>
-                ))
-              }
-              <View style={styles.imagePetani}>
-                <Image
-                source={ require("../../../assets/images/png/petani.png") }
-                />
-              </View>
-            </View>
-          </View>
-        </SafeAreaView> : 
-      /* Blured */
-          <SafeAreaView>
-            {/* ImageCarousel Start */}
-          <View>
-              <View>
-                {
-                  detailProductSelector.avatar ? 
-                      <Swiper
-                        style={styles.wrapper}
-                        height={340}
-                        dot={
-                          <View
-                            style={{
-                              backgroundColor: COLORS.colorC4,
-                              width: 5,
-                              height: 5,
-                              borderRadius: 4,
-                              marginLeft: 3,
-                              marginRight: 3,
-                              marginTop: 3,
-                              marginBottom: 3
-                            }}
-                          />
-                        }
-                        activeDot={
-                          <View
-                            style={{
-                              backgroundColor: COLORS.primaryColor,
-                              width: 8,
-                              height: 8,
-                              borderRadius: 4,
-                              marginLeft: 3,
-                              marginRight: 3,
-                              marginTop: 3,
-                              marginBottom: 3
-                            }}
-                          />
-                        }
-                        paginationStyle={{
-                          
-                        }}
-                        loop={false}
-                      >
-                        {
-                          detailProductSelector.avatar.map((x,i) => (
-                            <View
-                              style={styles.slide}
-                              key={i}
-                            >
-                              <Image
-                                resizeMode="stretch"
-                                style={styles.image}
-                                source={{ uri: x}}
-                              />
-                            </View>
-                          ))
-                        }
-                      </Swiper>
-                      :
-                      <View style={[styles.itemContainer]}>
-                        <Animated.Image
-                          style={{
-                            width: imageW,
-                            height: imageH,
-                            // borderRadius: 20,
-                            resizeMode: 'cover',
-                          }}
-                          source={require('../../../assets/images/png/empty.png') }
-                        />
-                      </View>
-                }
-                  {!loading ? <IconButton rippleColor={COLORS.blackSans} icon="share-variant" style={{ position: 'absolute', top: 10, left: 0, backgroundColor:COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} /> : null}
-                  {!loading ? <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 60, left: 0, backgroundColor: COLORS.colorC4 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={() => onPressLove()} /> : null }
-                  {!loading ?<IconButton icon="information-outline" style={{ position: 'absolute', top: 110, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={() => onPressCart} />: null}
-              </View>
-              <View style={styles.price}>
-                {
-                    loading ? <ShimmerPlaceHolder
-                      LinearGradient={LinearGradient}
-                      // visible={homeSelector.isLoading}
-                      style={{
-                        width: 170,
-                        height: 30,
-                        borderRadius: 16,
-                        marginLeft: 10
-                      }}
-                    /> : <Text style={styles.priceText}>{mProducts.price ? convertToIdr(mProducts.price) : "0"}</Text>
-                }
-                  {
-                      loading ? <View style={{ flexDirection: "row" }}> 
-                        <ShimmerPlaceHolder
-                          LinearGradient={LinearGradient}
-                          // visible={homeSelector.isLoading}
-                          style={{
-                            width: 60,
-                            height: 30,
-                            borderRadius: 16,
-                            marginLeft: 10
-                          }}
-                        /> 
-                        <ShimmerPlaceHolder
-                          LinearGradient={LinearGradient}
-                          // visible={homeSelector.isLoading}
-                          style={{
-                            width: 60,
-                            height: 30,
-                            borderRadius: 16,
-                            marginLeft: 10
-                          }}
-                        />
-                    </View> : <View style={styles.chip}>
-                          <Chip icon="star" onPress={() => console.log(isLove, "IsLove")}>Rating Produk : {mProducts.rating} (40)</Chip>
-                        </View>
-                  }
-              </View>
-              <View style={styles.lineProducts} />
-                {
-                  loading ? 
-                    <View style={styles.productDescription}>
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: 170,
-                          height: 30,
-                          borderRadius: 16,
-                          marginLeft: 10
-                        }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: 60,
-                          height: 30,
-                          borderRadius: 16,
-                          marginVertical: 10,
-                          marginLeft: 10
-                        }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: 60,
-                          height: 30,
-                          borderRadius: 16,
-                          marginLeft: 10
-                        }}
-                      />
-                    </View> : 
-                    <View style={styles.productDescription}>
-                      <Text>{mProducts.name}</Text>
-                      <Text style={{ marginTop: 10 }}>
-                        <Text>
-                          {"Terjual" + " "}
-                        </Text>
-                        <Text style={{ fontWeight: "bold" }}>
-                          { detailProductSelector.mProducts.is_sold }
-                        </Text>
-                      </Text>
-                      <Text style={{ marginTop: 10 }}>
-                        <Text>
-                          {"Berat" + " "}
-                        </Text>
-                        <Text style={{ fontWeight: "bold" }}>
-                          {detailProductSelector.mProducts.weight}
-                        </Text>
-                        {" Gram / Produk"}
-                      </Text>
-                      <Text style={{ marginTop: 10 }}>
-                        <Text>
-                          {'Stok' + ' '}
-                        </Text>
-                        <Text style={{ fontWeight: "bold" }}>
-                          {detailProductSelector.mProducts.stock - detailProductSelector.mProducts.is_sold }
-                        </Text>
-                      </Text>
-                    </View>
-                }
-              <View style={styles.lineProducts} />
-              {/* Info Toko */}
-              {
-                  loading ? <View style={{ flexDirection: "row" }}>
-                    <ShimmerPlaceHolder
-                    LinearGradient={LinearGradient}
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 60,
-                      marginLeft: 10,
-                      marginTop: 10
-                    }}
-                  />
-                  <View style={{ flexDirection: "column", marginTop: 10 }}>
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        style={{
-                          width: 170,
-                          height: 20,
-                          borderRadius: 16,
-                          marginLeft: 10,
-                          marginTop: 10
-                        }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        style={{
-                          width: 170,
-                          height: 20,
-                          borderRadius: 16,
-                          marginLeft: 10,
-                          marginTop: 10
-                        }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        style={{
-                          width: 170,
-                          height: 20,
-                          borderRadius: 16,
-                          marginLeft: 10,
-                          marginTop: 10
-                        }}
-                      />
-                  </View>
-                  </View>  :
-                  <View>
-                    <MarketInfo />
-                  </View>
-              }
-              <View style={styles.lineProducts} />
-              {/* Info Pengiriman */}
-              {
-                  loading ? <View style={styles.productDescription}>
-                    <ShimmerPlaceHolder
-                      LinearGradient={LinearGradient}
-                      // visible={homeSelector.isLoading}
-                      style={{
-                        width: 170,
-                        height: 20,
-                        borderRadius: 16,
-                        marginLeft: 10
-                      }}
-                    />
-                    <ShimmerPlaceHolder
-                      LinearGradient={LinearGradient}
-                      // visible={homeSelector.isLoading}
-                      style={{
-                        width: 180,
-                        height: 20,
-                        borderRadius: 16,
-                        marginVertical: 10,
-                        marginLeft: 10
-                      }}
-                    />
-                    <ShimmerPlaceHolder
-                      LinearGradient={LinearGradient}
-                      // visible={homeSelector.isLoading}
-                      style={{
-                        width: 190,
-                        height: 20,
-                        borderRadius: 16,
-                        marginLeft: 10
-                      }}
-                    />
-                  </View> :
-                    <>
-                      <Text style={styles.title}>Informasi Pengiriman</Text>
-                      <View style={styles.row}>
-                        <IconButton
-                          icon="truck-check"
-                          size={20}
-                        />
-                        <Text style={{ alignSelf: "center" }}>
-                          <Text>{"Diantar ke" + " "}</Text>
-                          <Text style={{ fontWeight: "bold" }}>{"Kosan Mandar"}</Text>
-                        </Text>
-                      </View>
-                      <View style={styles.row}>
-                        <IconButton
-                          icon="clock-outline"
-                          size={20}
-                        />
-                        <Text style={{ alignSelf: "center" }}>
-                          <Text>{"3 - 5 Jam"}</Text>
-                        </Text>
-                      </View>
-                      <View style={styles.row}>
-                        <IconButton
-                          icon="package-variant"
-                          size={20}
-                        />
-                        <Text style={{ alignSelf: "center" }}>
-                          <Text>{"Kurir :" + " "}</Text>
-                          <Text style={{ fontWeight: "bold" }}>{"JNE"}</Text>
-                        </Text>
-
-                        {/* <Button
-                          mode="outlined"
-                          color={COLORS.primaryOpacity}
-                          onPress={() => console.log("aaa")}
-                          style={{
-                            borderRadius: 16,
-                            borderColor: COLORS.primaryOpacity,
-                            height: 40,
-                            marginTop: 5,
-                            justifyContent: "flex-end",
-                            alignSelf: "center",
-                            right: 10,
-                            position: "absolute"
-                          }}>Ganti Kurir</Button> */}
-                      </View>
-                    </>
-              }
-              <View>
-                {/* End */}
+            <View>
+                {/* ImageCarousel */}
+                <ProductAvatar isLove={isLove}  onPressLove={ () => onPressLove() } />
+                <ProductName />
                 <View style={styles.lineProducts} />
-                  <View style={{ height: 0, backgroundColor: 'white' }}
-                  onLayout={ev => { 
-                    setBottomAction(ev.nativeEvent.layout)
-                  }}
-                  />
-                {/* Deskripsi Barang */}
-                  <Text style={styles.title}>Deskripsi Barang</Text>
-                {
-                    loading ? <View> 
-                      <ShimmerPlaceHolder
-                      LinearGradient={LinearGradient}
-                      // visible={homeSelector.isLoading}
-                      style={{
-                        width: 190,
-                        height: 20,
-                        marginTop: 10,
-                        borderRadius: 16,
-                        marginLeft: 10
-                      }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: width,
-                          height: 140,
-                          marginTop: 10,
-                          borderRadius: 16,
-                          marginHorizontal: 10
-                        }}
-                      />
-                    </View> :
-                    <View style={{ marginHorizontal: 10 }}>
-                      <Text style={{ marginBottom: 10, marginTop: 10 }}> { description ? description : truncate(mProducts.description, 200) } </Text>
-                      <Text style={{ color: COLORS.blue }} onPress={(e) => onRead()}>{ readableDesc ? "Minimalkan" : "Baca Selengkapnya" }</Text>
-                    </View>
-                }
+                <CommonProduct />
                 <View style={styles.lineProducts} />
-                {/* Produk lain di toko ini */}
+                <MarketComponent />
+                <View style={styles.lineProducts} />
+                <ShipmentInfo />
+                <View style={styles.lineProducts} />
+                <Text style={styles.title}>Deskripsi Barang</Text>
+                <ProductDescription description={description} readableDesc={readableDesc} onRead={() => onRead()} />
+                <View style={styles.lineProducts} />
                 <Text style={styles.title}>{"Produk lain pada toko " + "Hidroponik Bandung"}</Text>
-                {
-                    loading ? <View style={{ flexDirection: "row" }}>
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: 170,
-                          height: 170,
-                          borderRadius: 16,
-                          marginLeft: 10
-                        }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: 170,
-                          height: 170,
-                          borderRadius: 16,
-                          marginLeft: 10
-                        }}
-                      />
-                      <ShimmerPlaceHolder
-                        LinearGradient={LinearGradient}
-                        // visible={homeSelector.isLoading}
-                        style={{
-                          width: 170,
-                          height: 170,
-                          borderRadius: 16,
-                          marginLeft: 10
-                        }}
-                      />
-                    </View> :
-                      <View style={{ marginHorizontal: 10, marginTop: 10 }}>
-                        <FlatList
-                          horizontal
-                          data={homeSelector.products}
-                          renderItem={({ item }) => (
-                            <KpnCardProducts
-                              key={item.id}
-                              rating={item.rating}
-                              title={truncate(item.name, 30)}
-                              image={item.avatar}
-                              price={item.price}
-                              onPress={() => onNavigateToDetail(item.id)}
-                              onPressAvatar={() => onNavigateToDetail(item.id)}
-                            />
-                          )}
-                          keyExtractor={(item) => item.id}
-                        />
-                      </View>
-                }
+                <ProductListComponent />
                 <View style={styles.lineProducts} />
-                {/* Ulasan */}
-                {/* <Text style={styles.title}>Ulasan</Text>
-                <View>
-                  <CommentProduct />
-                </View> */}
-              </View>
-              {/*  */}
-          </View>
-            {/* End */}
+            </View>
           </SafeAreaView>
       }
       <View style={{ height: 95, backgroundColor: COLORS.white }} />
@@ -785,17 +303,6 @@ export default function Home(props) {
         flexDirection: "row",
         justifyContent: "center"
       }}>
-        {/* <Text style={{ 
-          justifyContent: "center",
-          marginHorizontal: 10,
-          alignSelf: "flex-start",
-          marginBottom: 10,
-          color: COLORS.red,
-          textDecorationLine: "underline",
-          fontWeight: "bold",
-          fontSize: 20
-        }}>{mProducts.price ? convertToIdr(mProducts.price) : "0"}</Text> */}
-        {/* <FooterButton cart={"0"} /> */}
         <Button
           color={COLORS.orange}
           icon="cart-outline"
@@ -812,172 +319,13 @@ export default function Home(props) {
           onPress={(e) => onPressBuy(e)}
         > Order Produk </Button>
       </Animated.View>
-            <KpnSnackBar 
-            errVisible={errVisible}
-            isError={isError}
-            onDismissSnackBar={() => onDissmissSnackBar()}
-            onPressAction={() => onPressSnackBarAction()}
-            validatorErrorMsg={validatorErrorMsg}
-            />
-            {/* <RenderBottomSheet /> */}
+      <KpnSnackBar 
+      errVisible={errVisible}
+      isError={isError}
+      onDismissSnackBar={() => onDissmissSnackBar()}
+      onPressAction={() => onPressSnackBarAction()}
+      validatorErrorMsg={validatorErrorMsg}
+      />
       </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.white,
-    height: heightScreen,
-    zIndex: 0,
-    paddingTop: 50,
-  },
-  wrapper: {
-
-  },
-  input: {
-    // flex: 1,
-    height: 40,
-    // width: 270,
-    backgroundColor: '#e4e6eb',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-    marginBottom: 10
-    // fontSize: 15
-  },
-  containerInput:{
-    position: "absolute",
-    top:0,
-    left:0,
-    right: 0,
-    backgroundColor: COLORS.primaryOpacity,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    height: 60,
-    elevation: 4,
-    zIndex: 100
-  },
-  onFocusContainer: {
-    // flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  line: {
-    height: 1,
-    backgroundColor: COLORS.white,
-    marginHorizontal: 10,
-    opacity: 0.5
-  },
-  onFocusItem: {
-    backgroundColor: COLORS.sans,
-    padding: 10,
-    opacity: 0.5,
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "flex-start",
-    alignItems: "center"
-  },
-  imagePetani: {
-    alignContent: "center",
-    alignSelf: "center",
-    marginTop: 10
-  },
-  price: {
-    margin: 10,
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "space-between",
-  },
-  chip:{
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "flex-end",
-  },
-  priceText: {
-    fontWeight: "bold",
-    fontSize: 25
-  },
-  lineProducts: {
-    height: 1,
-    backgroundColor: COLORS.colorC4,
-    marginHorizontal: 20,
-    marginTop: 10
-  },
-  productDescription:{
-    margin: 10
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "flex-start",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 20,
-    marginLeft: 10,
-    marginTop: 10
-  },
-  slide: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'transparent'
-  },
-
-  slide1: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#9DD6EB'
-  },
-
-  slide2: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#97CAE5'
-  },
-
-  slide3: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#92BBD9'
-  },
-
-  text: {
-    color: '#fff',
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
-
-  image: {
-    width: width,
-    flex: 1
-  },
-  containerSticky: {
-    position: 'absolute',
-    // opacity: 0.5,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    // marginHorizontal: 20,
-    backgroundColor: COLORS.white,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  buttonSticky: {
-    height: 35,
-    // width: Dimensions.get('screen').width - 150,
-    justifyContent: "center",
-    marginHorizontal: 10,
-    alignSelf: "flex-end",
-    marginBottom: 10
-  },
-  textLebihHemat: {
-    fontSize: 13,
-    color: COLORS.fontColor,
-    left: 10
-  }
-})

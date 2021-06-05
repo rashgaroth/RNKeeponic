@@ -81,3 +81,10 @@ export function setSellerFalse() {
         type: types.SET_SELLER_FALSE
     }
 }
+
+export function setScrollY(data) {
+    return {
+        type: types.SET_SCROLL_Y,
+        data
+    }
+}

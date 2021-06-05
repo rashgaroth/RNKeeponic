@@ -30,7 +30,6 @@ import {
   OrderSuccess
 } from "../features";
 
-enableScreens(false);
 const Stack = createStackNavigator();
 
 const homeOptions = {
@@ -39,12 +38,13 @@ const homeOptions = {
 
 function App() {
   const isLoggedIn = useSelector(state => state.loginReducer.isLoggedIn);
+  console.log(isLoggedIn, "logged in")
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
-        {isLoggedIn ? (
+        {isLoggedIn ? 
           <Stack.Screen name="Home" component={BottomNavigationTab} options={homeOptions} />
-        ) : (
+          : 
           <Stack.Screen
             name="WelcomePage"
             component={WelcomePage}
@@ -53,7 +53,7 @@ function App() {
               headerShown: false
             }}
           />
-        )}
+        }
         <Stack.Screen
           name="Notification"
           component={Notification}
