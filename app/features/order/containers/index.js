@@ -64,7 +64,7 @@ function TabStack() {
         name="Ordered"
         component={Ordered}
         options={{
-          tabBarLabel: 'Dikirim',
+          tabBarLabel: 'Ditujuan',
           tabBarIcon: ({ tintColor }) => (
             <Icon name="truck" size={20} color={COLORS.white} />
           )

@@ -517,6 +517,7 @@ export default function AddressOrderDetail(props){
         <View style={{ height: height - 100, width: width }}>
             <WebView 
             source={{ uri: url }} 
+            style={{ height: height - 100 }}
             onNavigationStateChange={(e) => onNavChange(e)}
             onLoadProgress={(e) => onLoadProgress(e)}
             />

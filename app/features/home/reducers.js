@@ -64,6 +64,9 @@ const initialState = {
         ]
     },
     products: null,
+    mediaTanam: null,
+    greenHouse: null,
+    bibit: null,
     allProducts: null
 };
 
@@ -72,6 +75,16 @@ export const homeReducer = createReducer(initialState, {
         return {
             ...state,
             isLoading: true
+        }
+    },
+    [types.HOME_REQUEST](state){
+        return {
+            ...state,
+            products: null,
+            mediaTanam: null,
+            greenHouse: null,
+            bibit: null,
+            allProducts: null
         }
     },
     [types.HIDE_LOADING](state) {
@@ -83,7 +96,7 @@ export const homeReducer = createReducer(initialState, {
     [types.HOME_GET_PRODUCTS](state, action) {
         return {
             ...state,
-            products : action.products
+            [action.field] : action.products
         }
     },
     [types.GET_ALL_PRODUCTS](state, action) {

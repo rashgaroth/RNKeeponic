@@ -52,11 +52,17 @@ export default function* homeGetProducts(state){
                 API.BASE_URL +
                 API.ENDPOINT.GET_PRODUCT,
                 HeaderAuth(token)
-            )
+            ),
         ])
         if (productList.data.error < 1) {
             const productData = productList.data.response.product
-            yield put(homeAction.getProductSuccess(productData))
+            const mediaTanam = productList.data.pMediaTanam.product
+            const greenHouse = productList.data.pGreenHouse.product
+            const bibit = productList.data.pBibit.product
+            yield put(homeAction.getProductSuccess('products', productData))
+            yield put(homeAction.getProductSuccess('mediaTanam', mediaTanam))
+            yield put(homeAction.getProductSuccess('greenHouse', greenHouse))
+            yield put(homeAction.getProductSuccess('bibit', bibit))
             if (allProduct.data.error < 1) {
                 const productAll = allProduct.data.response.product
                 yield put(homeAction.getAllProducts(productAll))

@@ -129,7 +129,11 @@ export default function OrderBefore(navigation) {
                 onPress: async () => {
                     try {
                         setLoading(true)
-                        const _onFavorite = await apiServices.POST(API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/delete`, param, HeaderAuth(tokenUser))
+                        const _onFavorite = await apiServices.POST(API.BASE_URL + 
+                            API.ENDPOINT.WISHLIST + 
+                            `/order_list/delete`, 
+                            param, 
+                            HeaderAuth(tokenUser))
                         if (_onFavorite.status === 200) {
                             await dispatch(orderActions.getWishlist())
                             setLoading(false)

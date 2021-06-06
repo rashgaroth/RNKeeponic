@@ -56,3 +56,9 @@ export const updateProduct = (productId) => {
         productId
     }
 }
+
+export const getOrderedList = () => {
+    return {
+        type: types.GET_ORDERED_LIST
+    }
+}

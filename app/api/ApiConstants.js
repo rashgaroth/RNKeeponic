@@ -18,7 +18,8 @@ const API_ENDPOINT = {
   GET_PROFILE: 'client/user',
   GET_PROFILE_ADDRESS: 'client/user/address',
   GET_ALL_ADDRESS: 'client/address/all',
-  WISHLIST: 'client/product'
+  WISHLIST: 'client/product',
+  ORDER: 'client/product/order_list',
 };
 
 const API = {

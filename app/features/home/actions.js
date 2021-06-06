@@ -22,10 +22,11 @@ export function hideLoading(){
     };
 }
 
-export function getProductSuccess(products){
+export function getProductSuccess(field, products){
     return{
         type: types.HOME_GET_PRODUCTS,
-        products
+        products,
+        field
     }
 }
 

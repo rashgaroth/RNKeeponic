@@ -20,7 +20,8 @@ const initialState = {
     name: "",
     is_email_validated: null,
     token: "",
-    phone: ""
+    phone: "",
+    is_admin: null
   },
   isRegistrant: false
 };
@@ -62,7 +63,8 @@ export const loginReducer = createReducer(initialState, {
         email: action.data.email,
         name: action.data.name,
         is_email_validated: action.data.is_email_validated,
-        phone: action.data.phone
+        phone: action.data.phone,
+        is_admin: action.data.is_admin
       }
     };
   },

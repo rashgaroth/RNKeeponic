@@ -5695,6 +5695,11 @@ react-native-animated-pagination-dots@^0.1.72:
   dependencies:
     react-native-svg "^12.1.0"
 
+react-native-background-fetch@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-background-fetch/-/react-native-background-fetch-4.0.2.tgz#97842722b67c584fd860f30eb1fc70e481b207c0"
+  integrity sha512-R5T4fxz3k7Lldv3urUDuhOVwueMNCGQ03pCu44oe/zcOmKX3iGzvwup9W2J2C763MKnuSztF0Y2F4fMYPIR0fw==
+
 react-native-bouncy-checkbox@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/react-native-bouncy-checkbox/-/react-native-bouncy-checkbox-2.1.1.tgz#b85d3c24dde5e785d2b2565dd4b47a69c4677004"

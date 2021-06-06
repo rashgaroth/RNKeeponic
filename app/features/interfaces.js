@@ -1,43 +1,3 @@
-export interface IHome{
-    isLoading: boolean,
-    spinnerLoading: boolean,
-    isSkeleton: boolean,
-    isError: boolean,
-    isSeller: boolean,
-    userProfile: {
-        name: string,
-        email: string,
-        username: string,
-        is_email_validated: number,
-        phone: string,
-        is_phone_validated: number,
-        avatar: string,
-        auth_provider: string,
-        auth_profile_id: number,
-        auth_data: string,
-        is_admin: number,
-        status: number,
-    },
-    userAddress: {
-        subdistrict: string,
-        city: string,
-        prov: string
-    },
-    user: {
-        username: string,
-        email: string,
-    },
-    address: {
-        province: string,
-        subdistricts: string,
-        city: string,
-        detail: string
-    },
-    dummyProducts: Object,
-    products: Object[],
-    allProducts: Object[],
-}
-
 export interface IWishList {
     id: number,
     t_product_id: number,
@@ -126,6 +86,62 @@ export interface IWishlistReducer {
     product: IData[],
 }
 
+interface IMarketAddress {
+    owner_market_subdistrict: number,
+    owner_market_subdistrict_name: string,
+    owner_market_city: number,
+    owner_market_city_name: string
+}
+
+interface IOrderedData {
+    id: number,
+    kode_pembayaran: string,
+    kode_resi: string,
+    status: number,
+    buyer_id: number,
+    t_product_id: number,
+    harga: number,
+    total_harga: number,
+    kurir: string,
+    sec_market_id: number,
+    name: string,
+    avatar: string,
+    t_category_id: number,
+    market_name: string,
+    category: string
+}
+
+// ==================== reducer ===========================
+
+export interface IOrderState {
+    loading: boolean,
+    isEmpty: boolean,
+    userAddressList: Array<Object>,
+    shipmentAddress: {
+        subdistrict: string,
+        city: string,
+        province: string,
+        detail: string,
+        postalCode: string,
+        userAddressId: string,
+    },
+    shipmentDetail: {
+        courier: string,
+        reciever: string,
+        sender: string,
+        senderAddress: string,
+        phoneNumber: string,
+        note: string,
+        userName: string,
+        paymentUrl: string,
+    },
+    wishListData: {
+        cart: Array<Object>,
+        ordered: IOrderedData[],
+        sended: Array<Object>
+    }
+}
+
 export interface IProductDetail {
     loading: boolean,
     market_id: number,
@@ -145,7 +161,8 @@ export interface IProductDetail {
         followers: number,
         status: number,
         created_date: string,
-        updated_date: string
+        updated_date: string,
+        address: IMarketAddress
     },
     mProducts: {
         id: number,
@@ -169,4 +186,44 @@ export interface IProductDetail {
     productInWishList: IData[],
     productWishlistData: IData[],
     isFavorite: number
+}
+
+export interface IHome {
+    isLoading: boolean,
+    spinnerLoading: boolean,
+    isSkeleton: boolean,
+    isError: boolean,
+    isSeller: boolean,
+    userProfile: {
+        name: string,
+        email: string,
+        username: string,
+        is_email_validated: number,
+        phone: string,
+        is_phone_validated: number,
+        avatar: string,
+        auth_provider: string,
+        auth_profile_id: number,
+        auth_data: string,
+        is_admin: number,
+        status: number,
+    },
+    userAddress: {
+        subdistrict: string,
+        city: string,
+        prov: string
+    },
+    user: {
+        username: string,
+        email: string,
+    },
+    address: {
+        province: string,
+        subdistricts: string,
+        city: string,
+        detail: string
+    },
+    dummyProducts: Object,
+    products: Object[],
+    allProducts: Object[],
 }

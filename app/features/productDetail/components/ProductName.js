@@ -56,7 +56,7 @@ const ProductName = () => {
                         }}
                     />
                 </View> : <View style={styles.chip}>
-                    <Chip icon="star" onPress={() => console.log(isLove, "IsLove")}>Rating Produk : {mProducts.rating} (40)</Chip>
+                    <Chip icon="star" onPress={() => console.log("IsLove")}>Rating Produk : {mProducts.rating} (40)</Chip>
                 </View>
             }
         </View>

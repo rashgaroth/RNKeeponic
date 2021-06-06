@@ -14,7 +14,7 @@ import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import * as orderActions from '../actions';
 import { Alert } from 'react-native';
-import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProductDetail } from "../../interfaces";
+import { IProductDetail, IOrderState } from "../../interfaces";
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
 import * as productDetailActions from "../../productDetail/actions";
@@ -30,7 +30,7 @@ export default function OrderCart(navigation) {
     const dispatch = useDispatch();
 
     const loginSelector = useSelector(state => state.loginReducer)
-    const orderState = useSelector(state => state.orderReducer)
+    const orderState:IOrderState = useSelector(state => state.orderReducer)
     const detailProductSelector: IProductDetail = useSelector(state => state.detailProductReducer);
 
     const tokenUser = loginSelector.user.token
@@ -46,7 +46,7 @@ export default function OrderCart(navigation) {
     }
 
     const onRefresh = async () => {
-        await dispatch(orderActions.getWishlist())
+        await dispatch(orderActions.getOrderedList())
     }
 
     const onPressItem = (id) => {
@@ -105,15 +105,16 @@ export default function OrderCart(navigation) {
                     /> : orderData.length > 0 ? orderData.map((x, i) => (
                         <OrderList
                             key={i}
-                            address={x.address}
+                            address={'serang'}
                             avatar={x.avatar}
                             category={x.category}
                             isFavorite={x.isFavorite === 1 ? true : false}
-                            marketName={x.marketName}
-                            price={convertToIdr(x.price)}
-                            title={x.productTitle}
+                            marketName={x.market_name}
+                            price={convertToIdr(x.harga)}
+                            title={x.name}
                             onCheck={(e) => onPressFav(x.id, e)}
                             onPressProduct={() => onPressItem(x.product_id)}
+                            orderedStatus={x.status}
                             status="Menunggu Konfirmasi"
                             isOrdered
                         />

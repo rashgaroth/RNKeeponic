@@ -68,6 +68,13 @@ export const setWishlistData = (data) => {
     }
 }
 
+export const setMarketAddress = (data) => {
+    return {
+        type: types.SET_MARKET_ADDRESS,
+        data
+    }
+}
+
 // ---------------------------- new Action for wishlist ---------------------- //
 export const onAddWishlist = (data, productData) => {
     return{

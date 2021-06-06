@@ -22,28 +22,11 @@ import Welcome3 from "../../../assets/images/svg/Welcome3";
 import Logo from "../../../assets/images/svg/Logo"
 // import { navigate } from "../../../navigation/NavigationService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { height } from "../../../utils/theme";
 
 export default function WelcomePage({}){
     const [signingProcess, setSigningProcess] = useState(false)
-    const navigation = useNavigation();
     const dispatch = useDispatch();
-    const loginSelector = useSelector(state => state.loginReducer)
-
-    const onPressLoginButton = async () => {
-        await dispatch(loginAction.setNewUser(false))
-    }
-
-    const onPressRegisterSeller = async () => {
-        const param = {
-            isNewUser: true
-        }
-        await navigation.navigate("Register", param)
-    }
-
-    const onPressExploration = async () => {
-        await dispatch(loginAction.setExplore())
-        await dispatch(loginAction.setUserAlreadyExplored(true))
-    }
 
     const onGoogleLogin = async () => {
         try {
@@ -81,54 +64,7 @@ export default function WelcomePage({}){
 
     return (
         <ScrollView style={{ backgroundColor: COLORS.white }}>
-                <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
-                {loginSelector.isUserAlreadyExplore ? 
-              <>  
-                <View style={styles.slide3}>
-                    <View style={[styles.logos, {marginBottom: 20}]}>
-                        <Logo />
-                    </View>
-                    <Welcome3 style ={{ marginTop: 170 }}/>
-                    <Text style={styles.text}>Login Sekarang!</Text>
-                    <Text style={styles.innerText}>
-                        Kami akan berikan rekomendasi terbaik untuk anda
-                    </Text>
-                    {/* <KpnButton
-                        text={"Lihat Beranda"}
-                        isRounded
-                        color={COLORS.primaryColor}
-                        style={styles.button}
-                        onPress={() => onPressExploration()}
-                    >
-                    </KpnButton> */}
-                    {/* <KpnButton
-                        text={"Login Keeponic Seller"}
-                        isRounded
-                        style={styles.button}
-                        onPress={() => onPressLoginButton()}
-                    /> */}
-                    {/* <KpnButton
-                        text={"Daftar Seller"}
-                        isRounded
-                        style={styles.button}
-                        color={COLORS.blue}
-                        onPress={() => onPressRegisterSeller()}
-                    /> */}
-                    <View style={styles.loginGoogle}>
-                        <View style={styles.line}></View>
-                        <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Login Dengan</Text>
-                        <View style={styles.line} ></View>
-                    </View>
-                    <GoogleSigninButton
-                        style={{ width: '74%', alignSelf: 'center', marginTop: 10 }}
-                        size={GoogleSigninButton.Size.Wide}
-                        color={GoogleSigninButton.Color.Light}
-                        onPress={onGoogleLogin}
-                        disabled={signingProcess} />
-                </View>
-                </>
-                : 
-                <>
+            <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
             <Swiper 
             style={styles.wrapper} 
             showsButtons={true} 
@@ -169,30 +105,30 @@ export default function WelcomePage({}){
                     <Text style={styles.innerText}>
                         Kami akan berikan rekomendasi terbaik untuk anda
                     </Text>
-                    <KpnButton
+                    {/* <KpnButton
                         text={"Lihat Beranda"}
                         isRounded
                         color={COLORS.primaryColor}
                         style={styles.button}
                         onPress={() => onPressExploration()}
                     >
-                    </KpnButton>
+                    </KpnButton> */}
                     {/* <KpnButton
                         text={"Login Keeponic Seller"}
                         isRounded
                         style={styles.button}
                         onPress={() => onPressLoginButton()}
                     /> */}
-                    <KpnButton
+                    {/* <KpnButton
                         text={"Daftar Seller"}
                         isRounded
                         style={styles.button}
                         color={COLORS.blue}
                         onPress={() => onPressRegisterSeller()}
-                    />
+                    /> */}
                     <View style={styles.loginGoogle}>
                         <View style={styles.line}></View>
-                        <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Atau Login Dengan</Text>
+                        <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Login Dengan</Text>
                         <View style={styles.line} ></View>
                     </View>
                     <GoogleSigninButton
@@ -203,8 +139,6 @@ export default function WelcomePage({}){
                         disabled={signingProcess} />
                 </View>
             </Swiper>
-                </>
-            }
         </ScrollView>
     )
 }
@@ -213,6 +147,7 @@ var styles = StyleSheet.create({
     wrapper: {
         color: COLORS.primaryColor,
         backgroundColor: COLORS.primaryColor,
+        height: height
     },
     slide1: {
         flex: 1,

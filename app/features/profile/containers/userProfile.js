@@ -49,7 +49,7 @@ export default function Profile() {
     const loginSelector = useSelector(state => state.loginReducer);
     const userProfile = homeSelector.userProfile;
     const userAddress = homeSelector.userAddress;
-    const isSeller = homeSelector.isSeller;
+    const isSeller = loginSelector.user.is_admin;
     const detailUser = [
         {
             title: "Nama",
@@ -95,17 +95,6 @@ export default function Profile() {
     const bottomSheetEditPhotoRef = useRef(null);
 
     const fall = new Animated.Value(1);
-    // const snapPoints = useMemo(() => ['25%', '50%'], []);
-    const openBottomSheet = () => {
-        bottomSheetRef.current.snapTo(0);
-    }
-
-    const bottomSheetEditField = (id, field, value) => {
-        // Kalau 0 muncul kalau 1 tutup
-        setField(field);
-        setFieldValue(value);
-        bottomSheetEditRef.current.snapTo(id);
-    }
 
     useEffect(() => {
 
@@ -157,7 +146,7 @@ export default function Profile() {
     }
 
     const onPressDaftarToko = useCallback(async () => {
-        if(isSeller){
+        if(isSeller === 0){
             const supported = await Linking.canOpenURL(url);
             if (supported) {
                 await Linking.openURL(url);
@@ -278,7 +267,7 @@ export default function Profile() {
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
                             <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
-                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller ? COLORS.blue : COLORS.sans}>{ isSeller ? "Login Seller" : "Daftar Toko"}</Button>
+                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller === 0 ? COLORS.blue : COLORS.sans}>{ isSeller === 0 ? "Login Seller" : "Daftar Toko"}</Button>
                             </View>
                             {/* View Setting ON/OFF */}
                             <View>

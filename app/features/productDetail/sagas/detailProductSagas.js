@@ -20,6 +20,7 @@ let detailProductReducer = state => state.detailProductReducer;
 
 // Our worker Saga that logins the user
 export default function* getProductDetail(state) {
+    console.log("mulai")
     yield put(detailProductAction.clearProduct());
     const loginState = yield select(loginReducer);
     const productState = yield select(detailProductReducer);
@@ -50,9 +51,11 @@ export default function* getProductDetail(state) {
                 )
             ]);
             if (productDetail.status === 200) {
+                console.log("tengah")
                 const payload = productDetail.data.data;
                 const market = productDetail.data.market;
                 const category = productDetail.data.category;
+                const marketAddress = productDetail.data.marketAddressData;
                 let avatar = payload.avatar;
                 let second_avatar = payload.second_avatar;
                 let third_avatar = payload.third_avatar;
@@ -68,10 +71,13 @@ export default function* getProductDetail(state) {
                 if(fourth_avatar){
                     image.push(fourth_avatar)
                 }
+                console.log("pushing image", marketAddress)
                 yield put(detailProductAction.setProductOnReducer(payload, image));
                 yield put(detailProductAction.setMarketOnReducer(market));
                 yield put(detailProductAction.setCategory(category));
+                yield put(detailProductAction.setMarketAddress(marketAddress));
                 yield put(detailProductAction.hideLoading());
+                console.log("Selesai")
                 if (productFavorite.status === 200) {
                     const productId = payload.id;
                     const favData: Array = productFavorite.data.data;

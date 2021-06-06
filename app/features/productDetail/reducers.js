@@ -24,7 +24,13 @@ const initialState:IProductDetail = {
         followers: null,
         status: null,
         created_date: "",
-        updated_date: null
+        updated_date: null,
+        address: {
+            owner_market_subdistrict: null,
+            owner_market_subdistrict_name: "",
+            owner_market_city: null,
+            owner_market_city_name: ""
+        }
     },
     mProducts: {
         id: null,
@@ -130,7 +136,14 @@ export const detailProductReducer = createReducer(initialState, {
                 followers: null,
                 status: null,
                 created_date: "",
-                updated_date: null
+                updated_date: null,
+                address: {
+                    ...state.mMarket.address,
+                    owner_market_subdistrict: null,
+                    owner_market_subdistrict_name: "",
+                    owner_market_city: null,
+                    owner_market_city_name: ""
+                }
             },
         };
     },
@@ -184,6 +197,21 @@ export const detailProductReducer = createReducer(initialState, {
             loading: action.loader,
             avatar: null
         };
+    },
+    [types.SET_MARKET_ADDRESS](state, action){
+        return {
+            ...state,
+            mMarket: {
+                ...state.mMarket,
+                address: {
+                    ...state.mMarket.address,
+                    owner_market_subdistrict: action.data.owner_market_subdistrict,
+                    owner_market_subdistrict_name: action.data.owner_market_subdistrict_name,
+                    owner_market_city: action.data.owner_market_city,
+                    owner_market_city_name: action.data.owner_market_city_name
+                }
+            }
+        }
     },
     [types.SET_CATEGORY](state, action) {
         return {

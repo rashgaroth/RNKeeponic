@@ -43,7 +43,6 @@ function* getWishList(state) {
                 const productListOrdered = productList.filter((v, i, a) => {
                     return wishList[i].t_product_id === a[i].id
                 })
-                console.log(productListOrdered, "PRODUCT")
                 const productListFiltered = productList.filter((v, i, a) => {
                     if (wishList[i].status === 1) {
                         return wishList[i].t_product_id === a[i].id
@@ -73,31 +72,31 @@ function* getWishList(state) {
                     yield put(orderActions.setWishlistData('cart', dataObj))
                 }
 
-                for (let i in wishListOrdered) {
-                    let dataOrderObj: IData = {}
-                    dataOrderObj.id = wishListOrdered[i].id
-                    dataOrderObj.product_id = wishListOrdered[i].t_product_id
-                    dataOrderObj.t_category_product_id = wishListOrdered[i].t_category_product_id
-                    dataOrderObj.quantity = wishListOrdered[i].quantity
-                    dataOrderObj.isFavorite = wishListOrdered[i].is_favorite
-                    dataOrderObj.owner_market_id = wishListOrdered[i].owner_market_id
-                    dataOrderObj.owner_market_subdistrict = wishListOrdered[i].owner_market_subdistrict
-                    dataOrderObj.owner_market_city = wishListOrdered[i].owner_market_city
-                    dataOrderObj.owner_market_subdistrict_name = wishListOrdered[i].owner_market_subdistrict_name
-                    dataOrderObj.owner_market_city_name = wishListOrdered[i].owner_market_city_name
-                    // product
-                    dataOrderObj.productTitle = productListOrdered[i].name
-                    dataOrderObj.avatar = productListOrdered[i].avatar
-                    dataOrderObj.price = productListOrdered[i].price * wishListOrdered[i].quantity
-                    // market
-                    dataOrderObj.marketName = marketList[i].market_name
-                    dataOrderObj.category = categoryList[i].name
-                    dataOrderObj.sec_market_id = wishListOrdered[i].sec_market_id
-                    dataOrderObj.address = homeState.userAddress.subdistrict ? homeState.userAddress.subdistrict : ""
-                    console.log("sukses sampai sini")
-                    yield put(orderActions.setWishlistData('ordered', dataOrderObj))
-                    console.log("tidak masuk")
-                }
+                // for (let i in wishListOrdered) {
+                //     let dataOrderObj: IData = {}
+                //     dataOrderObj.id = wishListOrdered[i].id
+                //     dataOrderObj.product_id = wishListOrdered[i].t_product_id
+                //     dataOrderObj.t_category_product_id = wishListOrdered[i].t_category_product_id
+                //     dataOrderObj.quantity = wishListOrdered[i].quantity
+                //     dataOrderObj.isFavorite = wishListOrdered[i].is_favorite
+                //     dataOrderObj.owner_market_id = wishListOrdered[i].owner_market_id
+                //     dataOrderObj.owner_market_subdistrict = wishListOrdered[i].owner_market_subdistrict
+                //     dataOrderObj.owner_market_city = wishListOrdered[i].owner_market_city
+                //     dataOrderObj.owner_market_subdistrict_name = wishListOrdered[i].owner_market_subdistrict_name
+                //     dataOrderObj.owner_market_city_name = wishListOrdered[i].owner_market_city_name
+                //     // product
+                //     dataOrderObj.productTitle = productListOrdered[i].name
+                //     dataOrderObj.avatar = productListOrdered[i].avatar
+                //     dataOrderObj.price = productListOrdered[i].price * wishListOrdered[i].quantity
+                //     // market
+                //     dataOrderObj.marketName = marketList[i].market_name
+                //     dataOrderObj.category = categoryList[i].name
+                //     dataOrderObj.sec_market_id = wishListOrdered[i].sec_market_id
+                //     dataOrderObj.address = homeState.userAddress.subdistrict ? homeState.userAddress.subdistrict : ""
+                //     console.log("sukses sampai sini")
+                //     yield put(orderActions.setWishlistData('ordered', dataOrderObj))
+                //     console.log("tidak masuk")
+                // }
 
                 if (dataArr.length < 1) {
                     yield put(orderActions.setEmpty(true))
@@ -127,10 +126,38 @@ function* updateWishlist(state) {
     try {
         const _fetchData = yield call(apiService.POST, API.BASE_URL + API.ENDPOINT.WISHLIST + `/order_list/change`, param ,HeaderAuth(token))
         if (_fetchData.status === 200 && _fetchData.data.error < 1){
-            console.log("OK", _fetchData.data.data)
         }
     } catch (error) {
         console.log(error)
+    }
+}
+
+function *getOrderedList(state) {
+    const orderState = yield select(orderStorage)
+    const loginState = yield select(loginStorage)
+    const token = loginState.user.token
+    const userId = loginState.user.user_id
+    yield put(orderActions.setLoading(true))
+
+    try {
+        const _fetchData = yield call(apiService.GET, 
+            API.BASE_URL + 
+            API.ENDPOINT.ORDER + 
+            `/get_order?shipment_status=0&between_status=2&user_id=${userId}`, 
+            HeaderAuth(token))
+        if (_fetchData.status === 200 && _fetchData.data.error < 1) {
+            console.log(_fetchData.data.data, "GETTTTT")
+            yield put(orderActions.setLoading(false))
+            const _data = _fetchData.data.data
+            for(let i in _data){
+                yield put(orderActions.setWishlistData('ordered', _data[i]))
+            }
+            console.log(orderState.wishListData.ordered, "ORDERED ---- ")
+        }else{
+            yield put(orderActions.setLoading(false))
+        }
+    } catch (error) {
+        console.log(error, "error get order")
     }
 }
 
@@ -142,10 +169,15 @@ export function* updateWishlistSagas() {
     yield takeEvery(types.UPDATE_STATUS_WISHLIST, updateWishlist)
 }
 
+export function* getOrderedListSagas(){
+    yield takeEvery(types.GET_ORDERED_LIST, getOrderedList)
+}
+
 function* wishlistSagas() {
     yield all([
         fork(getWishlistSagas),
-        fork(updateWishlistSagas)
+        fork(updateWishlistSagas),
+        fork(getOrderedListSagas)
     ])
 }
 

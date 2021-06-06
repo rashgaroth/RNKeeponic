@@ -30,20 +30,9 @@ export default function Home({ navigation }) {
 
   let scrollY = useRef(new Animated.Value(0)).current;
   const textInputRef = useRef(null);
-  
-  async function fetchAllHomeRequest(){
-      if(loginSelector.isUserRegistered){
-        await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
-        await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
-        setName(loginSelector.user.name)
-      }else{
-        await dispatch(homeAction.requestHome(name, 0, 0))
-        setName("Kamu")
-      }
-  }
 
   const onRefreshAll = async () => {
-    await fetchAllHomeRequest();
+    await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
   }
 
   useEffect(() => {
@@ -51,21 +40,14 @@ export default function Home({ navigation }) {
   }, [null])
 
   useEffect(() => {
-    const fetchWishListData = async () => {
+    const fetchHomeData = async () => {
       await dispatch(orderActions.getWishlist())
+      await dispatch(orderActions.getOrderedList())
       await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
       await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
     }
 
-    const fetchHomeData = async () => {
-      await dispatch(homeAction.requestHome(name, 0, 0))
-    }
-
-    if (loginSelector.isUserRegistered) {
-      fetchWishListData()
-    }else{
-      fetchHomeData()
-    }
+    fetchHomeData()
 
   }, [loginSelector.user.user_id])
 
@@ -124,6 +106,7 @@ export default function Home({ navigation }) {
       refreshControl={
       <RefreshControl 
       onRefresh={onRefreshAll}
+      refreshing={homeSelector.isLoading}
       />
       }
       onScroll={(e) => {

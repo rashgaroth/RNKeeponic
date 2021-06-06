@@ -44,25 +44,25 @@ const HomeContainer = () => {
                     <View style={styles.cardProducts}>
                         <ProductList />
                     </View>
-                    <Header name="Galeri Hidroponik & Kreativitas" />
+                    <Header name="Galeri Hidroponik & Kreativitas" icon="folder-multiple-image" color={COLORS.blackSans} />
                     <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
                     <LifeStyleContainer />
-                    <Header name="khusus untuk kamu" />
+                    <Header name="Media Tanam" icon="buffer" color={COLORS.secondColor} />
                     <Text style={styles.textLebihHemat}>Barang yang direkomendasikan untuk anda!</Text>
                     {/* Flatlist untuk rekomendasi */}
-                    <ProductList />
-                    <Header name="Inspirasi dan Edukasi" />
+                    <ProductList category="mediaTanam" />
+                    <Header name="Rumah Hijau" icon="home-assistant" color={COLORS.orange} />
                     <Text style={styles.textLebihHemat}>Ide Hidroponik yang menginspirasi anda!</Text>
                     <View style={styles.wideCards}>
                         {/* FlatList Inspirasi */}
-                        <ProductList />
+                    <ProductList category="greenHouse" />
                     </View>
                     {/* Flatlist untuk terdekat */}
-                    <Header name="Terdekat dari rumah anda" />
+                    <Header name="Bibit Hidroponik" icon="seed" color={COLORS.primaryOpacity} />
                     <Text style={styles.textLebihHemat}>Malas menunggu? Ini Solusinya!</Text>
-                    <ProductList />
+                    <ProductList category="bibit" />
                     {/* Other Products */}
-                    <Header name="Produk Lainnya" />
+                    <Header name="Produk Lainnya" icon="package-variant" color={COLORS.redOpacity}/>
                     <Text style={styles.textLebihHemat}>Produk lain nya, hanya di Keeponic</Text>
                     <View style={styles.otherProducts}>
                         {

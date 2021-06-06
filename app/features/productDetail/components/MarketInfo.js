@@ -10,6 +10,7 @@ export default function MarketInfo(){
     const [image, setImage] = useState("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
     const dispatcher = useDispatch();
     const marketSelector = useSelector(state => state.detailProductReducer.mMarket);
+    const address = marketSelector.address.owner_market_city_name;
 
     useEffect(() => {
         if(marketSelector.avatar){
@@ -34,7 +35,7 @@ export default function MarketInfo(){
                         {/* <Chip onPress={() => console.log('Pressed')}>Bandung</Chip> */}
                     </View>
                     <View style={[styles.rowChips,{  }]}>
-                        <Chip icon="truck" onPress={() => console.log('Pressed')}><Text> Dikirim Dari <Text style={{ fontWeight: "bold" }} >Bandung</Text> </Text> </Chip>
+                        <Chip icon="truck" onPress={() => console.log('Pressed')}><Text> Dikirim Dari <Text style={{ fontWeight: "bold" }} >{ address }</Text> </Text> </Chip>
                         {/* <Chip onPress={() => console.log('Pressed')}>{marketSelector.followers + " " + "Pengikut"}</Chip> */}
                     </View>
                     {/* <Button 

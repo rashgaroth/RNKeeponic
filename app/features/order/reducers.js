@@ -72,6 +72,15 @@ export const orderReducer = createReducer(initialState, {
             isEmpty: action.isEmpty
         };
     },
+    [types.GET_ORDERED_LIST](state, action) {
+        return {
+            ...state,
+            wishListData: {
+                ...state.wishListData,
+                ordered: []
+            }
+        };
+    },
     [types.STORE_WISHLIST](state, action) {
         if(action.field === 'cart'){
             return {

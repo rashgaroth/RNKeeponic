@@ -46,7 +46,7 @@ const RenderSkeleton = () => (
     </View>
 )
 
-const ProductList = () => {
+const ProductList = ({ category }) => {
     const homeSelector = useSelector(state => state.homeReducer)
 
     const onNavigateToDetail = (user_id, product_id) => {
@@ -62,7 +62,15 @@ const ProductList = () => {
             {homeSelector.isLoading ? <RenderSkeleton /> :
                 <FlatList
                     horizontal
-                    data={homeSelector.products}
+                    data={
+                        category === 'mediaTanam' ?
+                            homeSelector.mediaTanam 
+                            : category === 'greenHouse' ? 
+                            homeSelector.greenHouse 
+                            : category === 'bibit' ? 
+                            homeSelector.bibit
+                            : homeSelector.products
+                    }
                     snapToInterval={ITEM_WIDTH + SPACING * 1.6}
                     contentContainerStyle={{
                         paddingRight: width - ITEM_WIDTH - SPACING * 2,

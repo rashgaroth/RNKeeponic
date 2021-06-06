@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IProductDetail, IHome, IData } from '../../interfaces';
 import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
-import { goBack } from "../../../navigation/NavigationService";
+import { goBack, navigate } from "../../../navigation/NavigationService";
 import { truncate } from "../../../utils/stringUtils";
 import { widthScreen } from "../../../utils/theme";
 import { KpnSnackBar } from "../../../components";
@@ -60,6 +60,8 @@ export default function Home(props) {
   const detailProductSelector:IProductDetail = useSelector(state => state.detailProductReducer);
   const userId = loginSelector.user.user_id
   const { mProducts } = detailProductSelector;
+  const { mMarket } = detailProductSelector;
+  const { category } = detailProductSelector;
   const loading = detailProductSelector.loading;
   const tokenUser = loginSelector.user.token;
   const isFavorite = detailProductSelector.isFavorite;
@@ -149,7 +151,18 @@ export default function Home(props) {
   }
 
   const onPressBuy = () => {
-    console.log("Pressed")
+    const detailOrder = {
+      marketId: mMarket.id,
+      productId: mProducts.id,
+      price: mProducts.price,
+      quantity: 1,
+      productName: mProducts.name,
+      productAvatar: mProducts.avatar,
+      marketName: mMarket.market_name,
+      category: category.name,
+      userId: userId,
+    } 
+    navigate("OrderDetail", detailOrder)
   }
 
   const onPressSnackBarAction = () => {
