@@ -14,13 +14,13 @@ import Spinner from "react-native-loading-spinner-overlay";
 import { useDispatch, useSelector } from 'react-redux';
 // import styles from './styles';
 
-import { IProductDetail, IHome, IData } from '../../interfaces';
+import { IProductDetail } from '../../interfaces';
 import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
 import { goBack, navigate } from "../../../navigation/NavigationService";
 import { truncate } from "../../../utils/stringUtils";
 import { widthScreen } from "../../../utils/theme";
-import { KpnSnackBar } from "../../../components";
+import { KpnSnackBar, KpnNotFound } from "../../../components";
 import * as detailProductAction from "../actions";
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
@@ -50,6 +50,7 @@ export default function Home(props) {
   const [errVisible, setErrVisible] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [isStoredWishlist, setIsStoredWishlist] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   const dispatch = useDispatch();
   const textInputRef = useRef(null);
@@ -151,18 +152,22 @@ export default function Home(props) {
   }
 
   const onPressBuy = () => {
-    const detailOrder = {
-      marketId: mMarket.id,
-      productId: mProducts.id,
-      price: mProducts.price,
-      quantity: 1,
-      productName: mProducts.name,
-      productAvatar: mProducts.avatar,
-      marketName: mMarket.market_name,
-      category: category.name,
-      userId: userId,
-    } 
-    navigate("OrderDetail", detailOrder)
+    if(mProducts.stock != 0){
+      const detailOrder = {
+        marketId: mMarket.id,
+        productId: mProducts.id,
+        price: mProducts.price,
+        quantity: 1,
+        productName: mProducts.name,
+        productAvatar: mProducts.avatar,
+        marketName: mMarket.market_name,
+        category: category.name,
+        userId: userId,
+      }
+      navigate("OrderDetail", detailOrder)
+    }else{
+      setNotFound(true)
+    }
   }
 
   const onPressSnackBarAction = () => {
@@ -338,6 +343,10 @@ export default function Home(props) {
       onDismissSnackBar={() => onDissmissSnackBar()}
       onPressAction={() => onPressSnackBarAction()}
       validatorErrorMsg={validatorErrorMsg}
+      />
+      <KpnNotFound
+      visible={notFound}
+      onBackDropPressed={() => setNotFound(false)}
       />
       </>
   );

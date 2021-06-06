@@ -174,10 +174,10 @@ function App() {
         name="OrderDetail"
         component={OrderDetail}
         options={{
-          headerShown: true,
-          title: "Pengiriman",
-          gestureEnabled: true,
-          headerTitleAlign: "center"
+          headerShown: false,
+          // title: "Pengiriman",
+          // gestureEnabled: true,
+          // headerTitleAlign: "center"
         }}
       />
       </Stack.Navigator>

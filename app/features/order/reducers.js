@@ -6,6 +6,7 @@ import * as types from './types';
 
 const initialState = {
     loading: false,
+    modalLoading: false,
     isEmpty: true,
     userAddressList: null,
     shipmentAddress: {
@@ -30,6 +31,25 @@ const initialState = {
         cart: [],
         ordered: [],
         sended: []
+    },
+    trackingData: {
+        summary: {
+            awb: "",
+            courier: "",
+            service: "",
+            status: "",
+            date: "",
+            desc: "",
+            amount: "",
+            weight: ""
+        },
+        detail: {
+            origin: "",
+            destination: "",
+            shipper: "",
+            receiver: ""
+        },
+        history: []
     }
 };
 
@@ -43,10 +63,70 @@ export const orderReducer = createReducer(initialState, {
             },
         };
     },
+    [types.GET_TRACKING](state, action) {
+        return {
+            ...state,
+            trackingData: {
+                ...state.trackingData,
+                summary: {
+                    ...state.trackingData.summary,
+                    awb: "",
+                    courier: "",
+                    service: "",
+                    status: "",
+                    date: "",
+                    desc: "",
+                    amount: "",
+                    weight: ""
+                },
+                detail: {
+                    ...state.trackingData.detail,
+                    origin: "",
+                    destination: "",
+                    shipper: "",
+                    receiver: ""
+                },
+                history: []
+            }
+        };
+    },
+    [types.GET_TRACKING_SUCCESS](state, action){
+        return {
+            ...state,
+            trackingData: {
+                ...state.trackingData,
+                summary: {
+                    ...state.trackingData.summary,
+                    awb: action.data.summary.awb,
+                    courier: action.data.summary.courier,
+                    service: action.data.summary.service,
+                    status: action.data.summary.status,
+                    date: action.data.summary.date,
+                    desc: action.data.summary.desc,
+                    amount: action.data.summary.amount,
+                    weight: action.data.summary.weight
+                },
+                detail: {
+                    ...state.trackingData.detail,
+                    origin: action.data.detail.origin,
+                    destination: action.data.summary.destination,
+                    shipper: action.data.summary.shipper,
+                    receiver: action.data.summary.receiver
+                },
+                history: [...state.trackingData.history, action.data.history]
+            }
+        }
+    },
     [types.SET_ADDRESS_LIST](state, action) {
         return {
             ...state,
             userAddressList: action.data
+        };
+    },
+    [types.SET_LOADING_MODAL](state, action) {
+        return {
+            ...state,
+            modalLoading: action.data
         };
     },
     [types.SET_LOADING](state, action) {
@@ -60,9 +140,7 @@ export const orderReducer = createReducer(initialState, {
             ...state,
             wishListData: {
                 ...state.wishListData,
-                cart: [],
-                ordered: [],
-                sended: []
+                cart: []
             }
         };
     },
@@ -77,7 +155,8 @@ export const orderReducer = createReducer(initialState, {
             ...state,
             wishListData: {
                 ...state.wishListData,
-                ordered: []
+                ordered: [],
+                sended: []
             }
         };
     },

@@ -57,8 +57,38 @@ export const updateProduct = (productId) => {
     }
 }
 
-export const getOrderedList = () => {
+export const getOrderedList = (status, status_between) => {
     return {
-        type: types.GET_ORDERED_LIST
+        type: types.GET_ORDERED_LIST,
+        status,
+        status_between
+    }
+}
+
+export const setLoadingModal = (data) => {
+    return {
+        type: types.SET_LOADING_MODAL,
+        data
+    }
+}
+
+export const getTracking = (shipmentCode) => {
+    return {
+        type: types.GET_TRACKING,
+        shipmentCode
+    }
+}
+
+export const getTrackingSuccess = (data) => {
+    return {
+        type: types.GET_TRACKING_SUCCESS,
+        data,
+    }
+}
+
+export const passTrackingHistory = (data) => {
+    return {
+        type: types.PASSING_HISTORY,
+        data,
     }
 }

@@ -18,7 +18,7 @@ import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProduct
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
 import * as productDetailActions from "../../productDetail/actions";
-import { KpnLoading } from '../../../components'
+import { KpnLoading, KpnDialog } from '../../../components'
 
 export default function OrderBefore(navigation) {
     const [loading, setLoading] = useState(false)
@@ -27,6 +27,8 @@ export default function OrderBefore(navigation) {
     const [errVisible, setErrVisible] = useState(false)
     const [isError, setIsError] = useState(false)
     const [isEmpty, setIsEmpty] = useState(false)
+    const [dialogVisible, setDialogVisible] = useState(false)
+    const [deleteId, setDeleteId] = useState(null)
 
     const dispatch = useDispatch();
     const isFocused = useIsFocused();
@@ -116,42 +118,45 @@ export default function OrderBefore(navigation) {
 
     const onRefresh = async() => {
         await dispatch(orderActions.getWishlist())
+        await dispatch(orderActions.getOrderedList())
     }
 
-    const onPressDelete = (id) => {
+    const onPressDelete = async (id) => {
+        setDeleteId(id)
+        setDialogVisible(true)
+    }
+
+    const onPositive = () => {
+        setDialogVisible(false)
+        setDeleteId(null)
+    }
+
+    const deleteCart = async () => {
         const param = {
             user_id: userId,
-            wishlist_id: id,
+            wishlist_id: deleteId,
         }
-        Alert.alert("Hapus Daftar Produk", "Hapus Produk Dari Daftar Produk ?", [
-            {
-                text: "Hapus",
-                onPress: async () => {
-                    try {
-                        setLoading(true)
-                        const _onFavorite = await apiServices.POST(API.BASE_URL + 
-                            API.ENDPOINT.WISHLIST + 
-                            `/order_list/delete`, 
-                            param, 
-                            HeaderAuth(tokenUser))
-                        if (_onFavorite.status === 200) {
-                            await dispatch(orderActions.getWishlist())
-                            setLoading(false)
-                            // await dispatch(homeAction.requestHome(name, userId, 0, true))
-                        } else {
-                            Alert.alert("Terjadi Kesalahan")
-                            setValidatorErrorMsg(_onFavorite.data.msg)
-                            setLoading(false)
-                        }
-                    } catch (error) {
-                        setLoading(false)
-                        Alert.alert("Terjadi Kesalahan", "Gagal Saat Menambahkan Order" + error)
-                    }
-                },
-                style: "cancel"
-            },
-            { text: "Batalkan", onPress: () => {} }
-        ], { cancelable: true });
+        try {
+            setLoading(true)
+            const _onFavorite = await apiServices.POST(API.BASE_URL +
+                API.ENDPOINT.WISHLIST +
+                `/order_list/delete`,
+                param,
+                HeaderAuth(tokenUser))
+            if (_onFavorite.status === 200) {
+                await dispatch(orderActions.getWishlist())
+                setLoading(false)
+                setDialogVisible(false)
+                // await dispatch(homeAction.requestHome(name, userId, 0, true))
+            } else {
+                Alert.alert("Terjadi Kesalahan")
+                setValidatorErrorMsg(_onFavorite.data.msg)
+                setLoading(false)
+            }
+        } catch (error) {
+            setLoading(false)
+            Alert.alert("Terjadi Kesalahan", "Gagal Saat Menambahkan Order" + error)
+        }
     }
 
     const onPressBuy = async (id) => {
@@ -253,6 +258,17 @@ export default function OrderBefore(navigation) {
                 </View>
             </ScrollView>
             <KpnLoading visible={loading} />
+            <KpnDialog
+                key={1}
+                negativeButtonText={"Hapus"}
+                positiveButtonText={"Batal"}
+                title="Hapus Produk"
+                onBackDropPressed={() => setDialogVisible(false)}
+                visible={dialogVisible}
+                text={"Hapus Produk dari Keranjang?"}
+                onPositive={() => onPositive()}
+                onNegative={() => deleteCart() }
+            />
             <Snackbar
                 visible={errVisible}
                 onDismiss={onDismissSnackBar}

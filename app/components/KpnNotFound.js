@@ -37,9 +37,9 @@ const ShipmentModal = ({
                 deviceWidth={width}
                 deviceHeight={height}
                 animationIn="bounceIn"
-                animationInTiming={1000}
+                animationInTiming={300}
                 animationOut="bounceOut"
-                animationOutTiming={1000}
+                animationOutTiming={300}
                 style={{ height: 300 }}
             >
                 <View style={styles.container}>

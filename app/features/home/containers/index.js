@@ -43,6 +43,7 @@ export default function Home({ navigation }) {
     const fetchHomeData = async () => {
       await dispatch(orderActions.getWishlist())
       await dispatch(orderActions.getOrderedList())
+      await dispatch(orderActions.getOrderedList(3,4))
       await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
       await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
     }

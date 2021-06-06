@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
-import { Snackbar, Button, Dialog, Portal } from 'react-native-paper';
-import Spinner from "react-native-loading-spinner-overlay";
-import { useIsFocused } from "@react-navigation/native";
-import { useFocusEffect } from '@react-navigation/native';
+import { Snackbar } from 'react-native-paper';
 
 import { COLORS } from '../../../utils/colors';
 import { convertToIdr } from '../../../utils/stringUtils';
@@ -17,8 +14,7 @@ import { Alert } from 'react-native';
 import { IProductDetail, IOrderState } from "../../interfaces";
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
-import * as productDetailActions from "../../productDetail/actions";
-import { KpnLoading } from '../../../components'
+import { KpnLoading, KpnDialog } from '../../../components';
 
 export default function OrderCart(navigation) {
     const [loading, setLoading] = useState(false)
@@ -31,11 +27,12 @@ export default function OrderCart(navigation) {
 
     const loginSelector = useSelector(state => state.loginReducer)
     const orderState:IOrderState = useSelector(state => state.orderReducer)
-    const detailProductSelector: IProductDetail = useSelector(state => state.detailProductReducer);
+    const detailProductSelector: IProductDetail = useSelector(state => state.detailProductReducer)
 
     const tokenUser = loginSelector.user.token
     const userId = loginSelector.user.user_id
     const orderData = orderState.wishListData.ordered
+    const userName = loginSelector.user.name
 
     const onDismissSnackBar = () => {
         setErrVisible(false)
@@ -47,6 +44,7 @@ export default function OrderCart(navigation) {
 
     const onRefresh = async () => {
         await dispatch(orderActions.getOrderedList())
+        await dispatch(orderActions.getWishlist())
     }
 
     const onPressItem = (id) => {
@@ -110,13 +108,18 @@ export default function OrderCart(navigation) {
                             category={x.category}
                             isFavorite={x.isFavorite === 1 ? true : false}
                             marketName={x.market_name}
-                            price={convertToIdr(x.harga)}
+                            price={convertToIdr(x.total_harga)}
                             title={x.name}
                             onCheck={(e) => onPressFav(x.id, e)}
                             onPressProduct={() => onPressItem(x.product_id)}
                             orderedStatus={x.status}
                             status="Menunggu Konfirmasi"
                             isOrdered
+                            invoice={x.kode_pembayaran}
+                            shipmentCode={x.kode_resi ? x.kode_resi : 0}
+                            totalPrice={convertToIdr(x.total_harga)}
+                            buyerName={userName}
+                            productId={x.t_product_id}
                         />
                     )) :
                         <OnEmptyList

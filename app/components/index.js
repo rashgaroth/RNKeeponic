@@ -11,6 +11,7 @@ import ToastMessage from "./ToastMessage"
 import KpnSnackBar from "./KpnSnackBar"
 import KpnLoading from "./KpnLoading"
 import KpnNotFound from "./KpnNotFound"
+import KpnDialog from "./KpnDialog"
 
 export {
     KpnButton,
@@ -25,5 +26,6 @@ export {
     ToastMessage,
     KpnSnackBar,
     KpnLoading,
-    KpnNotFound
+    KpnNotFound,
+    KpnDialog
 }

@@ -111,6 +111,12 @@ interface IOrderedData {
     category: string
 }
 
+interface IHistoryData {
+    date: string,
+    desc: string,
+    location: string
+}
+
 // ==================== reducer ===========================
 
 export interface IOrderState {
@@ -139,6 +145,25 @@ export interface IOrderState {
         cart: Array<Object>,
         ordered: IOrderedData[],
         sended: Array<Object>
+    },
+    trackingData: {
+        summary: {
+            awb: string,
+            courier: string,
+            service: string,
+            status: string,
+            date: string,
+            desc: string,
+            amount: string,
+            weight: string
+        },
+        detail: {
+            origin: string,
+            destination: string,
+            shipper: string,
+            receiver: string
+        },
+        history: IHistoryData[]
     }
 }
 
