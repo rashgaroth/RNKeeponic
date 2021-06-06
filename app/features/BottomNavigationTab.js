@@ -9,6 +9,7 @@ import ProfilePage from "./profile/containers/index";
 import { COLORS } from '../utils/colors';
 import { useDispatch, useSelector } from "react-redux";
 import { Badge } from 'react-native-paper';
+import { IOrderState } from './interfaces';
 
 const HomeRoute = () => <HomePage />;
 
@@ -26,6 +27,11 @@ const BottomNavTabs = () => {
         { key: 'artikel', title: 'Artikel', icon: 'book-variant', color: COLORS.white },
         { key: 'akun', title: 'Akun', icon: 'account', color: COLORS.white }
     ]);
+    const orderState:IOrderState = useSelector(state => state.orderReducer)
+    const cart = orderState.wishListData.cart;
+    const ordered = orderState.wishListData.ordered;
+
+    const count = cart.length + ordered.length;
 
     const renderScene = BottomNavigation.SceneMap({
         beranda: HomeRoute,
@@ -44,9 +50,8 @@ const BottomNavTabs = () => {
             keyboardHidesNavigationBar
             style={styles.bottomNav}
             getBadge={(props) => {
-                console.log(props, "props")
                 if (props.route.key === "pesanan"){
-                    return (<Badge size={19} >3</Badge>)
+                    return (<Badge size={19} >{count ? String(count) : 0}</Badge>)
                 }
             }}
         />

@@ -6,6 +6,7 @@ import { IconButton, Button } from "react-native-paper";
 import { COLORS } from '../../../utils/colors';
 import { height, width } from '../../../utils/theme';
 import { KpnButton } from '../../../components';
+import ShipmentDetailModal from './ShipmentDetailModal'
 
 const OrderList = ({ 
     title, 
@@ -13,21 +14,22 @@ const OrderList = ({
     address, 
     marketName, 
     price, 
-    qty, 
     isFavorite, 
     avatar,
     onCheck,
     onPressBuy,
-    onIncrease,
-    onDecrease,
     onPressDelete,
     onPressProduct,
     status,
     orderedStatus,
     isOrdered,
+    // modal
+    invoice,
+    shipmentCode
 }) => {
 
     const [color, setColor] = useState(COLORS.red)
+    const [modalVisible, setModalVisible] = useState(false)
 
     useEffect(() =>{
         if(status === 'Di Keranjang'){
@@ -41,6 +43,7 @@ const OrderList = ({
 
     if(isOrdered){
         return (
+            <>
             <View style={!isOrdered ? styles.containerView : [styles.containerView, { height: 230 }]}>
                 <View style={[styles.container, { backgroundColor: COLORS.white }]}>
                     <View>
@@ -79,8 +82,32 @@ const OrderList = ({
                         <Text style={styles.priceTextOrdered}>{price || "Rp 000.000"}</Text>
                     </View>
                 </View>
-                <Button mode="outlined" icon="package-variant-closed" color={COLORS.primaryOpacity} > Detail Pesanan </Button>
+                <Button 
+                mode="outlined" 
+                icon="package-variant-closed" 
+                color={COLORS.blue} 
+                style={{ 
+                    width: 200, 
+                    height: 30,
+                    fontSize: 15,
+                    marginLeft: 10,
+                    justifyContent: "center",
+                }} 
+                theme={{ 
+                    fonts: {
+                        thin: 15
+                    },
+                    mode: "adaptive",
+                    animation: 20,
+                    roundness: 10
+                }}
+                onPress={ () => setModalVisible(true) }
+                > 
+                Detail Pesanan
+                </Button>
             </View>
+            <ShipmentDetailModal visible={modalVisible} onBackDropPressed={() => setModalVisible(false)} />
+            </>
         );
     }else{
         return (
