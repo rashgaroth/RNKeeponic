@@ -7,6 +7,7 @@ import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as orderActions from '../actions';
 import * as types from '../types'
+import * as homeAction from '../../home/actions';
 
 import { HeaderAuth } from '../../../services/header';
 import { ICategory, IHome, IData, IMarket, IWishList, IProductWishList, IOrderState } from "../../interfaces";
@@ -104,9 +105,12 @@ function* getWishList(state) {
                     yield put(orderActions.setEmpty(false))
                 }
                 yield put(orderActions.setLoading(false))
+                yield put(homeAction.hideLoading())
             }
         }
+        yield put(homeAction.hideLoading())
     } catch (error) {
+        yield put(homeAction.hideLoading())
         yield put(orderActions.setLoading(false))
         console.log(error, "ERROR")
     }
@@ -154,8 +158,10 @@ function *getOrderedList(state) {
                 }
             } else {
                 yield put(orderActions.setLoading(false))
+                yield put(homeAction.hideLoading())
             }
         } catch (error) {
+            yield put(homeAction.hideLoading())
             console.log(error, "error get order")
         }
     }else{
@@ -172,9 +178,11 @@ function *getOrderedList(state) {
                     yield put(orderActions.setWishlistData('ordered', _data[i]))
                 }
             } else {
+                yield put(homeAction.hideLoading())
                 yield put(orderActions.setLoading(false))
             }
         } catch (error) {
+            yield put(homeAction.hideLoading())
             console.log(error, "error get order")
         }
     }

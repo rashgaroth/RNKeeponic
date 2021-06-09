@@ -141,7 +141,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
     }
@@ -160,6 +160,12 @@ android {
             keyAlias 'keeponic_debug'
             keyPassword 'k33p0n!c'
         }
+        release {
+            storeFile file('keeponic_release.keystore')
+            storePassword 'k33p0n!c'
+            keyAlias 'keeponic_release'
+            keyPassword 'k33p0n!c'
+        }
     }
     buildTypes {
         debug {
@@ -168,7 +174,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

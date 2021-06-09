@@ -16,7 +16,7 @@ import wishlistSagas from '../features/order/sagas/wishlistSagas';
 // export default [loginSaga];
 
 export default function* rootSaga() {
-  yield all([...loginSagas]);
+  // yield all([...loginSagas]);
   yield all([...homeSagas]);
   yield all([...getDetailProduct]);
   yield all([...profileSagas]);

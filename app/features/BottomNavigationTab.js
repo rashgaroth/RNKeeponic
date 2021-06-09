@@ -15,7 +15,7 @@ const HomeRoute = () => <HomePage />;
 
 const SearchRoute = () => <LifeStyleDetail />;
 
-const OrderRoute = () => <OrderPage refresh={true} />;
+const OrderRoute = () => <OrderPage />;
 
 const ProfileRoute = () => <ProfilePage />;
 

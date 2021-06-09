@@ -5,14 +5,12 @@
 import React, {useEffect} from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/es/integration/react';
+import { PersistGate } from 'redux-persist/integration/react';
 import { configureFonts, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { enableScreens } from 'react-native-screens';
 
 import Navigator from 'app/navigation';
 import configureStore from 'app/store';
-enableScreens(false);
 const { persistor, store } = configureStore();
 
 const theme = {
@@ -24,22 +22,15 @@ const theme = {
 };
 
 export default function Entrypoint() {
-
-  useEffect(() => {
-
-    
-
-  }, [])
-
   return (
     <Provider store={store}>
-      <PersistGate loading={<ActivityIndicator />} persistor={persistor}>
-        <PaperProvider theme={theme}>
-          <SafeAreaProvider>
+      <PersistGate loading={null} persistor={persistor}>
+      <PaperProvider theme={theme}>
+        <SafeAreaProvider>
             <Navigator />
-          </SafeAreaProvider>
-        </PaperProvider>
-      </PersistGate>
+        </SafeAreaProvider>
+      </PaperProvider>
+      </PersistGate> 
     </Provider>
   );
 }

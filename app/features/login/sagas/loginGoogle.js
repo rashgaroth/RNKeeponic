@@ -9,11 +9,10 @@ import { delay } from 'redux-saga';
 
 import API from '../../../api/ApiConstants';
 import * as apiService from "../../../services/index";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as loginActions from '../actions';
-import { getToken, setToken, storeData, removeToken, removeAllItems } from "../../../services/asyncStorage";
 import { trimString } from "../../../utils/stringUtils";
 
 import { HeaderAuth, Header } from '../../../services/header';
@@ -30,12 +29,13 @@ export default function* loginGoogle(state) {
     const param = {
         tokenId: state.data
     };
-    console.log(param, "PARAMSS")
     if(param){
         try {
             const googleResponse = yield call(apiService.POST, API.BASE_URL + API.ENDPOINT.GOOGLE_LOGIN, param, Header());
             if(googleResponse.status === 200){
                 console.log(googleResponse, "DATA RESPON")
+                yield AsyncStorage.setItem("@isLoggedIn", "true")
+                yield AsyncStorage.setItem("@token", googleResponse.data.token)
                 yield put(loginActions.clearForm())
                 yield put(loginActions.setToken(googleResponse.data.token))
                 yield put(loginActions.onSuccessGoogleAuth(googleResponse.data.user))

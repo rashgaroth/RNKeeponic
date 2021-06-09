@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useSelector, useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { navigationRef } from './NavigationService';
-import { enableScreens } from 'react-native-screens';
 
 import { 
   BottomNavigationTab, 
@@ -37,23 +37,44 @@ const homeOptions = {
 };
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState('')
   const isLoggedIn = useSelector(state => state.loginReducer.isLoggedIn);
   console.log(isLoggedIn, "logged in")
+
+  useEffect(() => {
+    const getStorage = async () => {
+      await AsyncStorage.getItem("@isLoggedIn").then((data) => {
+        setLoggedIn(data)
+      })
+
+      await AsyncStorage.getItem("@token").then((data) => {
+        console.log(data, "token")
+      })
+    }
+
+    getStorage()
+  }, [null])
+
+  console.log(loggedIn, "DATA")
+
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
-        {isLoggedIn ? 
-          <Stack.Screen name="Home" component={BottomNavigationTab} options={homeOptions} />
+        {isLoggedIn ?
+          (<Stack.Screen 
+            name="Home"
+            component={BottomNavigationTab}
+            options={homeOptions}
+            />)
           : 
-          <Stack.Screen
+          (<Stack.Screen
             name="WelcomePage"
             component={WelcomePage}
             options={{
               animationTypeForReplace: isLoggedIn ? 'push' : 'pop',
               headerShown: false
             }}
-          />
-        }
+          />)}
         <Stack.Screen
           name="Notification"
           component={Notification}

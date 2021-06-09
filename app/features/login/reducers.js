@@ -9,6 +9,7 @@ const initialState = {
   isNewUser: true,
   isUserRegistered: false,
   isUserAlreadyExplore: false,
+  isUserLoggedIn: false,
   password: null,
   email: "",
   emailForm: null,
@@ -55,6 +56,7 @@ export const loginReducer = createReducer(initialState, {
       ...state,
       isLoggedIn: true,
       isNewUser: false,
+      isUserLoggedIn:true,
       isUserRegistered: true,
       isUserAlreadyExplore: true,
       user: {
@@ -140,39 +142,6 @@ export const loginReducer = createReducer(initialState, {
         ...state.user,
         token: action.data
       }
-    }
-  },
-  [types.SET_NEW_USER](state, action) {
-    return {
-      ...state,
-      isNewUser: action.data
-    }
-  },
-  [types.SET_USER_REGISTERED](state, action) {
-    return {
-      ...state,
-      isUserRegistered: action.data
-    }
-  },
-  [types.SET_EXPLORE](state, action) {
-    return {
-      ...state,
-      isLoggedIn: true
-    }
-  },
-  [types.SET_USER_ALREADY_EXPLORED](state, action) {
-    return {
-      ...state,
-      isUserAlreadyExplore: action.data,
-      isUserRegistered: false,
-      user: {
-        ...state.user,
-        user_id: null,
-        email: "",
-        name: "",
-        is_email_validated: null,
-        token: ""
-      },
     }
   },
 });

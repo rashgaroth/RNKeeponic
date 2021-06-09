@@ -18,8 +18,6 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import ImagePicker from 'react-native-image-crop-picker';
 import {
-    GoogleSigninButton,
-    statusCodes,
     GoogleSignin
 } from "@react-native-google-signin/google-signin";
 
@@ -36,8 +34,6 @@ import { navigate } from '../../../navigation/NavigationService';
 
 export default function Profile() {
     const [notificationSwitch, setNotificationSwitch] = useState(false);
-    const [recommendationSwitch, setRecommendationSwitch] = useState(false);
-    const [scrollEnabled, setScrollEnabled] = useState(true);
     const [field, setField] = useState('');
     const [fieldValue, setFieldValue] = useState('');
     const [profileImages, setProfileImages] = useState('https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg')
@@ -79,15 +75,13 @@ export default function Profile() {
             await GoogleSignin.signOut();
             await removeAllItems();
             await dispatch(loginActions.logOut());
-            await dispatch(loginActions.setUserAlreadyExplored(true));
-            await dispatch(homeActions.setSellerFalse());
         } catch (error) {
             console.error(error);
         }
-
     };
-    const onSwitchNotification = () => setNotificationSwitch(!notificationSwitch);
-    const onSwitchRecommendation = () => setRecommendationSwitch(!recommendationSwitch);
+    const onSwitchNotification = () => {
+        setNotificationSwitch(!notificationSwitch);
+    }
 
     // Ref setiap bottomSheet
     const bottomSheetRef = useRef(null);
@@ -98,21 +92,21 @@ export default function Profile() {
 
     useEffect(() => {
 
-        const configureGoogleSignin = async () => {
-            await GoogleSignin.configure({
-                webClientId: '871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com',
-                offlineAccess: true,
-            });
-        }
+    //     const configureGoogleSignin = async () => {
+    //         await GoogleSignin.configure({
+    //             webClientId: '871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com',
+    //             offlineAccess: true,
+    //         });
+    //     }
 
-        configureGoogleSignin()
+    //     configureGoogleSignin()
 
         if (userProfile.avatar) {
             setProfileImages(userProfile.avatar)
         } else {
             setProfileImages("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
         }
-    }, []);
+    }, [null]);
 
     const bottomSheetEditPhoto = (id) => {
         bottomSheetEditPhotoRef.current.snapTo(id);

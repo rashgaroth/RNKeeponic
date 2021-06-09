@@ -34,7 +34,6 @@ export default function WelcomePage({}){
             const userInfo = await GoogleSignin.signIn();
             console.log(userInfo)
             if (userInfo.user) {
-                // console.log(userInfo.user)
                 dispatch(loginAction.loginGoogleAuth(userInfo.idToken))
             }
         } catch (error) {

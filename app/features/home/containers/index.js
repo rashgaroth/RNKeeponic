@@ -50,7 +50,7 @@ export default function Home({ navigation }) {
 
     fetchHomeData()
 
-  }, [loginSelector.user.user_id])
+  }, [null])
 
   const onTextInputFocus = () => {
     setIsFocus(true)

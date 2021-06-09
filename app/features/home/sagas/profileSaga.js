@@ -22,7 +22,6 @@ let homeState = state => state.homeReducer;
 let loginState = state => state.loginReducer;
 
 export default function* homeGetProfile(state) {
-
     // state home
     const getHomeState = yield select(homeState)
     const getLoginState = yield select(loginState)
@@ -30,8 +29,6 @@ export default function* homeGetProfile(state) {
 
     try {
         // yield put(homeAction.showLoading())
-        console.log(getLoginState.isUserRegistered)
-        if(getLoginState.isUserRegistered){
             if (token) {
                 let sha;
                 const apiKey = `${state.userId}%${token}%${state.key}`;
@@ -59,29 +56,22 @@ export default function* homeGetProfile(state) {
                         city: address[1],
                         province: address[2]
                     }
-                    yield put(homeAction.getUserProfileSuccess(_response.data.data, userAddress))
-                    setTimeout(() => {
-                        console.log(getHomeState.userAddress, ": Address");
-                    }, 5000);
-                } else {
                     // yield put(homeAction.hideLoading())
+                    yield put(homeAction.getUserProfileSuccess(_response.data.data, userAddress))
+                } else {
                     // yield put(loginAction.logOut())
                     console.log(_response);
+                    yield put(homeAction.hideLoading())
                     setTimeout(() => {
                         Alert.alert('Keeponic', "Tidak dapat memuat data profile");
                     }, 200);
                 }
-
-            } else {
-                // yield put(homeAction.hideLoading())
-                setTimeout(() => {
-                    Alert.alert('Keeponic', "Tidak dapat mengambil data profile");
-                }, 200);
-            }
         }else{
+            yield put(homeAction.hideLoading())
             // yield put(homeAction.hideLoading())
         }
     } catch (error) {
+        yield put(homeAction.hideLoading())
         // yield put(homeAction.hideLoading())
         console.log("INI CATCH", error.message)
     }

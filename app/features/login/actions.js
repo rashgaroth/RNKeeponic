@@ -79,33 +79,6 @@ export function setToken(data){
   }
 }
 
-export function setNewUser(data){
-  return {
-    type: types.SET_NEW_USER,
-    data
-  }
-}
-
-export function setUserRegistered(data){
-  return {
-    type: types.SET_USER_REGISTERED,
-    data
-  }
-}
-
-export function setExplore(){
-  return {
-    type: types.SET_EXPLORE
-  }
-}
-
-export function setUserAlreadyExplored(data){
-  return {
-    type: types.SET_USER_ALREADY_EXPLORED,
-    data
-  }
-}
-
 export function loginGoogleAuth(data){
   return {
     type: types.LOGIN_GOOGLE_AUTH,
