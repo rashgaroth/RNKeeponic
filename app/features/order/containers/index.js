@@ -7,6 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { IconButton } from 'react-native-paper';
 //import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Ordered from './Ordered';
@@ -74,15 +75,34 @@ function TabStack() {
 }
 
 function App() {
+
+  const onPressLove = () => {
+    console.log("Pressed")
+  }
+
   return (
       <Stack.Navigator
         initialRouteName="OrderBefore"
         screenOptions={{
           headerStyle: { backgroundColor: COLORS.sans },
           headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: 'bold' }
+          headerTitleStyle: { fontWeight: 'bold' },          
         }}>
-        <Stack.Screen name="TabStack" component={TabStack} options={{ title: 'Pesanan' }} />
+        <Stack.Screen 
+        name="TabStack" 
+        component={TabStack} 
+        options={{ 
+          title: 'Pesanan',
+          headerRight: (props) => (
+          <IconButton 
+          {...props} 
+          color={COLORS.white} 
+          icon="cards-heart"
+          onPress={() => onPressLove()}
+          />
+          )
+        }} 
+        />
       </Stack.Navigator>
   );
 }

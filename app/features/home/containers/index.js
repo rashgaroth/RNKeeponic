@@ -1,12 +1,14 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
 import { 
   View, 
   RefreshControl,
   Animated,
   TextInput,
+  Text
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import SplashScreen from 'react-native-splash-screen';
+import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
@@ -18,6 +20,7 @@ import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
 import { IHome } from "../../interfaces";
 import HomeContainer from '../components/HomeContainer';
 import { KpnLoading } from "../../../components";
+import BottomSheetComponent from '../components/BottomSheet';
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
@@ -27,6 +30,9 @@ export default function Home({ navigation }) {
   const [name, setName] = useState(null);
   const [word, setWord] = useState('');
   const [isFocus, setIsFocus] = useState(false);
+  const bottomSheetRef = useRef(null);
+
+  const snapPoints = useMemo(() => [0, "47%"], [])
 
   let scrollY = useRef(new Animated.Value(0)).current;
   const textInputRef = useRef(null);
@@ -34,6 +40,24 @@ export default function Home({ navigation }) {
   const onRefreshAll = async () => {
     await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
   }
+
+  // useEffect(() => {
+  //   const userAddress = homeSelector.isUserAddress;
+
+  //   if (!homeSelector.userAddress.subdistrict === ""){
+  //     console.log("ada ni")
+  //     if (!userAddress) {
+  //       console.log("gada alamat")
+  //       setTimeout(() => {
+  //         setIsUserAddres(true)
+  //       }, 2000)
+  //     } else {
+  //       console.log("ada alamat")
+  //     }
+  //   }else{
+  //     console.log("blum ada")
+  //   }
+  // }, [homeSelector.userAddress.subdistrict])
 
   useEffect(() => {
     SplashScreen.hide();
@@ -51,6 +75,15 @@ export default function Home({ navigation }) {
     fetchHomeData()
 
   }, [null])
+
+  useEffect(() => {
+    console.log(homeSelector.isUserAddress, "ahuish")
+    if(homeSelector.isUserAddress){
+      bottomSheetRef.current.snapTo(0)
+    }else{
+      bottomSheetRef.current.expand()
+    }
+  }, [homeSelector.allProducts, homeSelector.isUserAddress])
 
   const onTextInputFocus = () => {
     setIsFocus(true)
@@ -70,8 +103,13 @@ export default function Home({ navigation }) {
     inputRange: [0, 0, 0, 60],
     outputRange: [0, 0, 0, -60]
   });
+  
+  const handleSheetChanges = useCallback((index) => {
+    console.log('handleSheetChanges', index);
+  }, []);
 
   return (
+    <>
     <View style={styles.containerView}>
       {/* SearchBar */}
         <Animated.View style={{
@@ -118,6 +156,25 @@ export default function Home({ navigation }) {
       <HomeContainer />
       <KpnLoading visible={homeSelector.isLoading} />
     </Animated.ScrollView>
+    <BottomSheet
+            ref={bottomSheetRef}
+            index={0}
+            snapPoints={snapPoints}
+            onChange={handleSheetChanges}
+            style={styles.bottomSheet}
+            backdropComponent={(props) => (<BottomSheetBackdrop {...props} enableTouchThrough={true} />)}
+        >
+          <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+            <Text style={styles.title}> Isi Lokasi Pengiriman Mu ✔</Text>
+            <BottomSheetComponent />
+          </BottomSheetScrollView>
+    </BottomSheet>
+    {
+      // !isUserAddres ? (
+        // <BottomSheetComponent />
+      // ) : null
+    }
     </View>
+    </>
   );
 }

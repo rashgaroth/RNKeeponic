@@ -89,3 +89,18 @@ export function setScrollY(data) {
         data
     }
 }
+
+export function setIsUserAddress(data) {
+    return {
+        type: types.SET_IS_USER_ADDRESS,
+        data
+    }
+}
+
+export function setAddressUpdated(field, data){
+    return {
+        type: types.SET_ADDRESS,
+        field,
+        data
+    }
+}

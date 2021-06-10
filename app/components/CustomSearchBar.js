@@ -255,6 +255,7 @@ class Search extends PureComponent {
                     duration: 200,
                     useNativeDriver: false
                 }).start(),
+                // TODO: gimana caranya pake useBottomSheet kalo udah gini? :)
                 this.props.keyboardShouldPersist === false
                     ? Animated.timing(this.inputFocusPlaceholderAnimated, {
                         toValue: this.middleWidth - this.props.placeholderCollapsedMargin,

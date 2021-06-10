@@ -3,6 +3,7 @@ import { View, StyleSheet, Image, Text, TouchableOpacity, TextInput } from "reac
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { IconButton, Button } from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
+import { AirbnbRating } from 'react-native-elements';
 
 import { COLORS } from '../../../utils/colors';
 import { height, width } from '../../../utils/theme';
@@ -35,7 +36,9 @@ const OrderList = ({
     shipmentCode,
     totalPrice,
     buyerName,
-    productId
+    productId,
+    index,
+    rating,
 }) => {
     const loginState = useSelector(state => state.loginReducer)
     const dispatch = useDispatch();
@@ -135,38 +138,47 @@ const OrderList = ({
                     </View>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
-                        <Button
-                            mode="outlined"
-                            icon={orderedStatus === 3 ? "star" : "package-variant-closed" }
-                            color={
-                                orderedStatus === 0 ? COLORS.orange :
-                                    orderedStatus === 1 ? COLORS.primaryColor :
-                                        orderedStatus === 2 ? COLORS.blue :
-                                            orderedStatus === 3 ? COLORS.yellow
-                                            : COLORS.blackSans
-                            }
-                            style={{
-                                // width: 200,
-                                height: 30,
-                                fontSize: 15,
-                                marginLeft: 10,
-                                justifyContent: "center",
-                            }}
-                            theme={{
-                                fonts: {
-                                    thin: 15
-                                },
-                                mode: "adaptive",
-                                animation: 20,
-                                roundness: 10
-                            }}
-                            onPress={() => onPressButton()}
-                        >
-                            {
-                                orderedStatus === 3 ? "Berikan Rating" : "Detail Pesanan"
-                            }
-                        </Button>
-
+                        {
+                            rating ? <AirbnbRating
+                                isDisabled
+                                showRating={false}
+                                size={15}
+                                style={{ justifyContent: "center", marginLeft: 10}}
+                                starStyle={{ marginLeft: 10 }}
+                                defaultRating={rating}
+                            /> : 
+                                <Button
+                                    mode="outlined"
+                                    icon={orderedStatus === 3 ? "star" : "package-variant-closed"}
+                                    color={
+                                        orderedStatus === 0 ? COLORS.orange :
+                                            orderedStatus === 1 ? COLORS.primaryColor :
+                                                orderedStatus === 2 ? COLORS.blue :
+                                                    orderedStatus === 3 ? COLORS.yellow
+                                                        : COLORS.blackSans
+                                    }
+                                    style={{
+                                        // width: 200,
+                                        height: 30,
+                                        fontSize: 15,
+                                        marginLeft: 10,
+                                        justifyContent: "center",
+                                    }}
+                                    theme={{
+                                        fonts: {
+                                            thin: 15
+                                        },
+                                        mode: "adaptive",
+                                        animation: 20,
+                                        roundness: 10
+                                    }}
+                                    onPress={() => onPressButton()}
+                                >
+                                    {
+                                        orderedStatus === 3 ? "Berikan Rating" : "Detail Pesanan"
+                                    }
+                                </Button>
+                        }
                         {
                             orderedStatus === 2 ? <Button
                                 mode="outlined"
@@ -222,6 +234,8 @@ const OrderList = ({
             onRating={ () => setRatingVisible(false) }
             visible={ratingVisible}
             onBackDropPressed={() => setRatingVisible(false)}
+            invoice={invoice}
+            index={index}
             />
             </>
         );

@@ -229,7 +229,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ecf0f1',
-  }
+  },
+  contentContainer: {
+    alignItems: 'center',
+    width: width,
+    paddingBottom: 30,
+    height: 400,
+    maxHeight: 500
+  },
+  bottomSheet: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.48,
+    shadowRadius: 11.95,
+
+    elevation: 18,
+  },
+  title: {
+    fontWeight: 'bold',
+  },
 });
 
 export default styles;

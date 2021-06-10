@@ -32,7 +32,7 @@ import * as homeActions from "../../home/actions";
 import { removeAllItems } from "../../../services/asyncStorage";
 import { navigate } from '../../../navigation/NavigationService';
 
-export default function Profile() {
+export default function Profile({ onAddress }) {
     const [notificationSwitch, setNotificationSwitch] = useState(false);
     const [field, setField] = useState('');
     const [fieldValue, setFieldValue] = useState('');
@@ -92,14 +92,14 @@ export default function Profile() {
 
     useEffect(() => {
 
-    //     const configureGoogleSignin = async () => {
-    //         await GoogleSignin.configure({
-    //             webClientId: '871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com',
-    //             offlineAccess: true,
-    //         });
-    //     }
+        const configureGoogleSignin = async () => {
+            await GoogleSignin.configure({
+                webClientId: '871007962536-lboqlstf7fm24d6ovlmqopjsc3up0sql.apps.googleusercontent.com',
+                offlineAccess: true,
+            });
+        }
 
-    //     configureGoogleSignin()
+        configureGoogleSignin()
 
         if (userProfile.avatar) {
             setProfileImages(userProfile.avatar)
@@ -107,37 +107,6 @@ export default function Profile() {
             setProfileImages("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
         }
     }, [null]);
-
-    const bottomSheetEditPhoto = (id) => {
-        bottomSheetEditPhotoRef.current.snapTo(id);
-        setIsPhotoUpdated(false);
-    }
-
-    const takePhotoFromCamera = () => {
-        ImagePicker.openCamera({
-            width: 200,
-            height: 200,
-            cropping: true,
-            includeBase64: true,
-        }).then(image => {
-            console.log(image);
-            setProfileImages(image.path)
-            setIsPhotoUpdated(true)
-        });
-    }
-
-    const takePhotoFromGallery = () => {
-        ImagePicker.openPicker({
-            width: 200,
-            height: 200,
-            cropping: true,
-            includeBase64: true
-        }).then(image => {
-            console.log(image);
-            setProfileImages(image.path)
-            setIsPhotoUpdated(true)
-        });
-    }
 
     const onPressDaftarToko = useCallback(async () => {
         if(isSeller === 0){
@@ -177,46 +146,6 @@ export default function Profile() {
             </View>
         </View>
     );
-
-    const renderChangePicture = () => (
-        <View style={stylesLocal.panel}>
-            <View style={{ alignItems: 'center' }}>
-                <Text style={stylesLocal.panelTitle}>Ganti Profil Foto</Text>
-                <Text style={stylesLocal.panelSubtitle}>Anda dapat mengakses galeri atau dengan kamera</Text>
-            </View>
-            <View style={{ alignSelf: "center" }}>
-                <Avatar.Image size={200} source={{ uri: profileImages }} />
-            </View>
-            <View style={stylesLocal.buttonGroup}>
-                <Button mode="contained" onPress={(e) => takePhotoFromGallery()} style={stylesLocal.button} color={COLORS.blue}>Galeri</Button>
-                <Button mode="contained" onPress={() => takePhotoFromCamera()} labelStyle={{ color: COLORS.white }} style={stylesLocal.button} color={COLORS.sans}>Kamera</Button>
-                {
-                    isPhotoUpdated ? <Button labelStyle={{ color: COLORS.white }} mode="contained" onPress={() => bottomSheetEditPhoto(1)} style={{ marginTop: 5, width: width - 20, borderRadius: 15 }} color={COLORS.sans}>Selesai</Button>
-                        : <Button labelStyle={{ color: COLORS.white }} mode="contained" onPress={() => bottomSheetEditPhoto(1)} style={{ marginTop: 5, width: width - 20, borderRadius: 15 }} color={COLORS.red}>Batal</Button>
-                }
-            </View>
-        </View>
-    );
-
-    const renderEditFieldBottomSheet = () => (
-        <View style={stylesLocal.panel}>
-            <View style={{ alignItems: 'center' }}>
-                <Text style={stylesLocal.panelTitle}>Edit {field}</Text>
-                {/* <Text style={stylesLocal.panelSubtitle}>{field}</Text> */}
-            </View>
-            <TextInput
-                label={field}
-                mode="outlined"
-                style={{ marginHorizontal: 10 }}
-                value={fieldValue}
-                onChangeText={text => setFieldValue(text)}
-            />
-            <View style={stylesLocal.buttonGroup}>
-                <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} color={COLORS.blue}>Ubah</Button>
-                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={() => bottomSheetEditRef.current.snapTo(1)} style={stylesLocal.button} color={COLORS.red}>Batal</Button>
-            </View>
-        </View>
-    )
 
     // End
 
@@ -260,8 +189,9 @@ export default function Profile() {
                             }
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
-                            <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
-                                <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller === 0 ? COLORS.blue : COLORS.sans}>{ isSeller === 0 ? "Login Seller" : "Daftar Toko"}</Button>
+                            <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar</Button>
+                            {/* <Button mode="contained" onPress={onAddress} style={stylesLocal.button} color={COLORS.primaryColor}>Tambah Alamat</Button> */}
+                            <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller === 0 ? COLORS.blue : COLORS.sans}>{ isSeller === 0 ? "Login Seller" : "Daftar Toko"}</Button>
                             </View>
                             {/* View Setting ON/OFF */}
                             <View>
@@ -275,21 +205,6 @@ export default function Profile() {
                                 <View style={stylesLocal.line}></View>
                             </View>
                             {/* skip */}
-                            {/* <View>
-                                <View style={stylesLocal.detailUsers}>
-                                    <Text style={stylesLocal.textTitle}>Rekomendasi</Text>
-                                    <View style={stylesLocal.switch}>
-                                        <Text style={stylesLocal.textDesc}>Izinkan Aplikasi memberikan Rekomendasi</Text>
-                                        <Switch value={recommendationSwitch} onValueChange={onSwitchRecommendation} color={COLORS.sans} />
-                                    </View>
-                                </View>
-                                <View style={stylesLocal.line}></View>
-                            </View> */}
-                            {/* View Button Update & Logout */}
-                            {/* <View style={stylesLocal.buttonGroup}>
-                                <Button mode="contained" onPress={(e) => console.log(e)} style={stylesLocal.button} disabled color={COLORS.sans}>Ubah Profile</Button>
-                                <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar Akun</Button>
-                            </View> */}
                             {/* View Tetang */}
                             <View>
                                 <View>
@@ -322,26 +237,6 @@ export default function Profile() {
                     renderContent={renderAlertLogout}
                     initialSnap={1}
                     callbackNode={fall}
-                    enabledGestureInteraction={true}
-                />
-                <BottomSheet
-                    ref={bottomSheetEditRef}
-                    snapPoints={[210, 0]}
-                    renderHeader={renderHeader}
-                    renderContent={renderEditFieldBottomSheet}
-                    initialSnap={1}
-                    callbackNode={fall}
-                    onCloseStart={() => Keyboard.dismiss()}
-                    enabledGestureInteraction={true}
-                />
-                <BottomSheet
-                    ref={bottomSheetEditPhotoRef}
-                    snapPoints={[430, 0]}
-                    renderHeader={renderHeader}
-                    renderContent={renderChangePicture}
-                    initialSnap={1}
-                    callbackNode={fall}
-                    onCloseStart={() => Keyboard.dismiss()}
                     enabledGestureInteraction={true}
                 />
             </>

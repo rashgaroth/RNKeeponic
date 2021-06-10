@@ -11,6 +11,7 @@ const initialState = {
     isSkeleton: false,
     isError: false,
     isSeller: false,
+    isUserAddress: false,
     scrollY: 0,
     userProfile: {
         name: "",
@@ -111,10 +112,25 @@ export const homeReducer = createReducer(initialState, {
             isError: true
         }
     },
+    [types.SET_IS_USER_ADDRESS](state, action) {
+        return {
+            ...state,
+            isUserAddress: action.data
+        }
+    },
     [types.SET_SELLER](state) {
         return {
             ...state,
             isSeller: true
+        }
+    },
+    [types.SET_ADDRESS](state, action) {
+        return {
+            ...state,
+            userAddress: {
+                ...state.userAddress,
+                [action.field]: action.data,
+            },
         }
     },
     [types.SET_SELLER_FALSE](state){

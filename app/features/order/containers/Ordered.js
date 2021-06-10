@@ -125,6 +125,8 @@ export default function ShipmentDone(navigation) {
                             totalPrice={convertToIdr(x.total_harga)}
                             buyerName={userName}
                             productId={x.t_product_id}
+                            index={i}
+                            rating={x.rating}
                         />
                     )) :
                         <OnEmptyList

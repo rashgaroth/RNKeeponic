@@ -32,7 +32,7 @@ const imageWidth = containerWidth - 250
 const styles = StyleSheet.create({
     containerView: {
         width: containerWidth,
-        height: containerHeight,
+        // height: containerHeight,
         backgroundColor: COLORS.white,
     },
     svgComponent: {

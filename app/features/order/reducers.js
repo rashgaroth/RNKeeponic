@@ -129,6 +129,19 @@ export const orderReducer = createReducer(initialState, {
             modalLoading: action.data
         };
     },
+    [types.DELTE_SENDED_ITEMS](state, action) {
+        console.log(action.index, "INDEX")
+        return {
+            ...state,
+            wishlistData: {
+                ...state.wishListData,
+                sended: [
+                    ...state.wishListData.sended.slice(0, action.index), 
+                    ...state.wishListData.sended.slice(action.index + 1)
+                ]
+            }
+        }
+    },
     [types.SET_LOADING](state, action) {
         return {
             ...state,

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { Avatar, Button, Card, Title, Paragraph, Text, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { WebView } from 'react-native-webview';
+import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 
 import * as registerActions from '../../../register/actions';
 import * as orderActions from '../../actions';
@@ -15,6 +16,7 @@ import * as apiServices from "../../../../services/index"
 import API from '../../../../api/ApiConstants';
 import { HeaderAuth } from "../../../../services/header";
 import { KpnLoading, KpnNotFound } from "../../../../components"
+import BottomSheetComponent from '../../../home/components/BottomSheet';
 
 import AddressModal from './AddressModal';
 import ShipmentModal from './ShipmentModal';
@@ -34,7 +36,7 @@ const RightContent = ({ onClick }) => {
     style={{ backgroundColor: COLORS.white }}
     onPress={onClick}
     >
-        Pilih
+        Ubah
     </Button>
     )
 }
@@ -122,8 +124,13 @@ export default function AddressOrderDetail(props){
     const [actualPrice, setActualPrice] = useState();
     const [isOrderSuccess, setIsOrderSuccess] = useState(false);
     const [isStockEmpty, setIsStockEmpty] = useState(false);
+    const [errorTitle, setErrorTitle] = useState('Stok Barang Sedang Kosong');
+    const [errorCommon, setErrorCommon] = useState('Kamu bisa menunggu sampai Seller mengupdate barang')
 
     const dispatch = useDispatch();
+    const bottomSheetRef = useRef(null);
+    const snapPoints = useMemo(() => [0, "47%"], []);
+
     const loginPhone = loginState.user.phone;
     const orderPhone = orderState.shipmentDetail.phoneNumber;
     const loginName = homeState.userProfile.name;
@@ -182,7 +189,7 @@ export default function AddressOrderDetail(props){
         //     await dispatch(registerActions.setClearAddress())
         // }
         // fetchAddress();
-    }, [null]);
+    }, [homeState.userAddress.subdistrict, loginState.user.phone]);
     // =============================================================================================================
 
     useEffect(() => {
@@ -193,7 +200,9 @@ export default function AddressOrderDetail(props){
         }
     }, [quantity]);
 
-
+    const onFinishLoading = () => {
+        bottomSheetRef.current.snapTo(0)
+    }
 
     useEffect(() => {
         const token = loginState.user.token
@@ -321,62 +330,79 @@ export default function AddressOrderDetail(props){
     }
 
     const onPressBuy = async () => {
-        setIsLoading(true)
-        const token = loginState.user.token
-        const jsonObjects = {
-            items: [
-                {
-                    id: productId,
-                    price: actualPrice,
-                    quantity: quantity,
-                    name: truncate(productName, 20)
-                },
-                {
-                    id: 100,
-                    price: 9000,
-                    quantity: 1,
-                    name: "Ongkos Kirim (JNE)"
-                }
-            ]
-        }
-        const jsonString = String(JSON.stringify(jsonObjects))
-        const paramOrder = {
-            buyerName: homeState.userProfile.name,
-            buyerEmail: homeState.userProfile.email,
-            buyerPhone: phone,
-            buyerId: userId,
-            buyerAddressId: userAddressId,
-            secMarketId: marketId,
-            productDetails: jsonString
-        }
-
-        try {
-            const _result = await apiServices.POST(API.BASE_URL + API.ENDPOINT.GET_PROFILE + '/order', paramOrder, HeaderAuth(token))
-            if (_result.status === 200) {
-                const data = _result.data
-                console.log(data.data, "order")
-                if(data.data.payment_url){
-                    setPaymentUrl(data.data.payment_url)
-                    dispatch(orderActions.setData(data.data.payment_url, "paymentUrl"))
-                    setIsOrderSuccess(true)
-                }else{
-                    setIsStockEmpty(true)
-                }
-                setIsLoading(false)
-            } else {
-                console.log(_result.data, "not success order")
-                setIsStockEmpty(true)
-                setIsLoading(false)
+        const address = homeState.userAddress.subdistrict;
+        console.log(address, "asdas", isPhoneNull)
+        if(!isPhoneNull && address !== ""){
+            setIsLoading(true)
+            const token = loginState.user.token
+            const jsonObjects = {
+                items: [
+                    {
+                        id: productId,
+                        price: actualPrice,
+                        quantity: quantity,
+                        name: truncate(productName, 20)
+                        // TODO: jadi 50
+                    },
+                    {
+                        id: 100,
+                        price: 9000,
+                        quantity: 1,
+                        name: "Ongkos Kirim (JNE)"
+                    }
+                ]
             }
-        } catch (error) {
-            setIsLoading(false)
-            console.log(error)
+            const jsonString = String(JSON.stringify(jsonObjects))
+            const paramOrder = {
+                buyerName: homeState.userProfile.name,
+                buyerEmail: homeState.userProfile.email,
+                buyerPhone: phone,
+                buyerId: userId,
+                buyerAddressId: userAddressId,
+                secMarketId: marketId,
+                productDetails: jsonString
+            }
+
+            try {
+                const _result = await apiServices.POST(API.BASE_URL + API.ENDPOINT.GET_PROFILE + '/order', paramOrder, HeaderAuth(token))
+                if (_result.status === 200) {
+                    const data = _result.data
+                    console.log(data.data, "order")
+                    if (data.data.payment_url) {
+                        setPaymentUrl(data.data.payment_url)
+                        dispatch(orderActions.setData(data.data.payment_url, "paymentUrl"))
+                        setIsOrderSuccess(true)
+                    } else {
+                        setIsStockEmpty(true)
+                    }
+                    setIsLoading(false)
+                } else {
+                    console.log(_result.data, "not success order")
+                    setIsStockEmpty(true)
+                    setIsLoading(false)
+                }
+            } catch (error) {
+                setIsLoading(false)
+                console.log(error)
+            }
+        }else{
+            setIsStockEmpty(true)
+            setErrorCommon("Sebelum Membeli Produk, Kamu Harus Mengisi Alamat atau Nomor Telepon!")
+            setErrorTitle("Alamat atau Nomor Telepon kosong")
         }
     }
 
     const onLoadProgress = async (e) => {
         console.log(e, "ON OPEN")
     }
+
+    const onChangeAddress = () => {
+        bottomSheetRef.current.expand()
+    }
+
+    const handleSheetChanges = useCallback((index) => {
+        console.log('handleSheetChanges', index);
+    }, []);
 
     //dipakai saat enhancement nanti!
     // const addressChecker = (data: IAddress[]) => {
@@ -418,13 +444,13 @@ export default function AddressOrderDetail(props){
     return (
         !isOrderSuccess ? 
         <>
-        <ScrollView>
+        <ScrollView style={{ paddingBottom: 30 }} >
             <Card>
                 <Card.Title 
-                title="Pilih Alamat Pengiriman" 
+                title="Alamat Pengiriman" 
                 subtitle={<Text {...props} style={{ color: COLORS.fontColor }}>{subdist + ' - ' + city + ' - ' + postalCode}</Text> }
                 left={LeftContent} 
-                // right={ (props) => <RightContent {...props} onClick={() => setVisible(true)} /> } 
+                right={ (props) => <RightContent {...props} onClick={() => onChangeAddress()} /> } 
                 />
             </Card>
             <View style={styles.line} />
@@ -480,14 +506,36 @@ export default function AddressOrderDetail(props){
             <Card style={{ paddingBottom: 10 }}>
                 <Card.Title
                     title="Ringkasan Pembayaran"
-                    subtitle={"Harga barang sudah termasuk PPN (10%)"}
+                    subtitle={"Ringkasan Pembayaran Produk"}
                     left={LeftContentCheckout}
                 />
                 <Card.Content>
-                    <Paragraph style={{ fontSize: 14 }}>Total Harga : 
+                    <Paragraph style={{ fontSize: 14 }}>Harga Produk : 
                     <Text style={{ fontSize: 14, fontWeight: "bold" }}> {dataObjects.price ? convertToIdr(actualPrice) : '----'} x {String(quantity)} = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
                     {' ' + dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' }
+                    </Text></Text></Paragraph>
+
+                    <Paragraph style={{ fontSize: 14 }}>Pajak PPN (10%) : 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {dataObjects.price ? convertToIdr(actualPrice) : '----'} x {"10%"} = {' '} 
+                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
+                    {' ' + dataObjects.price ? convertToIdr(0.1 * actualPrice) : '----' }
+                    </Text></Text></Paragraph>
+
+                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin (5%) : 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {dataObjects.price ? convertToIdr(actualPrice) : '----'} x {"5%"} = {' '} 
+                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
+                    {' ' + dataObjects.price ? convertToIdr(0.05 * actualPrice) : '----' }
+                    </Text></Text></Paragraph>
+
+                    <Paragraph style={{ fontSize: 14 }}>Total Harga {"\n"}
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> 
+                    {dataObjects.price ? convertToIdr(quantity * actualPrice) : '----'} {"\n"} 
+                    {convertToIdr(0.05 * actualPrice)} {"\n"} 
+                    {convertToIdr(0.1 * actualPrice)} {' '} {"\n"}
+                    {"---------------------"}{"\n"}
+                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
+                    {' ' + dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * actualPrice) + (0.05 * actualPrice) ) : '----' }
                     </Text></Text></Paragraph>
 
                 </Card.Content>
@@ -499,7 +547,7 @@ export default function AddressOrderDetail(props){
             <View style={styles.rowButton}>
                 <Title
                 style={{ marginTop: 10, fontWeight: "bold", color: COLORS.orange }}
-                >{dataObjects.price ? convertToIdr(quantity * actualPrice) : '----'}</Title>
+                >{dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * actualPrice) + (0.05 * actualPrice) ) : '----'}</Title>
                 <Button
                     color={COLORS.primaryColor}
                     mode="contained"
@@ -507,17 +555,30 @@ export default function AddressOrderDetail(props){
                     onPress={() => onPressBuy()}
                 > Beli </Button>
             </View>
-            <AddressModal visible={visible} key={1} onBackDropPressed={() => setVisible(false)} />
             <ShipmentModal visible={shipmentModalVisible} key={2} onBackDropPressed={() => setShipmentModalVisible(false)} />
         </ScrollView>
         <KpnLoading visible={isLoading} key={1} />
-        <KpnNotFound visible={isStockEmpty} onBackDropPressed={() => setIsStockEmpty(false)} />
+        <KpnNotFound title={errorTitle} common={errorCommon} visible={isStockEmpty} onBackDropPressed={() => setIsStockEmpty(false)} />
+        <BottomSheet
+            ref={bottomSheetRef}
+            index={0}
+            snapPoints={snapPoints}
+            onChange={handleSheetChanges}
+            style={styles.bottomSheet}
+            backdropComponent={(props) => (<BottomSheetBackdrop {...props} enableTouchThrough={true} />)}
+        >
+          <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+            <Text style={styles.title}> Isi Lokasi Pengiriman Mu ✔</Text>
+            <BottomSheetComponent
+            onFinishLoading={() => onFinishLoading()}
+            />
+          </BottomSheetScrollView>
+    </BottomSheet>
         </>
         :
         <View style={{ height: height - 100, width: width }}>
             <WebView 
             source={{ uri: url }} 
-            style={{ height: height - 100 }}
             onNavigationStateChange={(e) => onNavChange(e)}
             onLoadProgress={(e) => onLoadProgress(e)}
             />
@@ -586,6 +647,7 @@ const styles = StyleSheet.create({
     buttonBuy: {
         width: 180,
         marginTop: 10,
+        marginBottom: 10,
         alignSelf: "flex-end",
         borderRadius: 10
     },
@@ -600,5 +662,32 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         justifyContent: 'center',
         alignContent: 'center',
-    }
+    },
+    containerView: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ecf0f1',
+    },
+    contentContainer: {
+        alignItems: 'center',
+        width: width,
+        paddingBottom: 30,
+        height: 400,
+        maxHeight: 500
+    },
+    bottomSheet: {
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 9,
+        },
+        shadowOpacity: 0.48,
+        shadowRadius: 11.95,
+
+        elevation: 18,
+    },
+    title: {
+        fontWeight: 'bold',
+    },
 })

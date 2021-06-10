@@ -105,12 +105,11 @@ function* getWishList(state) {
                     yield put(orderActions.setEmpty(false))
                 }
                 yield put(orderActions.setLoading(false))
-                yield put(homeAction.hideLoading())
+                // yield put(homeAction.hideLoading())
             }
         }
-        yield put(homeAction.hideLoading())
+        yield put(orderActions.setLoading(false))
     } catch (error) {
-        yield put(homeAction.hideLoading())
         yield put(orderActions.setLoading(false))
         console.log(error, "ERROR")
     }
@@ -162,10 +161,12 @@ function *getOrderedList(state) {
             }
         } catch (error) {
             yield put(homeAction.hideLoading())
+            yield put(orderActions.setLoading(false))
             console.log(error, "error get order")
         }
     }else{
         try {
+            yield put(orderActions.setLoading(true))
             const _fetchData = yield call(apiService.GET,
                 API.BASE_URL +
                 API.ENDPOINT.ORDER +
@@ -183,6 +184,7 @@ function *getOrderedList(state) {
             }
         } catch (error) {
             yield put(homeAction.hideLoading())
+            yield put(orderActions.setLoading(false))
             console.log(error, "error get order")
         }
     }
@@ -215,6 +217,39 @@ function* getTracker(state) {
     }
 }
 
+function* postRating(state) {
+    const orderState: IOrderState = yield select(orderStorage)
+    const loginState = yield select(loginStorage)
+    const token = loginState.user.token
+    const userId = loginState.user.user_id
+    yield put(orderActions.setLoadingModal(true))
+    console.log(state, "statenya")
+    const param = {
+        rating: state.rating,
+        userId: userId,
+        invoiceId: state.invoice
+    }
+    try {
+        console.log(param, "param")
+        const _fetchData = yield call(apiService.POST,
+            API.BASE_URL +
+            API.ENDPOINT.GET_PRODUCT + "/rating",
+            param,
+            HeaderAuth(token))
+        if (_fetchData.status === 200) {
+            console.log(_fetchData.data.data, "GETTTTT")
+            const _data = _fetchData.data.data
+            console.log(_data, "data")
+            yield put(orderActions.getOrderedList(3, 4))
+            yield put(orderActions.setLoadingModal(false))
+        } else {
+            yield put(orderActions.setLoadingModal(false))
+        }
+    } catch (error) {
+        console.log(error, "error get order")
+    }
+}
+
 export function* getTrackerSagas() {
     yield takeEvery(types.GET_TRACKING, getTracker);
 }
@@ -231,12 +266,17 @@ export function* getOrderedListSagas(){
     yield takeEvery(types.GET_ORDERED_LIST, getOrderedList)
 }
 
+export function* postRatingSagas() {
+    yield takeEvery(types.POST_RATINGS, postRating)
+}
+
 function* wishlistSagas() {
     yield all([
         fork(getWishlistSagas),
         fork(updateWishlistSagas),
         fork(getOrderedListSagas),
         fork(getTrackerSagas),
+        fork(postRatingSagas),
     ])
 }
 

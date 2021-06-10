@@ -92,3 +92,19 @@ export const passTrackingHistory = (data) => {
         data,
     }
 }
+
+export const deleteSendedItems = (data, index) => {
+    return {
+        type: types.DELTE_SENDED_ITEMS,
+        data,
+        index
+    }
+}
+
+export const postRating = (rating, invoice) => {
+    return {
+        type: types.POST_RATINGS,
+        rating,
+        invoice
+    }
+}

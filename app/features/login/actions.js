@@ -92,3 +92,10 @@ export function onSuccessGoogleAuth(data){
     data
   }
 }
+
+export function setPhoneUpdated(data){
+  return {
+    type: types.SET_USER_PHONE_UPDATED,
+    data
+  }
+}

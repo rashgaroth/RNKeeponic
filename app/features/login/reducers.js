@@ -34,6 +34,15 @@ export const loginReducer = createReducer(initialState, {
       loading: true,
     };
   },
+  [types.SET_USER_PHONE_UPDATED](state, action) {
+    return {
+      ...state,
+      user: {
+        ...state.user,
+        phone: action.data,
+      },
+    };
+  },
   // [types.LOGIN_RESPONSE](state, action) {
   //   return {
   //     ...state,

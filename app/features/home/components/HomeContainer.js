@@ -19,6 +19,7 @@ import { IHome } from "../../interfaces";
 import Header from "./Header";
 import ProductList from './ProductList';
 import LifeStyleContainer from './LifeStyleContainer';
+import BottomSheetComponent from './BottomSheet'
 
 const HomeContainer = () => {
 

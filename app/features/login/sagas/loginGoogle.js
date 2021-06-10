@@ -34,8 +34,8 @@ export default function* loginGoogle(state) {
             const googleResponse = yield call(apiService.POST, API.BASE_URL + API.ENDPOINT.GOOGLE_LOGIN, param, Header());
             if(googleResponse.status === 200){
                 console.log(googleResponse, "DATA RESPON")
-                yield AsyncStorage.setItem("@isLoggedIn", "true")
-                yield AsyncStorage.setItem("@token", googleResponse.data.token)
+                // yield AsyncStorage.setItem("@isLoggedIn", "true")
+                // yield AsyncStorage.setItem("@token", googleResponse.data.token)
                 yield put(loginActions.clearForm())
                 yield put(loginActions.setToken(googleResponse.data.token))
                 yield put(loginActions.onSuccessGoogleAuth(googleResponse.data.user))

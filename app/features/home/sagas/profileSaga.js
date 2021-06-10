@@ -57,6 +57,11 @@ export default function* homeGetProfile(state) {
                         province: address[2]
                     }
                     // yield put(homeAction.hideLoading())
+                    if(address[0]){
+                        yield put(homeAction.setIsUserAddress(true))
+                    }else{
+                        yield put(homeAction.setIsUserAddress(false))
+                    }
                     yield put(homeAction.getUserProfileSuccess(_response.data.data, userAddress))
                 } else {
                     // yield put(loginAction.logOut())

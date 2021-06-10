@@ -17,7 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 import * as orderActions from '../actions';
 
 import { COLORS } from '../../../utils/colors';
-import { IHome } from "../../interfaces";
+import { IHome, IOrderState } from "../../interfaces";
 import { height, width } from '../../../utils/theme';
 
 const Loading = props => <LottieView {...props} source={require("../../../assets/anim/loading_apps.json")} autoPlay loop style={styles.anim} />
@@ -82,21 +82,26 @@ const ModalHeader = ({ onPress }) => {
     )
 }
 
-const ModalContent = ({ onBackPressed, productName, marketName, productImage, onComplete }) => {
-    const [loading, setLoading] = useState(false);
-
+const ModalContent = ({ onBackPressed, productName, marketName, productImage, onComplete, invoice, index }) => {
+    const dispatch = useDispatch();
+    const orderState: IOrderState = useSelector(state => state.orderReducer);
+    const modalLoading = orderState.modalLoading;
+    const onCompleteRating = async (d) => {
+        console.log(d, 'rat')
+        dispatch(orderActions.postRating(d, invoice))
+    }
     return (
         <View style={styles.container}>
             <ModalHeader onPress={onBackPressed} />
             {
-                loading ?
+                modalLoading ?
                     <Loading /> :
                     <ModalView
                         onComplete={onBackPressed}
                         productName={productName}
                         marketName={marketName}
                         productImage={productImage}
-                        onComplete={onComplete}
+                        onComplete={(d) => onCompleteRating(d)}
                     />
             }
         </View>
@@ -109,7 +114,9 @@ const ShipmentModal = ({
     onRating, 
     martketName, 
     productName, 
-    productImage 
+    productImage,
+    invoice,
+    index,
 }) => {
     const addressSelector: IHome = useSelector(state => state.homeReducer);
 
@@ -132,6 +139,8 @@ const ShipmentModal = ({
                 marketName={martketName}
                 productName={productName}
                 productImage={productImage}
+                invoice={invoice}
+                index={index}
                 />
             </Modal>
         </View>

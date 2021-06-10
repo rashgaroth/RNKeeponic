@@ -219,6 +219,7 @@ export interface IHome {
     isSkeleton: boolean,
     isError: boolean,
     isSeller: boolean,
+    isUserAddress: boolean,
     userProfile: {
         name: string,
         email: string,
