@@ -3,6 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 
 import { navigationRef } from './NavigationService';
 
@@ -27,10 +29,13 @@ import {
   SellerRegistrationSuccess,
   SellerRegistrationMarketName,
   OrderDetail,
-  OrderSuccess
+  OrderSuccess,
+  ArticleDetail
 } from "../features";
 
-const Stack = createStackNavigator();
+// const Stack = createStackNavigator();
+const Stack = createSharedElementStackNavigator();
+// const Stacka = createSharedElementStackNavigator();
 
 const homeOptions = {
   headerShown: false,
@@ -41,21 +46,19 @@ function App() {
   const isLoggedIn = useSelector(state => state.loginReducer.isLoggedIn);
   console.log(isLoggedIn, "logged in")
 
-  useEffect(() => {
-    const getStorage = async () => {
-      await AsyncStorage.getItem("@isLoggedIn").then((data) => {
-        setLoggedIn(data)
-      })
+  // useEffect(() => {
+  //   const getStorage = async () => {
+  //     await AsyncStorage.getItem("@isLoggedIn").then((data) => {
+  //       setLoggedIn(data)
+  //     })
 
-      await AsyncStorage.getItem("@token").then((data) => {
-        console.log(data, "token")
-      })
-    }
+  //     await AsyncStorage.getItem("@token").then((data) => {
+  //       console.log(data, "token")
+  //     })
+  //   }
 
-    getStorage()
-  }, [null])
-
-  console.log(loggedIn, "DATA")
+  //   getStorage()
+  // }, [null])
 
   return (
     <NavigationContainer ref={navigationRef}>
@@ -201,6 +204,17 @@ function App() {
           // headerTitleAlign: "center"
         }}
       />
+        <Stack.Screen
+          name="ArticleDetail"
+          component={ArticleDetail}
+          options={{
+            headerShown: false,
+          }}
+          sharedElementsConfig={(route, otherRoute, showing) => {
+            const { image } = route.params;
+            return [`item.${image}.article`];
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

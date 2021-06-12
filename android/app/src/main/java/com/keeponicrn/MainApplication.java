@@ -7,6 +7,7 @@ import com.airbnb.android.react.lottie.LottiePackage;
 //import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.ijzerenhein.sharedelement.RNSharedElementPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 

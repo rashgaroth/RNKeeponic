@@ -93,6 +93,8 @@ target 'Keeponic' do
 
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
 
+  pod 'RNSharedElement', :path => '../node_modules/react-native-shared-element'
+
   target 'KeeponicTests' do
     inherit! :complete
     # Pods for testing

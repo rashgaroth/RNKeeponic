@@ -19,6 +19,7 @@ import SellerRegistrationSuccess from "./profile/containers/sellerRegistrationSu
 import SellerRegistrationMarketName from "./profile/containers/sellerRegistrationMarketName";
 import OrderDetail from "./order/containers/OrderDetail";
 import OrderSuccess from "./order/containers/OrderSuccess";
+import ArticleDetail from "./lifestyleDetail/containers/ArticleDetail";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -44,5 +45,6 @@ export {
     SellerRegistrationSuccess,
     SellerRegistrationMarketName,
     OrderDetail,
-    OrderSuccess
+    OrderSuccess,
+    ArticleDetail
 }

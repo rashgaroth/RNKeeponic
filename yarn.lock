@@ -5681,7 +5681,7 @@ react-is@^16.12.0, react-is@^16.13.0, react-is@^16.13.1, react-is@^16.7.0, react
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-native-animatable@1.3.3:
+react-native-animatable@1.3.3, react-native-animatable@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.3.3.tgz#a13a4af8258e3bb14d0a9d839917e9bb9274ec8a"
   integrity sha512-2ckIxZQAsvWn25Ho+DK3d1mXIgj7tITkrS4pYDvx96WyOttSvzzFeQnM2od0+FUMzILbdHDsDEqZvnz1DYNQ1w==
@@ -5791,6 +5791,13 @@ react-native-ratings@^7.3.0:
   dependencies:
     lodash "^4.17.15"
     prop-types "^15.7.2"
+
+react-native-reanimatable@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-reanimatable/-/react-native-reanimatable-0.5.0.tgz#bff345c7ad0a54d775f58d380780eab83506353a"
+  integrity sha512-3vw9dtadsMUbs0IyLlllQCIxgEAi3+dTNOJmT9FNdaqmxXF6KQl896KNGVlJbAJkMDIcnn7O/3hPJJD28HyZsg==
+  dependencies:
+    prop-types "^15.6.2"
 
 react-native-reanimated@^2.1.0:
   version "2.1.0"
@@ -5970,10 +5977,10 @@ react-native@0.62.2:
     use-subscription "^1.0.0"
     whatwg-fetch "^3.0.0"
 
-react-navigation-shared-element@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/react-navigation-shared-element/-/react-navigation-shared-element-2.3.1.tgz#35a3ac2f42a3e8c55e60609344443725c793a9b7"
-  integrity sha512-MA2xDn9urQkgAiAhGttCtaoTW6VaseYpCB7f1CmXaj9ROYojznWxlKZuT94riGFzuiFxDMMKWFgLM6JMUf6ELA==
+react-navigation-shared-element@^5.0.0-alpha1:
+  version "5.0.0-alpha1"
+  resolved "https://registry.yarnpkg.com/react-navigation-shared-element/-/react-navigation-shared-element-5.0.0-alpha1.tgz#29f2090d3f0eef626df93b8572ce5c192d5c46f2"
+  integrity sha512-zPlpvUV6RGsZv3lTDanIN3ARvqABHDrqIOKcD6NpUKXarua8F2kukJ0MqD0Py+oZR3e5ksjDHAISDU05iGmPwQ==
   dependencies:
     hoist-non-react-statics "^3.3.2"
 

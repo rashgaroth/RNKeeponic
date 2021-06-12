@@ -38,7 +38,7 @@ const KpnWideCard = ({ rating, title, price, image, paragraph }) => {
 const styles = StyleSheet.create({
     cardContainer: {
         width: 250,
-        // height: 200,
+        height: 200,
         borderWidth: 1,
         borderColor: COLORS.colorC4,
         borderRadius: 10,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontWeight: "bold",
-        fontSize: 20
+        fontSize: 15
     }
 })
 
