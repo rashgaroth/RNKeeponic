@@ -22,6 +22,7 @@ import { truncate } from "../../../utils/stringUtils";
 import { widthScreen } from "../../../utils/theme";
 import { KpnSnackBar, KpnNotFound } from "../../../components";
 import * as detailProductAction from "../actions";
+import * as orderActions from "../../order/actions"
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import { HeaderAuth } from "../../../services/header";
@@ -44,13 +45,14 @@ export default function Home(props) {
   const [isFocus, setIsFocus] = useState(false);
   const [isLove, setIsLove] = useState(false);
   const [readableDesc, setReadableDesc] = useState(false);
-  const [description, setDescription] = useState("");
+  const [descriptionServer, setDescriptionServer] = useState("");
   const [isError, setIsError] = useState(false);
   const [validatorErrorMsg, setValidatorErrorMsg] = useState("");
   const [errVisible, setErrVisible] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [isStoredWishlist, setIsStoredWishlist] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [change, setChange] = useState(false);
 
   const dispatch = useDispatch();
   const textInputRef = useRef(null);
@@ -66,6 +68,25 @@ export default function Home(props) {
   const loading = detailProductSelector.loading;
   const tokenUser = loginSelector.user.token;
   const isFavorite = detailProductSelector.isFavorite;
+  // const { 
+  //   id,
+  //   name,
+  //   t_category_id,
+  //   description,
+  //   price,
+  //   avatar,
+  //   second_avatar,
+  //   third_avatar,
+  //   fourth_avatar,
+  //   stock,
+  //   weight,
+  //   status,
+  //   rating,
+  //   is_sold,
+  //   created_date,
+  //   updated_date,
+  //   m_product_model
+  // } = props.route.params;
 
   const onTextInputFocus = () => {
     setIsFocus(true)
@@ -81,6 +102,7 @@ export default function Home(props) {
 
   const onAddProductToWishlist = async (e) => {
     setLoadingProduct(true)
+    const mount = detailProductSelector.addToWishlist
     const param = {
       user_id: userId,
       t_product_id: detailProductSelector.mProducts.id,
@@ -94,6 +116,8 @@ export default function Home(props) {
       if (_onAddChart.status === 200) {
         setLoadingProduct(false)
         Alert.alert("Keeponic", "Produk Berhasil Ditambahkan!")
+        // await dispatch(detailProductAction.setWishlistDataDetail(!mount))
+        // await dispatch(orderActions.getWishlist())
       } else {
         Alert.alert("Terjadi Kesalahan", _onAddChart.data.msg)
         setValidatorErrorMsg(_onAddChart.data.msg)
@@ -146,7 +170,6 @@ export default function Home(props) {
       setIsFocus(false);
       Keyboard.dismiss();
     }else{
-      await dispatch(detailProductAction.setLoading(true));
       goBack();
     }
   }
@@ -180,10 +203,10 @@ export default function Home(props) {
 
   const onRead = () => {
     if(!readableDesc){
-      setDescription(mProducts.description);
+      setDescriptionServer(mProducts.description);
       setReadableDesc(!readableDesc);
     }else{
-      setDescription(truncate(mProducts.description, 200));
+      setDescriptionServer(truncate(mProducts.description, 200));
       setReadableDesc(!readableDesc);
     }
   }
@@ -199,7 +222,13 @@ export default function Home(props) {
   }
 
   useEffect(() => {
-    fetchProductDetail()
+    const {
+      productId
+    } = props.route.params;
+    const param = {
+      product_id: productId
+    }
+    dispatch(detailProductAction.getDetailProduct(param));
   }, [null]);
 
   useEffect(() => {
@@ -215,15 +244,20 @@ export default function Home(props) {
     favoriteChecker()
   }, [isFavorite, mProducts])
 
+  const onNewProduct = async () => {
+    await fetchProductDetail();
+    console.log("on New Product")
+  }
+
   useEffect(() => {
     return () => {
+      console.log("on top scroll")
       scrollRef.current?.scrollTo({
         y: 0,
         animated: true,
-        duration: 500,
       });
-    };
-  }, [mProducts]);
+    }
+  }, [onNewProduct])
 
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
   const diffClampButtonGroup = Animated.diffClamp(scrollY, 0, 60);
@@ -237,13 +271,6 @@ export default function Home(props) {
     inputRange: [0, 50],
     outputRange: [0, -50],
   })
-
-  const onNavigateToDetail = async (id) => {
-      const param = {
-        product_id: id
-      }
-      await dispatch(detailProductAction.getDetailProduct(param));
-  }
 
   return (
     <>
@@ -272,7 +299,7 @@ export default function Home(props) {
         <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell} />
       </Animated.View>
     <Animated.ScrollView style={styles.container}
-      scrollEnabled={!loading}
+      // scrollEnabled={!loading}
       onScroll={(e) => {
         scrollY.setValue(e.nativeEvent.contentOffset.y)
       }}
@@ -297,10 +324,10 @@ export default function Home(props) {
                 <ShipmentInfo />
                 <View style={styles.lineProducts} />
                 <Text style={styles.title}>Deskripsi Barang</Text>
-                <ProductDescription description={description} readableDesc={readableDesc} onRead={() => onRead()} />
+                <ProductDescription description={descriptionServer} readableDesc={readableDesc} onRead={() => onRead()} />
                 <View style={styles.lineProducts} />
-                <Text style={styles.title}>{"Produk lain pada toko " + "Hidroponik Bandung"}</Text>
-                <ProductListComponent />
+                <Text style={styles.title}>{"Produk lain"}</Text>
+                <ProductListComponent onPress={() => onNewProduct()} />
                 <View style={styles.lineProducts} />
             </View>
           </SafeAreaView>

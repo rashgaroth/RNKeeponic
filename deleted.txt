@@ -29,3 +29,96 @@
               </TouchableOpacity>
             ))}
           </View> */}
+              {/* {
+      !isFocus ? (
+            <BottomSheet
+              ref={bottomSheetRef}
+              index={0}
+              snapPoints={snapPoints}
+              onChange={handleSheetChanges}
+              style={styles.bottomSheet}
+              backdropComponent={(props) => (<BottomSheetBackdrop {...props} enableTouchThrough={true} />)}
+            >
+              <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+                <Text style={styles.title}> Isi Lokasi Pengiriman Mu ✔</Text>
+                <BottomSheetComponent />
+              </BottomSheetScrollView>
+            </BottomSheet>
+      ) : null
+    } */}
+    {
+      // !isUserAddres ? (
+        // <BottomSheetComponent />
+      // ) : null
+    }
+      // useEffect(() => {
+  //   console.log(homeSelector.isUserAddress, "ahuish")
+  //   if(homeSelector.isUserAddress){
+  //     bottomSheetRef.current.snapTo(0)
+  //   }else{
+  //     bottomSheetRef.current.expand()
+  //   }
+  // }, [homeSelector.allProducts, homeSelector.isUserAddress])
+
+    // useEffect(() => {
+  //   const userAddress = homeSelector.isUserAddress;
+
+  //   if (!homeSelector.userAddress.subdistrict === ""){
+  //     console.log("ada ni")
+  //     if (!userAddress) {
+  //       console.log("gada alamat")
+  //       setTimeout(() => {
+  //         setIsUserAddres(true)
+  //       }, 2000)
+  //     } else {
+  //       console.log("ada alamat")
+  //     }
+  //   }else{
+  //     console.log("blum ada")
+  //   }
+  // }, [homeSelector.userAddress.subdistrict])
+  const wishList: IWishList[] = _fetchData.data.data
+            const productList: IProductWishList[] = _fetchData.data.product
+            const marketList: IMarket[] = _fetchData.data.market
+            const categoryList: ICategory[] = _fetchData.data.category
+            // ======================================================== //
+            let dataArr: IData[] = [];
+            if (wishList && productList && marketList && categoryList) {
+                const wishListFiltered = wishList.filter((v, i, a) => {
+                    return v.status === 1
+                })
+                const productListFiltered = productList.filter((v, i, a) => {
+                    if (wishList[i].status === 1) {
+                        return wishList[i].t_product_id === a[i].id
+                    }
+                })
+                for (let i in wishListFiltered) {
+                    let dataObj: IData = {}
+                    dataObj.id = wishListFiltered[i].id
+                    dataObj.product_id = wishListFiltered[i].t_product_id
+                    dataObj.t_category_product_id = wishListFiltered[i].t_category_product_id
+                    dataObj.quantity = wishListFiltered[i].quantity
+                    dataObj.isFavorite = wishListFiltered[i].is_favorite
+                    dataObj.owner_market_id = wishListFiltered[i].owner_market_id
+                    dataObj.owner_market_subdistrict = wishListFiltered[i].owner_market_subdistrict
+                    dataObj.owner_market_city = wishListFiltered[i].owner_market_city
+                    dataObj.owner_market_subdistrict_name = wishListFiltered[i].owner_market_subdistrict_name
+                    dataObj.owner_market_city_name = wishListFiltered[i].owner_market_city_name
+                    // product
+                    dataObj.productTitle = productListFiltered[i].name
+                    dataObj.avatar = productListFiltered[i].avatar
+                    dataObj.price = productListFiltered[i].price * wishListFiltered[i].quantity
+                    // market
+                    dataObj.marketName = marketList[i].market_name
+                    dataObj.category = categoryList[i].name
+                    dataObj.sec_market_id = wishListFiltered[i].sec_market_id
+                    dataObj.address = homeState.userAddress.subdistrict ? homeState.userAddress.subdistrict : ""
+                    yield put(orderActions.setWishlistData('cart', dataObj))
+                }
+                if (dataArr.length < 1) {
+                    yield put(orderActions.setEmpty(true))
+                } else {
+                    yield put(orderActions.setEmpty(false))
+                }
+                yield put(orderActions.setLoading(false))
+            }

@@ -10,6 +10,8 @@ import { ITEM_WIDTH, SPACING, width } from "../../../utils/theme";
 import { truncate } from '../../../utils/stringUtils';
 import { navigate } from '../../../navigation/NavigationService';
 import styles from './styles';
+import { IProducts, IHome } from '../../interfaces';
+import * as productDetailActions from "../../productDetail/actions";
 
 const RenderSkeleton = () => (
     <View style={{ flexDirection: "row" }}>
@@ -47,11 +49,25 @@ const RenderSkeleton = () => (
 )
 
 const ProductList = ({ category }) => {
-    const homeSelector = useSelector(state => state.homeReducer)
+    const homeSelector:IHome = useSelector(state => state.homeReducer);
+    const dispatch = useDispatch();
 
-    const onNavigateToDetail = (user_id, product_id) => {
+    const onNavigateToDetail = async (user_id, product_id, props) => {
+        const image = []
+        image.push(props.avatar)
+        if (props.second_avatar) {
+            image.push(props.second_avatar)
+        }
+        if (props.third_avatar) {
+            image.push(props.third_avatar)
+        }
+        if (props.fourth_avatar) {
+            image.push(props.fourth_avatar)
+        }
+        await dispatch(productDetailActions.setProductOnReducer(props, image))
         const param = {
             // userId: user_id, 
+            ...props,
             productId: product_id
         }
         navigate("ProductDetail", param)
@@ -59,7 +75,6 @@ const ProductList = ({ category }) => {
 
     return (
         <View style={styles.cardProducts}>
-            {homeSelector.isLoading ? <RenderSkeleton /> :
                 <FlatList
                     horizontal
                     data={
@@ -82,13 +97,13 @@ const ProductList = ({ category }) => {
                             title={truncate(item.name, 30)}
                             image={item.avatar}
                             price={item.price}
-                            onPress={() => onNavigateToDetail(0, item.id)}
-                            onPressAvatar={() => onNavigateToDetail(0, item.id)}
+                            onPress={() => onNavigateToDetail(0,item.id,item)}
+                            onPressAvatar={() => onNavigateToDetail(0, item.id, item)}
                         />
                     )}
+                    ListEmptyComponent={() => <RenderSkeleton />}
                     keyExtractor={(item) => item.id}
                 />
-            }
         </View>
     );
 };

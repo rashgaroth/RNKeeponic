@@ -4,7 +4,9 @@ import {
   RefreshControl,
   Animated,
   TextInput,
-  Text
+  Text,
+  Keyboard,
+  SafeAreaView
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import SplashScreen from 'react-native-splash-screen';
@@ -21,80 +23,60 @@ import { IHome } from "../../interfaces";
 import HomeContainer from '../components/HomeContainer';
 import { KpnLoading } from "../../../components";
 import BottomSheetComponent from '../components/BottomSheet';
+import SearchContainer from '../components/SearchBarContainer';
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
   const homeSelector:IHome = useSelector(state => state.homeReducer)
   const loginSelector = useSelector(state => state.loginReducer)
 
-  const [name, setName] = useState(null);
-  const [word, setWord] = useState('');
   const [isFocus, setIsFocus] = useState(false);
-  const bottomSheetRef = useRef(null);
-
-  const snapPoints = useMemo(() => [0, "47%"], [])
+  const [query, setQuery] = useState('')
 
   let scrollY = useRef(new Animated.Value(0)).current;
   const textInputRef = useRef(null);
 
   const onRefreshAll = async () => {
-    await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
+    await dispatch(homeAction.requestHome("", loginSelector.user.user_id, 0, false))
   }
-
-  // useEffect(() => {
-  //   const userAddress = homeSelector.isUserAddress;
-
-  //   if (!homeSelector.userAddress.subdistrict === ""){
-  //     console.log("ada ni")
-  //     if (!userAddress) {
-  //       console.log("gada alamat")
-  //       setTimeout(() => {
-  //         setIsUserAddres(true)
-  //       }, 2000)
-  //     } else {
-  //       console.log("ada alamat")
-  //     }
-  //   }else{
-  //     console.log("blum ada")
-  //   }
-  // }, [homeSelector.userAddress.subdistrict])
 
   useEffect(() => {
     SplashScreen.hide();
   }, [null])
 
   useEffect(() => {
+    let isMounted = true;
     const fetchHomeData = async () => {
       await dispatch(orderActions.getWishlist())
       await dispatch(orderActions.getOrderedList())
-      await dispatch(orderActions.getOrderedList(3,4))
-      await dispatch(homeAction.requestHome(name, loginSelector.user.user_id, 0, false))
+      await dispatch(orderActions.getOrderedList(3, 4))
+      await dispatch(homeAction.requestHome("", loginSelector.user.user_id, 0, false))
       await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
+      console.log(isMounted, "mounted")
     }
-
-    fetchHomeData()
-
+    fetchHomeData();
+    return () => {
+      isMounted = false;
+    }
   }, [null])
-
-  useEffect(() => {
-    console.log(homeSelector.isUserAddress, "ahuish")
-    if(homeSelector.isUserAddress){
-      bottomSheetRef.current.snapTo(0)
-    }else{
-      bottomSheetRef.current.expand()
-    }
-  }, [homeSelector.allProducts, homeSelector.isUserAddress])
 
   const onTextInputFocus = () => {
     setIsFocus(true)
-  }
-
-  const onTextInputBlur = () => {
-    setIsFocus(false)
+    console.log(isFocus, "focus")
   }
 
   const onPressBell = () => {
-    console.log("aa");
+    if(!isFocus){
+      console.log("pressed")
+    }else{
+      setQuery('')
+    }
+  }
+
+  const onPressBack =() => {
+    setIsFocus(false)
+    setQuery('')
+    Keyboard.dismiss();
   }
 
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
@@ -103,10 +85,6 @@ export default function Home({ navigation }) {
     inputRange: [0, 0, 0, 60],
     outputRange: [0, 0, 0, -60]
   });
-  
-  const handleSheetChanges = useCallback((index) => {
-    console.log('handleSheetChanges', index);
-  }, []);
 
   return (
     <>
@@ -126,54 +104,48 @@ export default function Home({ navigation }) {
           elevation: 4,
           zIndex: 100,
         }}>
+        {
+          isFocus ? (
+            <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={() => onPressBack()} />
+          ) : null
+        }
         <AvoidKeyboard>
           <TextInput
             ref={textInputRef}
             placeholder="Cari Disini"
             clearButtonMode="always"
-            value={word}
-            onChangeText={(value) => setWord(value)}
-            style={styles.input}
+            value={query}
+            onChangeText={(value) => setQuery(value)}
+            style={[styles.input, { marginLeft: !isFocus ? 20 : 0 }]}
             onFocus={() => onTextInputFocus()}
-            onBlur={() => onTextInputBlur()}
+            // onBlur={() => onTextInputBlur()}
             clearTextOnFocus
           />
         </AvoidKeyboard>
-        <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell()} style={{ marginRight: 20 }} />
+        <IconButton icon={!isFocus ? "bell-outline" : "close-circle"} color={COLORS.white} onPress={() => onPressBell()} style={{ marginRight: 20 }} />
       </Animated.View>
     <Animated.ScrollView style={[styles.container, /* { opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)), } */]} 
       refreshControl={
       <RefreshControl 
       onRefresh={onRefreshAll}
-      refreshing={homeSelector.isLoading}
+      // refreshing={homeSelector.isLoading}
       />
       }
       onScroll={(e) => {
         scrollY.setValue(e.nativeEvent.contentOffset.y)
       }}
-      scrollEnabled={!homeSelector.isLoading}
+      // scrollEnabled={!homeSelector.isLoading}
     >
-      <HomeContainer />
-      <KpnLoading visible={homeSelector.isLoading} />
+      {
+        !isFocus ? (
+          <HomeContainer />
+        ) : ( 
+          <SafeAreaView>
+            <SearchContainer q={query} onClickChips={(name) => setQuery(name)} /> 
+          </SafeAreaView>
+        )
+      }
     </Animated.ScrollView>
-    <BottomSheet
-            ref={bottomSheetRef}
-            index={0}
-            snapPoints={snapPoints}
-            onChange={handleSheetChanges}
-            style={styles.bottomSheet}
-            backdropComponent={(props) => (<BottomSheetBackdrop {...props} enableTouchThrough={true} />)}
-        >
-          <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-            <Text style={styles.title}> Isi Lokasi Pengiriman Mu ✔</Text>
-            <BottomSheetComponent />
-          </BottomSheetScrollView>
-    </BottomSheet>
-    {
-      // !isUserAddres ? (
-        // <BottomSheetComponent />
-      // ) : null
-    }
     </View>
     </>
   );

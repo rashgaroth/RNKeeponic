@@ -57,7 +57,7 @@ export default function ShipmentDone(navigation) {
             productId: id
         }
         console.log(param)
-        navigate("ProductDetail", param)
+        // navigate("ProductDetail", param)
     }
 
     const onPressFav = async (id, e) => {

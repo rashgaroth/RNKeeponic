@@ -45,10 +45,10 @@ const BottomSheetProduct = ({ onFinishLoading }) => {
     const [subdistrictArray, setSubdistrictArray] = useState(null)
     const [buttonBackDisabled, setButtonBackDisabled] = useState(true)
     const [buttonName, setButtonName] = useState('Lanjut')
-    const [phone, setPhone] = useState('')
+    const [phone, setPhone] = useState(loginState.user.phone)
     const [detail, setDetail] = useState('')
-    const [subdistName, setSubdisName] = useState('')
-    const [cityName, setCityName] = useState('')
+    const [subdistName, setSubdisName] = useState(homeSelector.userAddress.subdistrict)
+    const [cityName, setCityName] = useState(homeSelector.userAddress.city)
     
     const onChangePicker = (value, index) => {
         setProvinceId(value) //set id provinsi
@@ -127,11 +127,12 @@ const BottomSheetProduct = ({ onFinishLoading }) => {
                 await dispatch(homeActions.setAddressUpdated('city', cityName))
                 await dispatch(loginActions.setPhoneUpdated(phone))
                 await dispatch(registerActions.setLoader(false, "loadingNext"))
-                onFinishLoading()
+                onFinishLoading(subdistName, cityName, phone, postalCode)
             } else {
                 await dispatch(registerActions.setLoader(false, "loadingNext"))
             }
         } catch (error) {
+            console.log("error : ", error)
             await dispatch(registerActions.setLoader(false, "loadingNext"))
         }
     }

@@ -4,7 +4,7 @@ import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { COLORS } from '../utils/colors';
 import Rating from "../assets/images/svg/Rating";
 import NoRating from "../assets/images/svg/NoRating";
-const KpnCardProducts = ({ rating, title, price, image, userId, productId, onPress, onPressAvatar, isBottomSheet}) => {
+const KpnCardProducts = ({ style, rating, title, price, image, userId, productId, onPress, onPressAvatar, isBottomSheet}) => {
     const totalRating = 5;
     const Cart = props => <Avatar.Icon 
     {...props} 
@@ -104,7 +104,7 @@ const stylesBottomSheet = StyleSheet.create({
         borderColor: COLORS.colorC4,
         borderRadius: 10,
         marginRight: 10,
-        marginVertical: 10
+        marginVertical: 10,
     },
     cardCover: {
         borderRadius: 10,
@@ -142,7 +142,8 @@ const styles = StyleSheet.create({
         borderColor: COLORS.colorC4,
         borderRadius: 10,
         marginRight: 10,
-        marginVertical: 10
+        marginVertical: 10,
+        marginHorizontal: 10
     },
     cardCover: {
         borderRadius: 10,

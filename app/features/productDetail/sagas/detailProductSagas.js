@@ -20,14 +20,12 @@ let detailProductReducer = state => state.detailProductReducer;
 
 // Our worker Saga that logins the user
 export default function* getProductDetail(state) {
-    console.log("mulai")
-    yield put(detailProductAction.clearProduct());
     const loginState = yield select(loginReducer);
-    const productState = yield select(detailProductReducer);
+    console.log("mulai")
+    // yield put(detailProductAction.clearProduct());
     const token = loginState.user.token
     const userId = loginState.user.user_id
-
-        console.log(state)
+    yield put(detailProductAction.showLoading());
         try {
             const product_id = state.payload.product_id;
 
@@ -37,7 +35,7 @@ export default function* getProductDetail(state) {
                 console.log(url)
 
             const urlFavorite = API.BASE_URL +
-                API.ENDPOINT.WISHLIST+`/order_list/favorite/${userId}`;
+                API.ENDPOINT.WISHLIST + `/order_list/favorite/${userId}/${product_id}`;
 
             const [productDetail, productFavorite] = yield all([
                 call(
@@ -51,64 +49,21 @@ export default function* getProductDetail(state) {
                 )
             ]);
             if (productDetail.status === 200) {
-                console.log("tengah")
-                const payload = productDetail.data.data;
+                yield put(detailProductAction.hideLoading());
                 const market = productDetail.data.market;
                 const category = productDetail.data.category;
                 const marketAddress = productDetail.data.marketAddressData;
-                let avatar = payload.avatar;
-                let second_avatar = payload.second_avatar;
-                let third_avatar = payload.third_avatar;
-                let fourth_avatar = payload.fourth_avatar;
-                const image = []
-                image.push(avatar)
-                if(second_avatar){
-                    image.push(second_avatar)
-                }
-                if(third_avatar){
-                    image.push(third_avatar)
-                }
-                if(fourth_avatar){
-                    image.push(fourth_avatar)
-                }
-                console.log("pushing image", marketAddress)
-                yield put(detailProductAction.setProductOnReducer(payload, image));
                 yield put(detailProductAction.setMarketOnReducer(market));
                 yield put(detailProductAction.setCategory(category));
                 yield put(detailProductAction.setMarketAddress(marketAddress));
-                yield put(detailProductAction.hideLoading());
-                console.log("Selesai")
-                if (productFavorite.status === 200) {
-                    const productId = payload.id;
-                    const favData: Array = productFavorite.data.data;
-
-                    const isFavorite = favData.filter((v, i, a) => {
-                        if(v.t_product_id){
-                            if (v.t_product_id === productId){
-                                return v.t_product_id === productId
-                            }else{
-                                return null
-                            }
-                        }else{
-                            return null
-                        }
-                    });
-
-                    if (isFavorite) {
-                        yield put(detailProductAction.getProductLoves(isFavorite[0].is_favorite))
-                    }else{
-                        console.log("tidak ada favorite")
-                    }
-
-                } else {
-                    setTimeout(() => {
-                        Alert.alert('Keeponic', "Server Tidak Dapat Mengambil Disukai");
-                    }, 200);
-                }
             }else{
                 setTimeout(() => {
-                    Alert.alert('Keeponic', "Server Tidak Dapat Mengambil Data");
+                    Alert.alert('Tidak Ada Internet', "Server Tidak Dapat Mengambil Data");
                 }, 200);
+            }
+            if (productFavorite.status === 200) {
+                const isFavorite: Array = productFavorite.data.data;
+                yield put(detailProductAction.getProductLoves(isFavorite))
             }
         } catch (error) {
             console.log(error)

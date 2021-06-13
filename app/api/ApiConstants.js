@@ -21,6 +21,7 @@ const API_ENDPOINT = {
   GET_ALL_ADDRESS: 'client/address/all',
   WISHLIST: 'client/product',
   ORDER: 'client/product/order_list',
+  ORDER_BETWEEN: 'client/product/order_between'
 };
 
 const API = {

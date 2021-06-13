@@ -4,7 +4,7 @@
  * un - username
  * pwd - password
  */
-import { all, takeEvery, put, select, call, fork } from 'redux-saga/effects';
+import { put, select, call } from 'redux-saga/effects';
 
 import API from '../../../api/ApiConstants';
 import * as apiService from "../../../services/index";
@@ -12,40 +12,24 @@ import * as apiService from "../../../services/index";
 import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as homeAction from '../actions';
-import { getToken } from "../../../services/asyncStorage";
 
-import { HeaderApiKey } from '../../../services/header';
+import { HeaderAuth } from '../../../services/header';
 // import { navigate } from "../../../navigation/NavigationService";
-import { sha256 } from 'react-native-sha256';
 
-let homeState = state => state.homeReducer;
 let loginState = state => state.loginReducer;
 
 export default function* homeGetProfile(state) {
     // state home
-    const getHomeState = yield select(homeState)
     const getLoginState = yield select(loginState)
     const token = getLoginState.user.token
 
     try {
-        // yield put(homeAction.showLoading())
             if (token) {
-                let sha;
-                const apiKey = `${state.userId}%${token}%${state.key}`;
-
-                sha256(apiKey).then((data) => {
-                    sha = data
-                }).catch((err) => {
-                    setTimeout(() => {
-                        Alert.alert('Keeponic', err);
-                    }, 200);
-                })
-
                 const _response = yield call(apiService.GET,
                     API.BASE_URL +
                     API.ENDPOINT.GET_PROFILE +
                     `/${state.userId}`,
-                    HeaderApiKey(token, sha)
+                    HeaderAuth(token)
                 )
 
                 if (_response.data.error < 1) {
@@ -56,7 +40,6 @@ export default function* homeGetProfile(state) {
                         city: address[1],
                         province: address[2]
                     }
-                    // yield put(homeAction.hideLoading())
                     if(address[0]){
                         yield put(homeAction.setIsUserAddress(true))
                     }else{
@@ -64,7 +47,6 @@ export default function* homeGetProfile(state) {
                     }
                     yield put(homeAction.getUserProfileSuccess(_response.data.data, userAddress))
                 } else {
-                    // yield put(loginAction.logOut())
                     console.log(_response);
                     yield put(homeAction.hideLoading())
                     setTimeout(() => {
@@ -73,11 +55,8 @@ export default function* homeGetProfile(state) {
                 }
         }else{
             yield put(homeAction.hideLoading())
-            // yield put(homeAction.hideLoading())
         }
     } catch (error) {
         yield put(homeAction.hideLoading())
-        // yield put(homeAction.hideLoading())
-        console.log("INI CATCH", error.message)
     }
 }

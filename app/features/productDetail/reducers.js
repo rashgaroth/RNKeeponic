@@ -53,33 +53,35 @@ const initialState:IProductDetail = {
     },
     productInWishList: [],
     productWishlistData: null,
-    isFavorite: 0
+    isFavorite: 0,
+    addToWishlist: false,
 };
 
 export const detailProductReducer = createReducer(initialState, {
     [types.GET_DETAIL_PRODUCT](state, action) {
         return {
             ...state,
-            mProducts: {
-                ...state.mProducts,
-                id: null,
-                name: "",
-                t_category_id: null,
-                description: "",
-                price: null,
-                avatar: "",
-                second_avatar: "",
-                third_avatar: "",
-                fourth_avatar: "",
-                stock: null,
-                weight: null,
-                status: null,
-                rating: null,
-                is_sold: null,
-                created_date: "",
-                updated_date: "",
-                m_product_model: null
-            },
+            loading: true,
+            // mProducts: {
+            //     ...state.mProducts,
+            //     id: null,
+            //     name: "",
+            //     t_category_id: null,
+            //     description: "",
+            //     price: null,
+            //     avatar: "",
+            //     second_avatar: "",
+            //     third_avatar: "",
+            //     fourth_avatar: "",
+            //     stock: null,
+            //     weight: null,
+            //     status: null,
+            //     rating: null,
+            //     is_sold: null,
+            //     created_date: "",
+            //     updated_date: "",
+            //     m_product_model: null
+            // },
         };
     },
     [types.SHOW_LOADING](state, action) {
@@ -94,12 +96,12 @@ export const detailProductReducer = createReducer(initialState, {
             loading: false,
         };
     },
-    // [types.GET_DETAIL_SUCCESS](state, action) {
-    //     return {
-    //         ...state,
-    //         product: action.data,
-    //     };
-    // },
+    [types.SET_WISHLIST_CART_DETAILS](state, action) {
+        return {
+            ...state,
+            addToWishlist: action.data,
+        };
+    },
     [types.CLEAR_PRODUCT](state, action) {
         return {
             ...state,
@@ -243,4 +245,28 @@ export const detailProductReducer = createReducer(initialState, {
             isFavorite: action.data
         };
     },
+    [types.SET_PRODUCT_DETAILS](state, action){
+        return {
+            ...state,
+            mProducts: {
+                id: action.id,
+                name: action.name,
+                t_category_id: action.t_category_id,
+                description: action.description,
+                price: action.price,
+                avatar: action.avatar,
+                second_avatar: action.second_avatar,
+                third_avatar: action.thrid_avatar,
+                fourth_avatar: action.fourth_avatar,
+                stock: action.stock,
+                weight: action.weight,
+                status: action.status,
+                rating: action.rating,
+                is_sold: action.is_sold,
+                created_date: action.created_date,
+                updated_date: action.updated_date,
+                m_product_model: action.m_product_model
+            },
+        }
+    }
 });

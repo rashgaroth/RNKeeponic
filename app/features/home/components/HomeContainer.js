@@ -1,14 +1,17 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import {
     View,
     StatusBar,
     Text,
+    FlatList
 } from 'react-native';
 import { useSelector } from 'react-redux';
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
+import LinearGradient from 'react-native-linear-gradient';
 
 import styles from './styles';
 
+import * as productDetailActions from "../../productDetail/actions";
 import { COLORS } from "../../../utils/colors";
 import { width } from "../../../utils/theme";
 import { truncate } from "../../../utils/stringUtils";
@@ -19,16 +22,58 @@ import { IHome } from "../../interfaces";
 import Header from "./Header";
 import ProductList from './ProductList';
 import LifeStyleContainer from './LifeStyleContainer';
-import BottomSheetComponent from './BottomSheet'
+
+
+const skeletonData = [1, 2, 3, 4, 5, 6];
+const RenderSkeleton = ({ length }) => (
+    <View style={{ flexDirection: "column", alignSelf: "center" }}>
+        {skeletonData.map((v, i) => (
+            <View key={i} style={{ flexDirection: "row", marginVertical: 10 }}>
+                <ShimmerPlaceHolder
+                    LinearGradient={LinearGradient}
+                    // visible={homeSelector.isLoading}
+                    style={{
+                        width: 170,
+                        height: 170,
+                        borderRadius: 16,
+                        marginLeft: 10
+                    }}
+                />
+                <ShimmerPlaceHolder
+                    LinearGradient={LinearGradient}
+                    // visible={homeSelector.isLoading}
+                    style={{
+                        width: 170,
+                        height: 170,
+                        borderRadius: 16,
+                        marginLeft: 10
+                    }}
+                />
+            </View>
+        ))}
+    </View>
+)
 
 const HomeContainer = () => {
 
     const homeSelector: IHome = useSelector(state => state.homeReducer)
     const allProducts = homeSelector.allProducts;
 
-    const onNavigateToDetail = (user_id, product_id) => {
+    const onNavigateToDetail = async (product_id, props) => {
+        const image = []
+        image.push(props.avatar)
+        if (props.second_avatar) {
+            image.push(props.second_avatar)
+        }
+        if (props.third_avatar) {
+            image.push(props.third_avatar)
+        }
+        if (props.fourth_avatar) {
+            image.push(props.fourth_avatar)
+        }
+        await dispatch(productDetailActions.setProductOnReducer(props, image))
         const param = {
-            // userId: user_id, 
+            ...props,
             productId: product_id
         }
         navigate("ProductDetail", param)
@@ -42,9 +87,7 @@ const HomeContainer = () => {
                 <View>
                     <Header name="Paket Hidroponik" />
                     <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
-                    <View style={styles.cardProducts}>
-                        <ProductList />
-                    </View>
+                    <ProductList />
                     <Header name="Galeri Hidroponik & Kreativitas" icon="folder-multiple-image" color={COLORS.blackSans} />
                     <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
                     <LifeStyleContainer />
@@ -64,23 +107,31 @@ const HomeContainer = () => {
                     <ProductList category="bibit" />
                     {/* Other Products */}
                     <Header name="Produk Lainnya" icon="package-variant" color={COLORS.redOpacity}/>
-                    <Text style={styles.textLebihHemat}>Produk lain nya, hanya di Keeponic</Text>
+                    <Text style={styles.textLebihHemat}>Produk lain nya</Text>
                     <View style={styles.otherProducts}>
-                        {
-                            allProducts ? allProducts.map((data, index) => (
-                                <View key={index}>
-                                    <KpnCardProducts
-                                        key={index}
-                                        rating={data.rating}
-                                        title={truncate(data.name, 30)}
-                                        image={data.avatar}
-                                        price={data.price}
-                                        onPress={() => onNavigateToDetail(0, data.id)}
-                                        onPressAvatar={() => onNavigateToDetail(0, data.id)}
-                                    />
-                                </View>
-                            )) : null
-                        }
+                        <FlatList
+                            key={'#'}
+                            data={allProducts}
+                            keyExtractor={item => item.id}
+                            style={styles.flatListContainer}
+                            renderItem={({ item }) => (
+                                <KpnCardProducts
+                                    key={item.id}
+                                    rating={item.rating}
+                                    title={truncate(item.name, 30)}
+                                    image={item.avatar}
+                                    price={item.price}
+                                    onPress={() => onNavigateToDetail(item.id, item)}
+                                    style={{ paddingHorizontal: 10 }}
+                                    onPressAvatar={() => onNavigateToDetail(item.id, item)}
+                                />
+                            )}
+                            contentContainerStyle={styles.itemContainer}
+                            ListEmptyComponent={(props) => (
+                                <RenderSkeleton />
+                            )}
+                            numColumns={2}
+                        />
                     </View>
                 </View>
                 <View style={{ height: 60, width: width }}></View>

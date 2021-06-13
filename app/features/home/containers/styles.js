@@ -220,7 +220,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 30,
     paddingLeft: 20
     // fontSize: 15
   },

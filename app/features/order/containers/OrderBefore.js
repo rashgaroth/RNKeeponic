@@ -1,5 +1,13 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    ScrollView, 
+    RefreshControl,
+    FlatList,
+    SafeAreaView
+} from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, Button, Dialog, Portal } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
@@ -40,9 +48,10 @@ export default function OrderBefore(navigation) {
     
     const tokenUser = loginSelector.user.token
     const userId = loginSelector.user.user_id
-    const wishlistData = detailProductSelector.productWishlistData;
+    const wishlistData = detailProductSelector.productWishlistData
     const name = loginSelector.user.name
     const cartData = orderState.wishListData.cart
+    const cartChange = detailProductSelector.addToWishlist
 
     const onDismissSnackBar = () => {
         setErrVisible(false)
@@ -164,14 +173,15 @@ export default function OrderBefore(navigation) {
         const detailOrder = {}
         for(let i in OrderDetailData) {
             if(OrderDetailData[i].id === id){
-                detailOrder.productName = OrderDetailData[i].productTitle
-                detailOrder.marketName = OrderDetailData[i].marketName
-                detailOrder.category = OrderDetailData[i].category
+                console.log(OrderDetailData[i].product_id, "price")
+                detailOrder.productName = OrderDetailData[i].name
+                detailOrder.marketName = OrderDetailData[i].market_name
+                detailOrder.category = OrderDetailData[i].category_name
                 detailOrder.productId = OrderDetailData[i].product_id
                 detailOrder.marketId = OrderDetailData[i].sec_market_id
                 detailOrder.userId = userId
                 detailOrder.price = OrderDetailData[i].price
-                detailOrder.quantity = OrderDetailData[i].quantity
+                detailOrder.quantity = 1
                 detailOrder.productAvatar = OrderDetailData[i].avatar
                 detailOrder.ownerCityId = OrderDetailData[i].owner_market_city
                 detailOrder.ownerSubdistrictId = OrderDetailData[i].owner_market_subdistrict
@@ -187,7 +197,7 @@ export default function OrderBefore(navigation) {
             productId: id
         }
         console.log(param)
-        navigate("ProductDetail", param)
+        // navigate("ProductDetail", param)
     }
 
     const onPressFav = async (id, e) => {
@@ -219,7 +229,31 @@ export default function OrderBefore(navigation) {
         }
     }
 
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         let isMounted = true;
 
+    //         const fetchData = async () => {
+    //             try {
+    //                 console.log("hitting useCallback")
+    //                 // if(cartData.length < 1){
+    //                     await dispatch(orderActions.getWishlist())
+    //                 // }
+    //                 console.log(isMounted, "mounted cart")
+    //             } catch (error) {
+    //                 console.log(error, "ERROR")
+    //             }
+    //         }
+
+    //         fetchData();
+
+    //         return () => {
+    //             console.log("cleaning")
+    //             isMounted = false;
+    //         }
+    //     }, [cartChange])
+    // )
+    // console.log(cartData, "CART-----------------------------")
     return (
         <>
             <ScrollView style={styles.container}
@@ -231,8 +265,39 @@ export default function OrderBefore(navigation) {
                 />
             }
             >
-            <View>
-                    { isEmpty ? <OnEmptyList /> : cartData.length > 0 ? cartData.map((x, i) => (
+            <SafeAreaView>
+                <FlatList
+                    key={'#'}
+                    data={cartData.length > 0 ? cartData : []}
+                    keyExtractor={item => item.id}
+                    style={styles.flatListContainer}
+                    renderItem={({ item }) => (
+                        <OrderList
+                            address={item.address}
+                            avatar={item.avatar}
+                            category={item.category_name}
+                            isFavorite={item.isFavorite === 1 ? true : false}
+                            marketName={item.market_name}
+                            price={convertToIdr(item.price)}
+                            title={item.name}
+                            qty={"1"}
+                            onPressBuy={() => onPressBuy(item.id)}
+                            onCheck={(e) => onPressFav(item.id, e)}
+                            onDecrease={() => onDecrease(item.id)}
+                            onIncrease={() => onIncrease(item.id)}
+                            onPressDelete={() => onPressDelete(item.id)}
+                            onPressProduct={() => onPressItem(item.product_id)}
+                            status="Di Keranjang"
+                        />
+                    )}
+                    contentContainerStyle={styles.itemContainer}
+                    ListEmptyComponent={(props) => (
+                        <OnEmptyList
+                            onRefresh={() => onRefresh()}
+                        />
+                    )}
+                />
+                    {/* { isEmpty ? <OnEmptyList /> : cartData.length > 0 ? cartData.map((x, i) => (
                         <OrderList 
                         key={i}
                         address={x.address}
@@ -254,8 +319,8 @@ export default function OrderBefore(navigation) {
                     )) : 
                     <OnEmptyList
                         onRefresh={ () => onRefresh() }
-                    />}
-                </View>
+                    />} */}
+                </SafeAreaView>
             </ScrollView>
             <KpnLoading visible={loading} />
             <KpnDialog

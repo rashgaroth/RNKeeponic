@@ -2,12 +2,15 @@
 // https://aboutreact.com/react-native-tab //
 import 'react-native-gesture-handler';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { IconButton } from 'react-native-paper';
+import * as orderActions from '../actions';
+import { useFocusEffect } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 //import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Ordered from './Ordered';
@@ -19,9 +22,15 @@ import { COLORS } from '../../../utils/colors';
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
-function TabStack() {
-
-  const [iconColor, setIconColor] = useState(COLORS)
+function TabStack({ navigation }) {
+    const dispatch = useDispatch();
+    useEffect((e) => {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        console.log("on unsubscribe-------")
+        await dispatch(orderActions.getWishlist())
+      });
+      return unsubscribe
+    }, [null])
 
   return (
     <Tab.Navigator

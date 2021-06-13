@@ -18,7 +18,7 @@ export default function MarketInfo(){
         }else{
             setImage("https://icon-library.com/images/no-profile-pic-icon/no-profile-pic-icon-27.jpg")
         }
-    }, []);
+    }, [marketSelector.avatar]);
 
     return (
         <View style={styles.container}>

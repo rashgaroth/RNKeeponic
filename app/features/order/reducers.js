@@ -123,6 +123,15 @@ export const orderReducer = createReducer(initialState, {
             userAddressList: action.data
         };
     },
+    [types.SET_CART_EMPTY_FROM_DETAILS](state, action) {
+        return {
+            ...state,
+            wishListData: {
+                ...state.wishListData,
+                cart: []
+            }
+        };
+    },
     [types.SET_LOADING_MODAL](state, action) {
         return {
             ...state,

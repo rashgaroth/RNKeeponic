@@ -90,3 +90,10 @@ export const getProductLoves = (data) => {
         data
     }
 }
+
+export const setWishlistDataDetail = (data) => {
+    return {
+        type: types.SET_WISHLIST_CART_DETAILS,
+        data
+    }
+}

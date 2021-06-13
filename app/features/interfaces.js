@@ -70,6 +70,26 @@ export interface IData {
     owner_market_city_name: string
 }
 
+export interface IProducts {
+    id: number,
+    name: string,
+    t_category_id: number,
+    description: string,
+    price: number,
+    avatar: string,
+    second_avatar: string,
+    third_avatar: string,
+    fourth_avatar: string,
+    stock: number,
+    weight: number,
+    status: number,
+    rating: number,
+    is_sold: number,
+    created_date: string,
+    updated_date: string,
+    m_product_model: number
+}
+
 export interface IOrderDetailData {
     productName: string,
     marketName: string,
@@ -250,6 +270,9 @@ export interface IHome {
         detail: string
     },
     dummyProducts: Object,
-    products: Object[],
-    allProducts: Object[],
+    products: IProducts[],
+    mediaTanam: IProducts[],
+    greenHouse: IProducts[],
+    bibit: IProducts[],
+    allProducts: IProducts[],
 }

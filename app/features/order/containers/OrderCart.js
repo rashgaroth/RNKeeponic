@@ -52,7 +52,7 @@ export default function OrderCart(navigation) {
             productId: id
         }
         console.log(param)
-        navigate("ProductDetail", param)
+        // navigate("ProductDetail", param)
     }
 
     const onPressFav = async (id, e) => {

@@ -119,13 +119,16 @@ export default function AddressOrderDetail(props){
     const [subdistrictId, setSubdistrictId] = useState('');
     const [cityId, setCityId] = useState('');
     const [postalCode, setPostalCode] = useState('');
-    const [userAddressId, setUserAddressId] = useState('');
+    const [userAddressId, setUserAddressId] = useState();
     const [paymentUrl, setPaymentUrl] = useState();
     const [actualPrice, setActualPrice] = useState();
     const [isOrderSuccess, setIsOrderSuccess] = useState(false);
     const [isStockEmpty, setIsStockEmpty] = useState(false);
     const [errorTitle, setErrorTitle] = useState('Stok Barang Sedang Kosong');
-    const [errorCommon, setErrorCommon] = useState('Kamu bisa menunggu sampai Seller mengupdate barang')
+    const [errorCommon, setErrorCommon] = useState('Kamu bisa menunggu sampai Seller mengupdate barang');
+    const [ownerAddress, setOwnerAddress] = useState();
+    const [courierCost, setCourierCost] = useState('');
+    const [etd, setEtd] = useState('');
 
     const dispatch = useDispatch();
     const bottomSheetRef = useRef(null);
@@ -145,10 +148,7 @@ export default function AddressOrderDetail(props){
         marketId,
         userId,
         price,
-        ownerCityId,
-        ownerSubdistrictId,
-        ownerCityName,
-        ownerSubdistrictName,
+        ownerCityId
     } = dataObjects
 
     // * Dipakai saat nanti saat enhancement
@@ -163,9 +163,9 @@ export default function AddressOrderDetail(props){
                 const _result = await apiServices.GET(API.BASE_URL + API.ENDPOINT.GET_PROFILE + '/list/address/' + loginState.user.user_id, HeaderAuth(token))
                 if (_result.status === 200 || _result.data.data) {
                     console.log('success address')
-                    console.log("success")
                     const data = _result.data.data
                     const city = _result.data.city
+                    console.log("success", data.id)
                     setUserAddressId(data.id)
                     setSubdistrictId(data.t_subdistrict_id)
                     setPostalCode(data.postal_code)
@@ -200,21 +200,30 @@ export default function AddressOrderDetail(props){
         }
     }, [quantity]);
 
-    const onFinishLoading = () => {
+    const onFinishLoading = (subdistName, cityName, phone, postalCode) => {
         bottomSheetRef.current.snapTo(0)
+        setCity(cityName)
+        setSubdist(subdistName)
+        setPhone(phone)
+        setPostalCode(postalCode)
     }
 
     useEffect(() => {
         const token = loginState.user.token
-        const productId = dataObjects.productId
+        const { orderDetailData } = props;
+        const { productId } = orderDetailData;
+        console.log(productId, "id")
         const getCommonProduct = async () => {
             try {
+                setIsLoading(true)
                 const _result = await apiServices.GET(API.BASE_URL + API.ENDPOINT.GET_PRODUCT + '/commonProduct/' + productId, HeaderAuth(token))
                 if (_result.status === 200 || _result.data.data) {
                     console.log("success common")
                     const weightData = _result.data.data
                     setWeight(String(weightData.actual_weight))
                     setActualPrice(weightData.price)
+                    setOwnerAddress(weightData.market_address_id)
+                    console.log(weightData.market_address_id, "OWNER")
                     setIsLoading(false)
                 } else {
                     console.log(_result.data, "not success get product")
@@ -227,7 +236,7 @@ export default function AddressOrderDetail(props){
         }
 
         getCommonProduct()
-    }, [subdistrictId])
+    }, [])
 
     useEffect(() => {
 
@@ -241,35 +250,50 @@ export default function AddressOrderDetail(props){
 
     useEffect(() => {
 
-        // const fetchOngkir = async () => {
-        //     const token = loginState.user.token
-        //     const productId = dataObjects.productId
-        //     try {
-        //         const body = {
-        //             origin: cityId,
-        //             destination: ownerCityId,
-        //             weight: weight,
-        //             courier: 'jne',
-        //         }
-        //         console.log(body)
-        //         const _result = await apiServices.POST(API.BASE_URL + 'ongkos', body, HeaderAuth(token))
-        //         if (_result.status === 200) {
-        //             const data = _result.data.data
-        //             console.log(data, "harga")
-        //             setIsLoading(false)
-        //         } else {
-        //             console.log(_result.data, "not success")
-        //             setIsLoading(false)
-        //         }
-        //     } catch (error) {
-        //         setIsLoading(false)
-        //         console.log(error)
-        //     }
-        // }
+        const fetchOngkir = async () => {
+            const token = loginState.user.token
+            const productId = dataObjects.productId
+            console.log(ownerAddress, "ALAMAT")
+            try {
+                const body = {
+                    origin: cityId,
+                    destination: ownerAddress,
+                    weight: weight,
+                    courier: 'jne',
+                }
+                console.log(body)
+                const _result = await apiServices.POST(API.BASE_URL + 'ongkos', body, HeaderAuth(token))
+                if (_result.status === 200) {
+                    const data = _result.data.data
+                    // console.log(data[0].costs[0].cost[0], "harga")
+                    const harga = data[0].costs[0].cost[0].value;
+                    const waktu = data[0].costs[0].cost[0].etd;
+                    console.log(harga, "harga", waktu, "waktu")
+                    if(harga && waktu){
+                        setEtd(waktu)
+                        setCourierCost(harga)
+                    }else{
+                        setEtd("3-4")
+                        setCourierCost(9000)
+                    }
+                    setIsLoading(false)
+                } else {
+                    console.log(_result.data, "not success")
+                    setIsLoading(false)
+                    setEtd("3-4")
+                    setCourierCost(9000)
+                }
+            } catch (error) {
+                setIsLoading(false)
+                console.log(error)
+                setEtd("3-4")
+                setCourierCost(9000)
+            }
+        }
 
-        // fetchOngkir()
+        fetchOngkir()
 
-    }, [weight])
+    }, [weight, ownerAddress])
 
     useEffect(() => {
         const { orderDetailData } = props;
@@ -332,6 +356,8 @@ export default function AddressOrderDetail(props){
     const onPressBuy = async () => {
         const address = homeState.userAddress.subdistrict;
         console.log(address, "asdas", isPhoneNull)
+        console.log(actualPrice, "ACTUAL")
+        console.log((quantity * actualPrice) + (0.1 * (actualPrice * quantity)) + (0.05 * (actualPrice * quantity)) + courierCost, "HASIL TAMBAHAN")
         if(!isPhoneNull && address !== ""){
             setIsLoading(true)
             const token = loginState.user.token
@@ -345,10 +371,22 @@ export default function AddressOrderDetail(props){
                         // TODO: jadi 50
                     },
                     {
-                        id: 100,
-                        price: 9000,
+                        id: 2,
+                        price: courierCost,
                         quantity: 1,
                         name: "Ongkos Kirim (JNE)"
+                    },
+                    {
+                        id: 3,
+                        price: 0.1 * actualPrice,
+                        quantity: 1,
+                        name: "Pajak (PPN) 10%"
+                    },
+                    {
+                        id: 3,
+                        price: 0.02 * actualPrice,
+                        quantity: 1,
+                        name: "Biaya Admin (2%)"
                     }
                 ]
             }
@@ -362,6 +400,8 @@ export default function AddressOrderDetail(props){
                 secMarketId: marketId,
                 productDetails: jsonString
             }
+
+            console.log(paramOrder, "STRING")
 
             try {
                 const _result = await apiServices.POST(API.BASE_URL + API.ENDPOINT.GET_PROFILE + '/order', paramOrder, HeaderAuth(token))
@@ -379,6 +419,8 @@ export default function AddressOrderDetail(props){
                 } else {
                     console.log(_result.data, "not success order")
                     setIsStockEmpty(true)
+                    setErrorCommon("Terjadi Kesalahan")
+                    setErrorTitle("Terdapat kesalahan tidak terduga saat melakukan transaksi")
                     setIsLoading(false)
                 }
             } catch (error) {
@@ -459,7 +501,7 @@ export default function AddressOrderDetail(props){
                     title="Informasi Pengiriman"
                     subtitle={'Pastikan info terverifikasi oleh Pembeli'}
                     left={LeftContentShipment}
-                    right={(props) => <RightContentShipment {...props} onClick={() => setShipmentModalVisible(true)} postalCode={postalCode} />}
+                    // right={(props) => <RightContentShipment {...props} onClick={() => setShipmentModalVisible(true)} postalCode={postalCode} />}
                 />
                 <Card.Content style={styles.shipmentContainer}>
                     <View style={{ flexDirection: 'column' }}>
@@ -511,31 +553,38 @@ export default function AddressOrderDetail(props){
                 />
                 <Card.Content>
                     <Paragraph style={{ fontSize: 14 }}>Harga Produk : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {dataObjects.price ? convertToIdr(actualPrice) : '----'} x {String(quantity)} = {' '} 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {String(quantity)} = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' }
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' : "-----" }
                     </Text></Text></Paragraph>
 
                     <Paragraph style={{ fontSize: 14 }}>Pajak PPN (10%) : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {dataObjects.price ? convertToIdr(actualPrice) : '----'} x {"10%"} = {' '} 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {"10%"} = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + dataObjects.price ? convertToIdr(0.1 * actualPrice) : '----' }
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(0.1 * (actualPrice * quantity)) : '----' : "-----"}
                     </Text></Text></Paragraph>
 
-                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin (5%) : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {dataObjects.price ? convertToIdr(actualPrice) : '----'} x {"5%"} = {' '} 
+                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin (2%) : 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {"2%"} = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + dataObjects.price ? convertToIdr(0.05 * actualPrice) : '----' }
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(0.02 * (actualPrice * quantity)) : '----' :"-----" }
                     </Text></Text></Paragraph>
 
-                    <Paragraph style={{ fontSize: 14 }}>Total Harga {"\n"}
+                    <Paragraph style={{ fontSize: 14 }}>Ongkos Kirim : 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> JNE {!isLoading ? "(" + etd + " " + "Hari" + ")" : "-----"} = {" "} 
+                    <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
+                    {!isLoading ? convertToIdr(courierCost) : "-----"}
+                    </Text></Text></Paragraph>
+
+                    <Paragraph style={{ fontSize: 14, fontWeight: 'bold', color: COLORS.red }}>Total Harga {"\n"}
                     <Text style={{ fontSize: 14, fontWeight: "bold" }}> 
-                    {dataObjects.price ? convertToIdr(quantity * actualPrice) : '----'} {"\n"} 
-                    {convertToIdr(0.05 * actualPrice)} {"\n"} 
-                    {convertToIdr(0.1 * actualPrice)} {' '} {"\n"}
+                    {!isLoading ? dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' : "-----"} {"\n"} 
+                    {!isLoading ? convertToIdr(0.05 * (actualPrice * quantity)) : "-----"} {"\n"} 
+                    {!isLoading ? convertToIdr(0.1 * (actualPrice * quantity)) : "-----"} {' '} {"\n"}
+                    {!isLoading ? convertToIdr(courierCost) : "-----"} {' '} {"\n"}
                     {"---------------------"}{"\n"}
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * actualPrice) + (0.05 * actualPrice) ) : '----' }
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * (actualPrice * quantity)) + (0.05 * (actualPrice * quantity)) + courierCost) : '----' :"-----" }
                     </Text></Text></Paragraph>
 
                 </Card.Content>
@@ -547,7 +596,7 @@ export default function AddressOrderDetail(props){
             <View style={styles.rowButton}>
                 <Title
                 style={{ marginTop: 10, fontWeight: "bold", color: COLORS.orange }}
-                >{dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * actualPrice) + (0.05 * actualPrice) ) : '----'}</Title>
+                >{!isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * (actualPrice * quantity)) + (0.05 * (actualPrice * quantity)) + courierCost ) : '----' : "-----"}</Title>
                 <Button
                     color={COLORS.primaryColor}
                     mode="contained"
@@ -570,13 +619,13 @@ export default function AddressOrderDetail(props){
           <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
             <Text style={styles.title}> Isi Lokasi Pengiriman Mu ✔</Text>
             <BottomSheetComponent
-            onFinishLoading={() => onFinishLoading()}
+            onFinishLoading={(subdistName, cityName, phone, postalCode) => onFinishLoading(subdistName, cityName, phone, postalCode)}
             />
           </BottomSheetScrollView>
     </BottomSheet>
         </>
         :
-        <View style={{ height: height - 100, width: width }}>
+        <View style={{ height: height - 30, width: width }}>
             <WebView 
             source={{ uri: url }} 
             onNavigationStateChange={(e) => onNavChange(e)}
