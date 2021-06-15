@@ -20,6 +20,7 @@ import SellerRegistrationMarketName from "./profile/containers/sellerRegistratio
 import OrderDetail from "./order/containers/OrderDetail";
 import OrderSuccess from "./order/containers/OrderSuccess";
 import ArticleDetail from "./lifestyleDetail/containers/ArticleDetail";
+import OrderDetailWebview from "./order/components/OrderDetailWebview";
 
 import BottomNavigationTab from "./BottomNavigationTab";
 
@@ -46,5 +47,6 @@ export {
     SellerRegistrationMarketName,
     OrderDetail,
     OrderSuccess,
-    ArticleDetail
+    ArticleDetail,
+    OrderDetailWebview
 }

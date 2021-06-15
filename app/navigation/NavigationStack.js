@@ -30,7 +30,8 @@ import {
   SellerRegistrationMarketName,
   OrderDetail,
   OrderSuccess,
-  ArticleDetail
+  ArticleDetail,
+  OrderDetailWebview
 } from "../features";
 
 // const Stack = createStackNavigator();
@@ -204,6 +205,17 @@ function App() {
           // headerTitleAlign: "center"
         }}
       />
+        <Stack.Screen
+          name="OrderDetailWebview"
+          component={OrderDetailWebview}
+          options={{
+            headerShown: true,
+            title: "Pembayaran",
+            gestureEnabled: false,
+            headerLeft: null
+            // headerTitleAlign: "center"
+          }}
+        />
         <Stack.Screen
           name="ArticleDetail"
           component={ArticleDetail}

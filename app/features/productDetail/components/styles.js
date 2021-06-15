@@ -3,6 +3,23 @@ import { COLORS } from "../../../utils/colors";
 import { width, height, heightScreen } from "../../../utils/theme";
 
 const styles = StyleSheet.create({
+    searchView: {
+        backgroundColor: COLORS.sans,
+        height: 50,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    logo: {
+        alignSelf: 'center',
+        marginRight: 10,
+    },
+    heading: {
+        fontSize: 22,
+        fontWeight: '300',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+    },
     header_safe_area: {
         zIndex: 1000
     },
@@ -130,7 +147,8 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.primaryOpacity,
         flexDirection: "row",
         justifyContent: "space-between",
-        height: 60,
+        height: 50,
+        alignItems: "center",
         elevation: 4,
         zIndex: 100
     },

@@ -91,7 +91,7 @@ const ProductAvatar = ({ onPressLove, onPressCart, onPressInfo, isLove }) => {
             }
             {!loading ? <IconButton rippleColor={COLORS.blackSans} icon="share-variant" style={{ position: 'absolute', top: 10, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={onPressCart} /> : null}
             {!loading ? <IconButton icon={isLove ? "heart" : "heart-outline"} style={{ position: 'absolute', top: 60, left: 0, backgroundColor: COLORS.colorC4 }} color={isLove ? COLORS.red : COLORS.white} size={25} onPress={onPressLove} /> : null}
-            {!loading ? <IconButton icon="information-outline" style={{ position: 'absolute', top: 110, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={onPressInfo} /> : null}
+            {/* {!loading ? <IconButton icon="information-outline" style={{ position: 'absolute', top: 110, left: 0, backgroundColor: COLORS.colorC4 }} color={COLORS.white} size={25} onPress={onPressInfo} /> : null} */}
         </View>
     );
 };

@@ -14,30 +14,6 @@ import { height, ITEM_WIDTH, SPACING, width } from "../../../utils/theme";
 import { truncate } from "../../../utils/stringUtils";
 import { navigate } from '../../../navigation/NavigationService';
 
-const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
-    const containerAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(
-            animatedIndex.value,
-            [0, 1],
-            [0, 1],
-            Extrapolate.CLAMP
-        ),
-    }));
-
-    const containerStyle = useMemo(
-        () => [
-            style,
-            {
-                backgroundColor: '#a8b5eb',
-            },
-            containerAnimatedStyle,
-        ],
-        [style, containerAnimatedStyle]
-    );
-
-    return <Animated.View style={containerStyle} />;
-}
-
 const BottomSheetProduct = () => {
     // ref
     const bottomSheetRef = useRef(null);

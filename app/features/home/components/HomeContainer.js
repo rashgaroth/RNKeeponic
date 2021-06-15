@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     StatusBar,
@@ -8,6 +8,7 @@ import {
 import { useSelector } from 'react-redux';
 import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
+import { useDispatch } from 'react-redux';
 
 import styles from './styles';
 
@@ -15,13 +16,14 @@ import * as productDetailActions from "../../productDetail/actions";
 import { COLORS } from "../../../utils/colors";
 import { width } from "../../../utils/theme";
 import { truncate } from "../../../utils/stringUtils";
-import { KpnCardProducts } from "../../../components";
+import { KpnCardProducts, KpnNotFound } from "../../../components";
 import { navigate } from "../../../navigation/NavigationService";
 import Swiper from "../components/Swiper";
 import { IHome } from "../../interfaces";
 import Header from "./Header";
 import ProductList from './ProductList';
 import LifeStyleContainer from './LifeStyleContainer';
+import RecommendationList from './RecommendationList';
 
 
 const skeletonData = [1, 2, 3, 4, 5, 6];
@@ -55,9 +57,11 @@ const RenderSkeleton = ({ length }) => (
 )
 
 const HomeContainer = () => {
-
+    const dispatch = useDispatch();
     const homeSelector: IHome = useSelector(state => state.homeReducer)
     const allProducts = homeSelector.allProducts;
+
+    const [isDialogVisible, setIsDialogVisible] = useState(false)
 
     const onNavigateToDetail = async (product_id, props) => {
         const image = []
@@ -85,28 +89,31 @@ const HomeContainer = () => {
             <Swiper />
             <View>
                 <View>
-                    <Header name="Paket Hidroponik" />
-                    <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
+                    <Header onPress={() => setIsDialogVisible(true)} name="Produk Terhangat" icon="fire" color={COLORS.red} />
+                    <Text style={styles.textLebihHemat}>Produk Terkini</Text>
+                    {/* FlatList Inspirasi */}
                     <ProductList />
-                    <Header name="Galeri Hidroponik & Kreativitas" icon="folder-multiple-image" color={COLORS.blackSans} />
+                    <Header onPress={() => setIsDialogVisible(true)} name="Galeri Hidroponik & Kreativitas" icon="folder-multiple-image" color={COLORS.blackSans} />
                     <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
                     <LifeStyleContainer />
-                    <Header name="Media Tanam" icon="buffer" color={COLORS.secondColor} />
+                    <Header name="Rekomendasi Untuk Kamu" onPress={() => setIsDialogVisible(true)} />
+                    <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
+                    {/* <ProductList /> */}
+                    <RecommendationList />
+                    <Header onPress={() => setIsDialogVisible(true)} name="Media Tanam" icon="buffer" color={COLORS.secondColor} />
                     <Text style={styles.textLebihHemat}>Barang yang direkomendasikan untuk anda!</Text>
                     {/* Flatlist untuk rekomendasi */}
                     <ProductList category="mediaTanam" />
-                    <Header name="Rumah Hijau" icon="home-assistant" color={COLORS.orange} />
+                    <Header onPress={() => setIsDialogVisible(true)} name="Rumah Hijau" icon="home-assistant" color={COLORS.orange} />
                     <Text style={styles.textLebihHemat}>Ide Hidroponik yang menginspirasi anda!</Text>
-                    <View style={styles.wideCards}>
                         {/* FlatList Inspirasi */}
                     <ProductList category="greenHouse" />
-                    </View>
                     {/* Flatlist untuk terdekat */}
-                    <Header name="Bibit Hidroponik" icon="seed" color={COLORS.primaryOpacity} />
+                    <Header onPress={() => setIsDialogVisible(true)} name="Bibit Hidroponik" icon="seed" color={COLORS.primaryOpacity} />
                     <Text style={styles.textLebihHemat}>Malas menunggu? Ini Solusinya!</Text>
                     <ProductList category="bibit" />
                     {/* Other Products */}
-                    <Header name="Produk Lainnya" icon="package-variant" color={COLORS.redOpacity}/>
+                    <Header onPress={() => setIsDialogVisible(true)} name="Produk Lainnya" icon="package-variant" color={COLORS.redOpacity}/>
                     <Text style={styles.textLebihHemat}>Produk lain nya</Text>
                     <View style={styles.otherProducts}>
                         <FlatList
@@ -136,6 +143,12 @@ const HomeContainer = () => {
                 </View>
                 <View style={{ height: 60, width: width }}></View>
             </View>
+            <KpnNotFound
+                visible={isDialogVisible}
+                common="Oops! Maaf Fitur Belum Tersedia :("
+                title="Keeponic v0.0.1"
+                onBackDropPressed={() => setIsDialogVisible(false)}
+            />
         </View>
     );
 };

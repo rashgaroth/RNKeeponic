@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { View, ScrollView, Image, StatusBar, Text, StyleSheet, Dimensions } from "react-native";
+import { View, ScrollView, Image, StatusBar, Text, StyleSheet, Dimensions, Alert } from "react-native";
 import {
     
 } from "react-native-paper"
@@ -34,22 +34,49 @@ export default function WelcomePage({}){
             const userInfo = await GoogleSignin.signIn();
             console.log(userInfo)
             if (userInfo.user) {
-                dispatch(loginAction.loginGoogleAuth(userInfo.idToken))
+                await dispatch(loginAction.loginGoogleAuth(userInfo.idToken))
             }
         } catch (error) {
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
                 // user cancelled the login flow
-                console.log("Canceled login")
+                Alert.alert(
+                    "Keeponic",
+                    "Login Dibatalkan",
+                    [
+                        { text: "OK", onPress: () => {} }
+                    ]
+                );
             } else if (error.code === statusCodes.IN_PROGRESS) {
                 // operation (f.e. sign in) is in progress already
                 console.log("In Progress")
             } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
                 // play services not available or outdated
                 console.log("Outdated")
+                Alert.alert(
+                    "Terjadi Kesalahan",
+                    "Layanan Google Play Sudah Berakhir",
+                    [
+                        { text: "OK", onPress: () => { } }
+                    ]
+                );
             } else {
                 // some other error happened
+                Alert.alert(
+                    "Keeponic",
+                    `Tidak Dapat Melakukan Login ${error.code}`,
+                    [
+                        { text: "OK", onPress: () => { } }
+                    ]
+                );
                 console.log(error)
             }
+            Alert.alert(
+                "Keeponic",
+                `Login Error ${error.code}`,
+                [
+                    { text: "OK", onPress: () => {  } }
+                ]
+            );
         }
     }
 

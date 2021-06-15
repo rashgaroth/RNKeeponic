@@ -56,14 +56,14 @@ export default function* getProductDetail(state) {
                 yield put(detailProductAction.setMarketOnReducer(market));
                 yield put(detailProductAction.setCategory(category));
                 yield put(detailProductAction.setMarketAddress(marketAddress));
+                if (productFavorite.status === 200) {
+                    const isFavorite: Array = productFavorite.data.data;
+                    yield put(detailProductAction.getProductLoves(isFavorite))
+                }
             }else{
                 setTimeout(() => {
                     Alert.alert('Tidak Ada Internet', "Server Tidak Dapat Mengambil Data");
                 }, 200);
-            }
-            if (productFavorite.status === 200) {
-                const isFavorite: Array = productFavorite.data.data;
-                yield put(detailProductAction.getProductLoves(isFavorite))
             }
         } catch (error) {
             console.log(error)

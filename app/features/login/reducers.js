@@ -86,6 +86,15 @@ export const loginReducer = createReducer(initialState, {
       loading: false
     };
   },
+  [types.SET_USER_SELLER_LOGIN](state) {
+    return {
+      ...state,
+      user: {
+        ...state.user,
+        is_admin: 1
+      },
+    };
+  },
   [types.LOG_OUT](state) {
     return {
       ...state,

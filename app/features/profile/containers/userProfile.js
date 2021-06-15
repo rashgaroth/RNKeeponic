@@ -16,7 +16,6 @@ import Spinner from "react-native-loading-spinner-overlay"
 // import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
-import ImagePicker from 'react-native-image-crop-picker';
 import {
     GoogleSignin
 } from "@react-native-google-signin/google-signin";
@@ -32,7 +31,7 @@ import * as homeActions from "../../home/actions";
 import { removeAllItems } from "../../../services/asyncStorage";
 import { navigate } from '../../../navigation/NavigationService';
 
-export default function Profile({ onAddress }) {
+export default function Profile({ onAddress, onQuis }) {
     const [notificationSwitch, setNotificationSwitch] = useState(false);
     const [field, setField] = useState('');
     const [fieldValue, setFieldValue] = useState('');
@@ -112,7 +111,7 @@ export default function Profile({ onAddress }) {
         if(isSeller === 0){
             const supported = await Linking.canOpenURL(url);
             if (supported) {
-                await Linking.openURL(url);
+                onQuis(url)
             } else {
                 Alert.alert(`Tidak Bisa Membuka Website: ${url}`);
             }
@@ -190,7 +189,7 @@ export default function Profile({ onAddress }) {
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
                             <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar</Button>
-                            {/* <Button mode="contained" onPress={onAddress} style={stylesLocal.button} color={COLORS.primaryColor}>Tambah Alamat</Button> */}
+                            <Button mode="contained" onPress={onAddress} style={stylesLocal.button} color={COLORS.primaryColor}>Edit Alamat</Button>
                             <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller === 0 ? COLORS.blue : COLORS.sans}>{ isSeller === 0 ? "Login Seller" : "Daftar Toko"}</Button>
                             </View>
                             {/* View Setting ON/OFF */}
@@ -207,7 +206,7 @@ export default function Profile({ onAddress }) {
                             {/* skip */}
                             {/* View Tetang */}
                             <View>
-                                <View>
+                                <TouchableOpacity>
                                     <View style={stylesLocal.detailUsers}>
                                         <View style={stylesLocal.switch}>
                                             <Text style={stylesLocal.textInfo}>Tentang Keeponic</Text>
@@ -215,9 +214,9 @@ export default function Profile({ onAddress }) {
                                         </View>
                                     </View>
                                     <View style={stylesLocal.line}></View>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View>
+                                <TouchableOpacity onPress={() => onQuis("https://development.d3rwng03cwc4kn.amplifyapp.com/edu")}>
                                     <View style={{ marginLeft: 10 }}>
                                         <View style={stylesLocal.switch}>
                                             <Text style={stylesLocal.textInfo}>Bantuan</Text>
@@ -225,7 +224,27 @@ export default function Profile({ onAddress }) {
                                         </View>
                                     </View>
                                     <View style={stylesLocal.line}></View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity>
+                                    <View style={{ marginLeft: 10 }}>
+                                        <View style={stylesLocal.switch}>
+                                            <Text style={stylesLocal.textInfo}>Versi Aplikasi <Text style={{ fontWeight: 'bold', color: COLORS.primaryColor}}> v0.0.2 </Text></Text>
+                                            <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+                                        </View>
+                                    </View>
+                                    <View style={stylesLocal.line}></View>
+                                </TouchableOpacity>
+
+                            <TouchableOpacity onPress={() => onQuis("https://docs.google.com/forms/d/e/1FAIpQLSeOv3SV3SHazGIYvzwlTXqn0BTL1789bXJ_pMLn7VTcZU5k8Q/viewform?usp=sf_link")}>
+                                <View style={{ marginLeft: 10 }}>
+                                    <View style={stylesLocal.switch}>
+                                        <Text style={[stylesLocal.textInfo, { color: COLORS.red, fontWeight: 'bold'}]}>Isi Kuisioner Disini </Text>
+                                        <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+                                    </View>
                                 </View>
+                                <View style={stylesLocal.line}></View>
+                            </TouchableOpacity>
                             </View>
                         </ScrollView>
                     </Animated.View>
@@ -274,7 +293,7 @@ const stylesLocal = StyleSheet.create({
     },
     detailUsers: {
         marginLeft: 10,
-        marginTop: 20
+        marginTop: 10
     },
     textTitle: {
         fontWeight: "bold"

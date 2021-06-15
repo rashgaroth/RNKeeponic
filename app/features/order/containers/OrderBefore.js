@@ -190,6 +190,7 @@ export default function OrderBefore(navigation) {
             }
         }
         navigate("OrderDetail", detailOrder)
+        // navigate("OrderSuccess", { productName: OrderDetailData[0].name, marketName: OrderDetailData[0].market_name, avatar: OrderDetailData[0].avatar })
     }
 
     const onPressItem = (id) => {

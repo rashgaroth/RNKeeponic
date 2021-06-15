@@ -9,6 +9,7 @@ import { height, width } from "../../../utils/theme";
 import { COLORS } from "../../../utils/colors";
 import { KpnButton } from "../../../components"
 import * as homeActions from "../../home/actions";
+import * as loginActions from "../../login/actions";
 
 export default function SellerRegistrationSuccess(props) {
     const [loading, setLoading] = useState(false)
@@ -43,6 +44,7 @@ export default function SellerRegistrationSuccess(props) {
 
     useEffect(() => {
         dispatch(homeActions.setSeller())
+        dispatch(loginActions.setUserSellerLogin())
 
         setTimeout(() => {
             console.log(selector.isSeller)

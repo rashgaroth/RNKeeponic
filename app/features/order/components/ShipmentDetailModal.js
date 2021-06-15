@@ -18,6 +18,7 @@ import { COLORS } from '../../../utils/colors';
 import { IHome } from "../../interfaces";
 import { height, width } from '../../../utils/theme';
 import { IOrderState } from "../../interfaces";
+import PaymentInfo from './PaymentInfo';
 
 const Loading = props => <LottieView {...props} source={require("../../../assets/anim/loading_apps.json")} autoPlay loop style={styles.anim} />
 
@@ -76,6 +77,17 @@ const ModalView = ({
             }}
         >
             <View>
+                <View style={styles.row}>
+                    <IconButton
+                        icon="credit-card"
+                        size={20}
+                        color={COLORS.primaryColor}
+                    />
+                    <Text style={[styles.textBold, { fontSize: 20 }]}>Detail Pembayaran</Text>
+                </View>
+                <View style={styles.rating}>
+                    <PaymentInfo invoiceId={invoice} key="1" />
+                </View>
                 <View style={styles.row}>
                     <IconButton
                         icon="package"

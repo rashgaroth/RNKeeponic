@@ -154,6 +154,8 @@ const BottomSheetProduct = ({ onFinishLoading }) => {
         }
 
         getAddress()
+
+        return () => dispatch(registerActions.setClearAddress())
     }, [null])
 
     return (

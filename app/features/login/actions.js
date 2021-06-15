@@ -99,3 +99,9 @@ export function setPhoneUpdated(data){
     data
   }
 }
+
+export function setUserSellerLogin() {
+  return {
+    type: types.SET_USER_SELLER_LOGIN
+  }
+}

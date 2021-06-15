@@ -78,7 +78,7 @@ const KpnCardProducts = ({ style, rating, title, price, image, userId, productId
                     <Rating key={i} height={13} width={13} />
                 ) : (
                     // TODO: Ini untuk membuat rating kosong
-                    <NoRating height={13} width ={13} />
+                    <NoRating key={i} height={13} width ={13} />
                 )
                 ) }
                 {/* <TouchableOpacity>

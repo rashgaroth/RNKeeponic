@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '300',
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
+    paddingHorizontal: 10, 
     paddingVertical: 10,
   },
   searchView: {

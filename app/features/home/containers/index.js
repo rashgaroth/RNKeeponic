@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import SplashScreen from 'react-native-splash-screen';
-import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 
 import { useDispatch, useSelector } from 'react-redux';
 import * as homeAction from '../actions';
@@ -21,9 +20,8 @@ import { COLORS } from "../../../utils/colors";
 import AvoidKeyboard from "../../../components/KpnKeyboardAvoidView";
 import { IHome } from "../../interfaces";
 import HomeContainer from '../components/HomeContainer';
-import { KpnLoading } from "../../../components";
-import BottomSheetComponent from '../components/BottomSheet';
 import SearchContainer from '../components/SearchBarContainer';
+import { KpnNotFound } from '../../../components';
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
@@ -31,7 +29,8 @@ export default function Home({ navigation }) {
   const loginSelector = useSelector(state => state.loginReducer)
 
   const [isFocus, setIsFocus] = useState(false);
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState('');
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   let scrollY = useRef(new Animated.Value(0)).current;
   const textInputRef = useRef(null);
@@ -52,8 +51,8 @@ export default function Home({ navigation }) {
       await dispatch(orderActions.getOrderedList(3, 4))
       await dispatch(homeAction.requestHome("", loginSelector.user.user_id, 0, false))
       await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
-      console.log(isMounted, "mounted")
     }
+    
     fetchHomeData();
     return () => {
       isMounted = false;
@@ -67,7 +66,7 @@ export default function Home({ navigation }) {
 
   const onPressBell = () => {
     if(!isFocus){
-      console.log("pressed")
+      setIsDialogVisible(true)
     }else{
       setQuery('')
     }
@@ -146,6 +145,12 @@ export default function Home({ navigation }) {
         )
       }
     </Animated.ScrollView>
+      <KpnNotFound 
+      visible={isDialogVisible} 
+      common="Oops! Maaf Fitur Belum Tersedia :(" 
+      title="Keeponic v0.0.1" 
+      onBackDropPressed={() => setIsDialogVisible(false)}
+      />
     </View>
     </>
   );

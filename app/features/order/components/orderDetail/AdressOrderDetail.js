@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { View, StyleSheet, TextInput, ScrollView, BackHandler, Alert } from 'react-native';
 import { Avatar, Button, Card, Title, Paragraph, Text, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { WebView } from 'react-native-webview';
@@ -15,12 +15,13 @@ import { convertToIdr, truncate } from '../../../../utils/stringUtils';
 import * as apiServices from "../../../../services/index"
 import API from '../../../../api/ApiConstants';
 import { HeaderAuth } from "../../../../services/header";
-import { KpnLoading, KpnNotFound } from "../../../../components"
+import { KpnLoading, KpnNotFound } from "../../../../components";
 import BottomSheetComponent from '../../../home/components/BottomSheet';
 
 import AddressModal from './AddressModal';
 import ShipmentModal from './ShipmentModal';
 import { navigate } from '../../../../navigation/NavigationService';
+import { KpnDialog } from '../../../../components';
 
 const LeftContent = props => <Avatar.Icon {...props} icon="map-marker-radius" color={COLORS.sans} style={{ backgroundColor: COLORS.white }} />
 const LeftContentShipment = props => <Avatar.Icon {...props} icon="truck-outline" color={COLORS.sans} style={{ backgroundColor: COLORS.white }} />
@@ -129,6 +130,7 @@ export default function AddressOrderDetail(props){
     const [ownerAddress, setOwnerAddress] = useState();
     const [courierCost, setCourierCost] = useState('');
     const [etd, setEtd] = useState('');
+    const [dialogVisible, setDialogVisible] = useState(false);
 
     const dispatch = useDispatch();
     const bottomSheetRef = useRef(null);
@@ -206,6 +208,9 @@ export default function AddressOrderDetail(props){
         setSubdist(subdistName)
         setPhone(phone)
         setPostalCode(postalCode)
+        if(phone !== ""){
+            setIsPhoneNull(false)
+        }
     }
 
     useEffect(() => {
@@ -249,10 +254,8 @@ export default function AddressOrderDetail(props){
     }, [null])
 
     useEffect(() => {
-
         const fetchOngkir = async () => {
             const token = loginState.user.token
-            const productId = dataObjects.productId
             console.log(ownerAddress, "ALAMAT")
             try {
                 const body = {
@@ -291,7 +294,9 @@ export default function AddressOrderDetail(props){
             }
         }
 
-        fetchOngkir()
+        if(weight && ownerAddress){
+            fetchOngkir()
+        }
 
     }, [weight, ownerAddress])
 
@@ -326,14 +331,13 @@ export default function AddressOrderDetail(props){
             setName('-')
             setIsPhoneNull(true)
         }
+
     }, [orderState.shipmentDetail.userName, orderState.shipmentDetail.phoneNumber])
 
     const onIncrease = (e) => {
         if(quantity >= 1){
             setButtonVisible(false)
         }
-        console.log(actualPrice, "PAY")
-        console.log(orderState.shipmentDetail)
         setQuantity(quantity + 1)
     }
 
@@ -348,8 +352,8 @@ export default function AddressOrderDetail(props){
         console.log(e.url, e, "event")
         const navFinish = "finish";
         if (e.title === navFinish ){
-            await dispatch(orderActions.updateProduct(productId))
             navigate("OrderSuccess")
+            await dispatch(orderActions.updateProduct(productId))
         }
     }
 
@@ -378,15 +382,15 @@ export default function AddressOrderDetail(props){
                     },
                     {
                         id: 3,
-                        price: 0.1 * actualPrice,
+                        price: Math.ceil((actualPrice * quantity) * (10 / 100)),
                         quantity: 1,
                         name: "Pajak (PPN) 10%"
                     },
                     {
-                        id: 3,
-                        price: 0.02 * actualPrice,
+                        id: 4,
+                        price: 2000,
                         quantity: 1,
-                        name: "Biaya Admin (2%)"
+                        name: "Biaya Admin"
                     }
                 ]
             }
@@ -411,7 +415,15 @@ export default function AddressOrderDetail(props){
                     if (data.data.payment_url) {
                         setPaymentUrl(data.data.payment_url)
                         dispatch(orderActions.setData(data.data.payment_url, "paymentUrl"))
-                        setIsOrderSuccess(true)
+                        // setIsOrderSuccess(true)
+                        navigate("OrderDetailWebview", 
+                        { 
+                            url: data.data.payment_url,
+                            productId, 
+                            invoiceId: data.data.invoice_id, 
+                            productName: productName, 
+                            marketName: marketName, avatar: dataObjects.productAvatar
+                        })
                     } else {
                         setIsStockEmpty(true)
                     }
@@ -482,6 +494,30 @@ export default function AddressOrderDetail(props){
     //         }
     //     }
     // }
+
+    const onPositive = () => {
+        navigate("Home")
+        setDialogVisible(false)
+    }
+
+    const onNegative = () => {
+        setDialogVisible(false)
+    }
+
+    useEffect(() => {
+        console.log("hit use Effect!")
+        const backAction = () => {
+            setDialogVisible(true)
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, [null])
 
     return (
         !isOrderSuccess ? 
@@ -561,13 +597,13 @@ export default function AddressOrderDetail(props){
                     <Paragraph style={{ fontSize: 14 }}>Pajak PPN (10%) : 
                     <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {"10%"} = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(0.1 * (actualPrice * quantity)) : '----' : "-----"}
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(Math.ceil(0.1 * (actualPrice * quantity))) : '----' : "-----"}
                     </Text></Text></Paragraph>
 
-                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin (2%) : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {"2%"} = {' '} 
+                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin : 
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} + {"2000"} = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(0.02 * (actualPrice * quantity)) : '----' :"-----" }
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr(2000) : '----' :"-----" }
                     </Text></Text></Paragraph>
 
                     <Paragraph style={{ fontSize: 14 }}>Ongkos Kirim : 
@@ -579,12 +615,12 @@ export default function AddressOrderDetail(props){
                     <Paragraph style={{ fontSize: 14, fontWeight: 'bold', color: COLORS.red }}>Total Harga {"\n"}
                     <Text style={{ fontSize: 14, fontWeight: "bold" }}> 
                     {!isLoading ? dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' : "-----"} {"\n"} 
-                    {!isLoading ? convertToIdr(0.05 * (actualPrice * quantity)) : "-----"} {"\n"} 
-                    {!isLoading ? convertToIdr(0.1 * (actualPrice * quantity)) : "-----"} {' '} {"\n"}
+                    {!isLoading ? convertToIdr(Math.ceil(0.1 * (actualPrice * quantity))) : "-----"} {' '} {"\n"}
+                    {!isLoading ? convertToIdr(2000) : "-----"} {"\n"} 
                     {!isLoading ? convertToIdr(courierCost) : "-----"} {' '} {"\n"}
-                    {"---------------------"}{"\n"}
+                    {/* {"---------------------"}{"\n"} */}
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
-                    {' ' + !isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * (actualPrice * quantity)) + (0.05 * (actualPrice * quantity)) + courierCost) : '----' :"-----" }
+                    {' ' + !isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + Math.ceil((0.1 * (actualPrice * quantity))) + Math.ceil(2000) + courierCost) : '----' :"-----" }
                     </Text></Text></Paragraph>
 
                 </Card.Content>
@@ -596,7 +632,7 @@ export default function AddressOrderDetail(props){
             <View style={styles.rowButton}>
                 <Title
                 style={{ marginTop: 10, fontWeight: "bold", color: COLORS.orange }}
-                >{!isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + (0.1 * (actualPrice * quantity)) + (0.05 * (actualPrice * quantity)) + courierCost ) : '----' : "-----"}</Title>
+                >{!isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + Math.ceil((0.1 * (actualPrice * quantity))) + Math.ceil(2000) + courierCost) : '----' : "-----"}</Title>
                 <Button
                     color={COLORS.primaryColor}
                     mode="contained"
@@ -608,6 +644,17 @@ export default function AddressOrderDetail(props){
         </ScrollView>
         <KpnLoading visible={isLoading} key={1} />
         <KpnNotFound title={errorTitle} common={errorCommon} visible={isStockEmpty} onBackDropPressed={() => setIsStockEmpty(false)} />
+        <KpnDialog
+                key={`@a$`}
+                negativeButtonText={"Tidak"}
+                positiveButtonText={"Ya"}
+                title="Pembatalan Chekout"
+                onBackDropPressed={() => setDialogVisible(false)}
+                visible={dialogVisible}
+                text={"Batalkan Pembelian ?"}
+                onPositive={() => onPositive()}
+                onNegative={() => onNegative()}
+            />
         <BottomSheet
             ref={bottomSheetRef}
             index={0}
@@ -622,7 +669,7 @@ export default function AddressOrderDetail(props){
             onFinishLoading={(subdistName, cityName, phone, postalCode) => onFinishLoading(subdistName, cityName, phone, postalCode)}
             />
           </BottomSheetScrollView>
-    </BottomSheet>
+        </BottomSheet>
         </>
         :
         <View style={{ height: height - 30, width: width }}>

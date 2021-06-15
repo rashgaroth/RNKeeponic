@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Alert,
   Animated,
+  Share
 } from 'react-native';
 import { IconButton, Text, Button } from 'react-native-paper';
 import Spinner from "react-native-loading-spinner-overlay";
@@ -36,6 +37,8 @@ import MarketComponent from '../components/MarketComponent';
 import ShipmentInfo from '../components/ShipmentInfo';
 import ProductDescription from '../components/ProductDescription';
 import ProductListComponent from '../components/ProductListComponent';
+import SearchContainer from '../../home/components/SearchBarContainer';
+import LogoRounded from '../../../assets/images/svg/LogoRounded';
 
 const imageW = widthScreen;
 const imageH = imageW * 1;
@@ -52,7 +55,8 @@ export default function Home(props) {
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [isStoredWishlist, setIsStoredWishlist] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const [change, setChange] = useState(false);
+  const [query, setQuery] = useState('');
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   const dispatch = useDispatch();
   const textInputRef = useRef(null);
@@ -68,36 +72,9 @@ export default function Home(props) {
   const loading = detailProductSelector.loading;
   const tokenUser = loginSelector.user.token;
   const isFavorite = detailProductSelector.isFavorite;
-  // const { 
-  //   id,
-  //   name,
-  //   t_category_id,
-  //   description,
-  //   price,
-  //   avatar,
-  //   second_avatar,
-  //   third_avatar,
-  //   fourth_avatar,
-  //   stock,
-  //   weight,
-  //   status,
-  //   rating,
-  //   is_sold,
-  //   created_date,
-  //   updated_date,
-  //   m_product_model
-  // } = props.route.params;
 
   const onTextInputFocus = () => {
     setIsFocus(true)
-  }
-
-  const onTextInputBlur = () => {
-    setIsFocus(false)
-  }
-
-  const onPressCart = () => {
-    Keyboard.dismiss();
   }
 
   const onAddProductToWishlist = async (e) => {
@@ -132,7 +109,7 @@ export default function Home(props) {
   }
 
   const onPressBell = () => {
-    Keyboard.dismiss();
+    setIsDialogVisible(true)
   }
 
   const onPressLove = async () => {
@@ -165,11 +142,11 @@ export default function Home(props) {
     }
   }
 
-  const onBackPressed = async () => {
-    if(isFocus){
-      setIsFocus(false);
-      Keyboard.dismiss();
-    }else{
+  const onBackPressed = () => {
+    setIsFocus(false);
+    setQuery('');
+    Keyboard.dismiss();
+    if(!isFocus){
       goBack();
     }
   }
@@ -257,7 +234,34 @@ export default function Home(props) {
         animated: true,
       });
     }
-  }, [onNewProduct])
+  }, [mProducts])
+
+  useEffect(() => {
+    return async () => {
+      console.log("cleanup detail product")
+      await dispatch(detailProductAction.clearProduct())
+    }
+  }, [null])
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message:
+          `Produk ${detailProductSelector.mProducts.name}, Selengkapnya download Keeponic di: https://drive.google.com/drive/folders/1cSyxWhVx6aqUeO96qGuYv-hekSflvyUV?usp=sharing`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   const diffClampSearchContainer = Animated.diffClamp(scrollY, 0, 60);
   const diffClampButtonGroup = Animated.diffClamp(scrollY, 0, 60);
@@ -280,23 +284,29 @@ export default function Home(props) {
         textStyle={{ color: COLORS.white }}
       />
       {/* SearchBar */}
-      <Animated.View style={[styles.containerInput, { transform: [ { translateY: translateSearchContainer } ] }]}>
-        <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={onBackPressed} />
+      {/* <Animated.View style={[styles.containerInput, { transform: [ { translateY: translateSearchContainer } ] }]}>
+        <IconButton icon="keyboard-backspace" color={COLORS.white} onPress={() => onBackPressed()} />
         <AvoidKeyboard>
           <TextInput
             ref={textInputRef}
             placeholder="Paket Hidroponik Pemula"
             clearButtonMode="always"
-            value={word}
-            onChangeText={(value) => setWord(value)}
+            value={query}
+            onChangeText={(value) => setQuery(value)}
             style={styles.input}
             onFocus={() => onTextInputFocus()}
-            onBlur={() => onTextInputBlur()}
+            // onBlur={() => onTextInputBlur()}
             disableFullscreenUI={true}
             clearTextOnFocus
           />
         </AvoidKeyboard>
-        <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell} />
+        <IconButton icon="bell-outline" color={COLORS.white} onPress={() => onPressBell()} />
+      </Animated.View> */}
+      <Animated.View style={[styles.containerInput, { transform: [{ translateY: translateSearchContainer }] }]}>
+        {/* <IconButton icon="keyboard-backspace" style={styles.buttonDown} color={COLORS.white} size={25} onPress={() => goBack()} /> */}
+        {/* LOGO */}
+        <Text style={[styles.heading, { fontSize: 20, color: COLORS.white, fontWeight: "bold" }]}>Detail Produk</Text>
+        <LogoRounded style={styles.logo} width={30} height={40} />
       </Animated.View>
     <Animated.ScrollView style={styles.container}
       // scrollEnabled={!loading}
@@ -308,13 +318,14 @@ export default function Home(props) {
       <StatusBar backgroundColor={COLORS.primaryOpacity} />
       {/* Focused */}
       {
-        isFocus ? 
-        <SearchView />
+        isFocus ? (
+        <SearchContainer q={query} onClickChips={(name) => setQuery(name)} />
+        )
         : 
-        <SafeAreaView>
+        (<SafeAreaView>
             <View>
                 {/* ImageCarousel */}
-                <ProductAvatar isLove={isLove}  onPressLove={ () => onPressLove() } />
+                <ProductAvatar isLove={isLove} onPressCart={() => onShare()} onPressLove={ () => onPressLove() } />
                 <ProductName />
                 <View style={styles.lineProducts} />
                 <CommonProduct />
@@ -330,7 +341,7 @@ export default function Home(props) {
                 <ProductListComponent onPress={() => onNewProduct()} />
                 <View style={styles.lineProducts} />
             </View>
-          </SafeAreaView>
+          </SafeAreaView>)
       }
       <View style={{ height: 95, backgroundColor: COLORS.white }} />
       </Animated.ScrollView>
@@ -374,6 +385,12 @@ export default function Home(props) {
       <KpnNotFound
       visible={notFound}
       onBackDropPressed={() => setNotFound(false)}
+      />
+      <KpnNotFound
+        visible={isDialogVisible}
+        title={"Keeponic v0.0.1"}
+        common={"Oops! Maaf Fitur Belum Tersedia :("}
+        onBackDropPressed={() => setIsDialogVisible(false)}
       />
       </>
   );

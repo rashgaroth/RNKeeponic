@@ -75,7 +75,8 @@ const styles = StyleSheet.create({
     textLihatSemua: {
         fontSize: 13,
         color: COLORS.primaryColor,
-        right: 10
+        right: 10,
+        top: 10
     },
     textPaketHidroponik: {
         fontWeight: "bold",
@@ -90,7 +91,8 @@ const styles = StyleSheet.create({
     },
     cardProducts: {
         left: 10,
-        marginTop: 20
+        marginTop: 20,
+        // alignSelf: 'center'
     },
     cardLifestyle: {
         flexWrap: 'nowrap',

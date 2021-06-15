@@ -136,6 +136,11 @@ const SearchList = ({ q, onClickChips }) => {
             }
         }
         getCommonProduct();
+
+        return () => {
+            setProductData([])
+        }
+
     }, [q])
 
     const getRandomColor = () => {
@@ -199,7 +204,7 @@ const SearchList = ({ q, onClickChips }) => {
             <View>
                 {
                     (!isLoading) ? (
-                        productData.length > 1 ? 
+                        productData.length > 0 ? 
                         (
                         <FlatList
                             key={'#'}
