@@ -526,7 +526,7 @@ export default function AddressOrderDetail(props){
             <Card>
                 <Card.Title 
                 title="Alamat Pengiriman" 
-                subtitle={<Text {...props} style={{ color: COLORS.fontColor }}>{subdist + ' - ' + city + ' - ' + postalCode}</Text> }
+                            subtitle={subdist ? <Text {...props} style={{ color: COLORS.fontColor }}>{subdist + ' - ' + city + ' - ' + postalCode}</Text> : <Text  {...props} style={{ color: COLORS.fontColor }}>Tidak ada Alamat</Text>}
                 left={LeftContent} 
                 right={ (props) => <RightContent {...props} onClick={() => onChangeAddress()} /> } 
                 />
@@ -588,26 +588,26 @@ export default function AddressOrderDetail(props){
                     left={LeftContentCheckout}
                 />
                 <Card.Content>
-                    <Paragraph style={{ fontSize: 14 }}>Harga Produk : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {String(quantity)} = {' '} 
+                    <Paragraph style={{ fontSize: 14 }}>Harga Produk
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
                     {' ' + !isLoading ? dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' : "-----" }
                     </Text></Text></Paragraph>
 
-                    <Paragraph style={{ fontSize: 14 }}>Pajak PPN (10%) : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} x {"10%"} = {' '} 
+                    <Paragraph style={{ fontSize: 14 }}>Pajak PPN (10%)
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
                     {' ' + !isLoading ? dataObjects.price ? convertToIdr(Math.ceil(0.1 * (actualPrice * quantity))) : '----' : "-----"}
                     </Text></Text></Paragraph>
 
-                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> {!isLoading ? dataObjects.price ? convertToIdr((actualPrice * quantity)) : '----' : "-----"} + {"2000"} = {' '} 
+                    <Paragraph style={{ fontSize: 14 }}>Biaya Admin
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> = {' '} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
                     {' ' + !isLoading ? dataObjects.price ? convertToIdr(2000) : '----' :"-----" }
                     </Text></Text></Paragraph>
 
-                    <Paragraph style={{ fontSize: 14 }}>Ongkos Kirim : 
-                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> JNE {!isLoading ? "(" + etd + " " + "Hari" + ")" : "-----"} = {" "} 
+                    <Paragraph style={{ fontSize: 14 }}>Ongkos Kirim
+                    <Text style={{ fontSize: 14, fontWeight: "bold" }}> JNE = {" "} 
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
                     {!isLoading ? convertToIdr(courierCost) : "-----"}
                     </Text></Text></Paragraph>

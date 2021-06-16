@@ -26,8 +26,10 @@ function TabStack({ navigation }) {
     const dispatch = useDispatch();
     useEffect((e) => {
       const unsubscribe = navigation.addListener('focus', async () => {
-        console.log("on unsubscribe-------")
+        console.log("--- on subscribe")
         await dispatch(orderActions.getWishlist())
+        await dispatch(orderActions.getOrderedList())
+        await dispatch(orderActions.getOrderedList(3, 4))
       });
       return unsubscribe
     }, [null])

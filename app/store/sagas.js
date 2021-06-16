@@ -12,11 +12,12 @@ import { submitRegistrationSagas } from 'app/features/register/sagas';
 import { submitVerificationSagas } from 'app/features/register/sagas';
 import { submitAddress } from 'app/features/register/sagas';
 import wishlistSagas from '../features/order/sagas/wishlistSagas';
+import categoryProducts from '../features/home/sagas/baseSagas';
 
 // export default [loginSaga];
 
 export default function* rootSaga() {
-  // yield all([...loginSagas]);
+  yield all([...loginSagas]);
   yield all([...homeSagas]);
   yield all([...getDetailProduct]);
   yield all([...profileSagas]);
@@ -25,5 +26,5 @@ export default function* rootSaga() {
   yield all([...submitVerificationSagas]);
   yield all([...submitAddress]);
   yield all([...loginGoogleSagas]);
-  yield all([wishlistSagas()]);
+  yield all([wishlistSagas(), categoryProducts()]);
 }

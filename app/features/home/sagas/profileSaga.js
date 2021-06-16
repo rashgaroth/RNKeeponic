@@ -33,6 +33,7 @@ export default function* homeGetProfile(state) {
                 )
 
                 if (_response.data.error < 1) {
+                    yield put(homeAction.hideLoading())
                     const address = _response.data.userAddress;
                     console.log(address[0] + ":", "address")
                     const userAddress = {

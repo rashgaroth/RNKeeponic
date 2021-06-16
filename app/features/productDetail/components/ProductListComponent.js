@@ -80,7 +80,7 @@ const ProductListComponent = ({ onPress }) => {
                     <View style={{ marginHorizontal: 10, marginTop: 10 }}>
                         <FlatList
                             horizontal
-                            data={homeSelector.products}
+                            data={homeSelector.category.mediaTanam}
                             renderItem={({ item }) => (
                                 <KpnCardProducts
                                     key={item.id}

@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         left: 10
     },
     cardProducts: {
-        left: 10,
+        // left: 10,
         marginTop: 20,
         // alignSelf: 'center'
     },

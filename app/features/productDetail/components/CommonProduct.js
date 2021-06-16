@@ -55,7 +55,7 @@ const CommonProduct = () => {
                         />
                     </View> :
                     <View style={styles.productDescription}>
-                        <Text>{mProducts.name}</Text>
+                        <Text style={{ fontWeight: "bold", fontSize: 17 }}>{mProducts.name}</Text>
                         <Text style={{ marginTop: 10 }}>
                             <Text>
                                 {"Terjual" + " "}

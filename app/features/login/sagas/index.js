@@ -9,5 +9,5 @@ import * as types from '../types';
 import loginSaga from './loginSaga';
 import loginGoogle from './loginGoogle'
 
-// export const loginSagas = [takeEvery(types.LOGIN_REQUEST, loginSaga)];
+export const loginSagas = [takeEvery(types.LOGIN_REQUEST, loginSaga)];
 export const loginGoogleSagas = [takeEvery(types.LOGIN_GOOGLE_AUTH, loginGoogle)];

@@ -40,7 +40,7 @@ const ShipmentModal = ({
                 animationInTiming={300}
                 animationOut="bounceOut"
                 animationOutTiming={300}
-                style={{ height: 300 }}
+                // style={{ height: 300 }}
             >
                 <View style={styles.container}>
                     <ModalView

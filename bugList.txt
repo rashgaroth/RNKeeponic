@@ -1,0 +1,6 @@
+- pemilihan kecamatan masih ada kuta
+- home page lemot
+- tambah fitur lihat Semua
+- loading home page bug 
+- lihat produk detail dari order sukses gakbisa
+- jenis transaksi ganti jadi jenis pembayaran

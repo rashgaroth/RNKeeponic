@@ -275,4 +275,14 @@ export interface IHome {
     greenHouse: IProducts[],
     bibit: IProducts[],
     allProducts: IProducts[],
+    category: {
+        page: number,
+        size: number,
+        loadingCategory: Boolean,
+        hot: IProducts[],
+        mediaTanam: IProducts[],
+        bibit: IProducts[],
+        greenHouse: IProducts[],
+        allCategoryProducts: IProducts[],
+    }
 }

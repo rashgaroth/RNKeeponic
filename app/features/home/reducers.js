@@ -68,7 +68,17 @@ const initialState = {
     mediaTanam: null,
     greenHouse: null,
     bibit: null,
-    allProducts: null
+    allProducts: null,
+    category: {
+        loadingCategory: false,
+        page: 0,
+        size: 10,
+        hot: [],
+        mediaTanam: [],
+        bibit: [],
+        greenHouse: [],
+        allCategoryProducts: [],
+    }
 };
 
 export const homeReducer = createReducer(initialState, {
@@ -78,6 +88,117 @@ export const homeReducer = createReducer(initialState, {
             isLoading: true
         }
     },
+    // category success
+    [types.SET_PAGINATION](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                [action.field] : action.data
+            }
+        }
+    },
+    [types.CLEAN_UP_CATEGORY](state) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                hot: [],
+                mediaTanam: [],
+                bibit: [],
+                greenHouse: [],
+                allCategoryProducts: [],
+            }
+        }
+    },
+    [types.ON_SUCCESS_GET_HOT_CATEGORY](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                hot: action.data
+            }
+        }
+    },
+    [types.ON_SUCCESS_GET_MEDIA_TANAM](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                mediaTanam: action.data
+            }
+        }
+    },
+    [types.ON_SUCCESS_GET_BIBIT](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                bibit: action.data
+            }
+        }
+    },
+    [types.ON_SUCCESS_GET_GREEN_HOUSE](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                greenHouse: action.data
+            }
+        }
+    },
+    [types.ON_SUCCESS_GET_ALL_PRODUCTS](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                allCategoryProducts: [...state.category.allCategoryProducts, action.data]
+            }
+        }
+    },
+    // on success ended
+    [types.CATEGORY_GET_HOT_PRODUCTS](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                hot: [],
+            }
+        }
+    },
+    [types.CATEGORY_GET_MEDIA_TANAM](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                mediaTanam: [],
+            }
+        }
+    },
+    [types.CATEGORY_GET_BIBIT](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                bibit: [],
+            }
+        }
+    },
+    [types.CATEGORY_GET_GREEN_HOUSE](state, action) {
+        return {
+            ...state,
+            category: {
+                ...state.category,
+                greenHouse: [],
+            }
+        }
+    },
+    [types.CATEGORY_GET_ALL_PRODUCTS](state, action) {
+        return {
+            ...state,
+        }
+    },
+    // category
     [types.HOME_REQUEST](state){
         return {
             ...state,

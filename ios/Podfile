@@ -95,6 +95,8 @@ target 'Keeponic' do
 
   pod 'RNSharedElement', :path => '../node_modules/react-native-shared-element'
 
+  pod 'RNCClipboard', :path => '../node_modules/@react-native-clipboard/clipboard'
+
   target 'KeeponicTests' do
     inherit! :complete
     # Pods for testing

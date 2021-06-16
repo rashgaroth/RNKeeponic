@@ -27,12 +27,12 @@ const PaymentInfo = ({ invoiceId }) => {
             value: state.paymentCode ? state.paymentCode : "-----"
         },
         {
-            title: "Jenis Transaksi",
+            title: "Jenis Pembayaran",
             value: state.method ? state.method : "-----"
         },
         {
             title: "Total Pembayaran",
-            value: state.total ? state.total : "-----"
+            value: state.total ? "Rp. " + state.total : "-----"
         },
         {
             title: "Status Pembayaran",
@@ -50,7 +50,7 @@ const PaymentInfo = ({ invoiceId }) => {
                     const { data } = _result.data
                     if (data.hasOwnProperty('va_numbers')){
                         const va_numbers = data.va_numbers[0].va_number;
-                        const method = "Transfer Bank";
+                        const method = "Transfer Bank" + ` (${data.va_numbers[0].bank})`;
                         const paymentId = data.order_id;
                         const grossAmount = data.gross_amount;
                         const status = data.transaction_status;
@@ -67,7 +67,7 @@ const PaymentInfo = ({ invoiceId }) => {
                         console.log("ada va")
                     }else{
                         const payment_code = data.payment_code;
-                        const method = "Retail";
+                        const method = data.store;
                         const paymentId = data.order_id;
                         const grossAmount = data.gross_amount;
                         const status = data.transaction_status;
@@ -112,8 +112,8 @@ const PaymentInfo = ({ invoiceId }) => {
                 ITEMS.map((x, i) => (
                     <View style={styles.row}>
                         <Text style={styles.textCommon}>{x.title}</Text>
-                        <Text style={[styles.textCommon, { color: x.value.includes("pending") ? COLORS.red : COLORS.black, textAlign: 'right' }]}>
-                            {x.value}
+                        <Text style={[styles.textCommon, { color: x.value.includes("pending") ? COLORS.red : x.value.includes("settlement") ? COLORS.primaryColor : COLORS.black, textAlign: 'right' }]}>
+                            {x.value.includes("settlement") ? "Dibayar" : x.value}
                         </Text>
                     </View>
                 ))
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     },
     orderDetail: {
         // height: 200,
-        marginHorizontal: 20,
+        // marginHorizontal: 20,
         borderWidth: 1,
         borderRadius: 10,
         borderColor: COLORS.primaryColor,

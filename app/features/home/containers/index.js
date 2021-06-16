@@ -36,7 +36,13 @@ export default function Home({ navigation }) {
   const textInputRef = useRef(null);
 
   const onRefreshAll = async () => {
-    await dispatch(homeAction.requestHome("", loginSelector.user.user_id, 0, false))
+    // await dispatch(homeAction.requestHome("", loginSelector.user.user_id, 0, false))
+    await dispatch(homeAction.cleanUpCategory())
+    // await dispatch(homeAction.categoryGetAllProducts())
+    await dispatch(homeAction.categoryGetMediaTanam())
+    await dispatch(homeAction.categoryGetHotProduct())
+    await dispatch(homeAction.categoryGetGreenHouse())
+    await dispatch(homeAction.categoryGetBibit())
   }
 
   useEffect(() => {
@@ -44,12 +50,12 @@ export default function Home({ navigation }) {
   }, [null])
 
   useEffect(() => {
+    return () => console.log("Cleaning Home Page")
+  }, [null])
+
+  useEffect(() => {
     let isMounted = true;
     const fetchHomeData = async () => {
-      await dispatch(orderActions.getWishlist())
-      await dispatch(orderActions.getOrderedList())
-      await dispatch(orderActions.getOrderedList(3, 4))
-      await dispatch(homeAction.requestHome("", loginSelector.user.user_id, 0, false))
       await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
     }
     
@@ -127,7 +133,7 @@ export default function Home({ navigation }) {
       refreshControl={
       <RefreshControl 
       onRefresh={onRefreshAll}
-      // refreshing={homeSelector.isLoading}
+      refreshing={homeSelector.isLoading}
       />
       }
       onScroll={(e) => {
