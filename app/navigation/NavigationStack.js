@@ -201,20 +201,20 @@ function App() {
         options={{
           headerShown: false,
           // title: "Pengiriman",
-          // gestureEnabled: true,
+          gestureEnabled: false,
           // headerTitleAlign: "center"
         }}
       />
         <Stack.Screen
           name="OrderDetailWebview"
           component={OrderDetailWebview}
-          options={{
+          options={(props) => ({
             headerShown: true,
-            title: "Pembayaran",
+            title: props.route.params.avatar ? "Pembayaran" : "Halaman Keeponic",
             gestureEnabled: false,
             headerLeft: null
             // headerTitleAlign: "center"
-          }}
+          })}
         />
         <Stack.Screen
           name="ArticleDetail"

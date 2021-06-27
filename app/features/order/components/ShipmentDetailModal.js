@@ -5,6 +5,7 @@ import {
     Card,
     Text,
     IconButton,
+    Button
 } from 'react-native-paper';
 import Modal from 'react-native-modal';
 import LottieView from 'lottie-react-native';
@@ -62,6 +63,10 @@ const ModalView = ({
             value: category || '--------'
         },
     ]
+
+    const onPressCopy = () => {
+
+    }
 
     const scrollRef = useRef();
     return (

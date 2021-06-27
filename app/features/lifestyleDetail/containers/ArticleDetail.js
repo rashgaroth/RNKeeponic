@@ -17,6 +17,7 @@ import {
 import { useSafeArea } from 'react-native-safe-area-context';
 import * as Animatable from 'react-native-animatable';
 import { SharedElement } from 'react-navigation-shared-element';
+import AutoHeightWebView from 'react-native-autoheight-webview';
 
 import { useDispatch } from 'react-redux';
 import * as loginActions from 'app/features/login/actions';
@@ -26,6 +27,7 @@ import PropTypes from 'prop-types';
 import { COLORS } from "../../../utils/colors";
 import LogoRounded from "../../../assets/images/svg/LogoRounded";
 import { loremText1, loremText2 } from '../selectors';
+import { width } from '../../../utils/theme';
 
 const DURATION = 2000;
 
@@ -63,7 +65,7 @@ const _RenderHeader = ({ scroll }) => {
             barStyle={ isTransparent? "light-content" : "dark-content" }
             translucent
             />
-            <Text style={[styles.heading(isTransparent)]}>Judul Artikel</Text>
+            <Text style={[styles.heading(isTransparent)]}>Detail Artikel</Text>
             <LogoRounded style={styles.logo} width={30} height={40} color={isTransparent ? COLORS.sans : COLORS.white} />
         </Animatable.View>
     );
@@ -86,13 +88,13 @@ const _RenderIcon = () => {
                     size={20}
                 /> 
             </View>
-            <Chip 
+            {/* <Chip 
             collapsable 
             style={{ marginTop: 5, height: 30 }} 
             icon="account" 
             onPress={() => console.log('Pressed')}
             >Example Chip
-            </Chip>
+            </Chip> */}
         </Animatable.View>
     )
 }
@@ -110,21 +112,30 @@ const _RenderImage = ({scroll, props}) => {
     )
 }
 
-const _RenderHTML = () => {
+const _RenderHTML = ({ title, content }) => {
     return (
-        <Animatable.View 
+        <View 
         style={{ marginHorizontal: 10 }}
         animation="fadeInUp"
         duration={DURATION + 1000}
         >
-            <Title> Judul Artikel </Title>
-            <Paragraph style={{ textAlign: "justify" }}>
-                {loremText1}
-                {loremText2}
-                {loremText1}
-                {loremText2}
-            </Paragraph>
-        </Animatable.View>
+            <Title>{title}</Title>
+            <AutoHeightWebView
+                style={{
+                    paddingLeft: 0,
+                    flex: 1,
+                    marginBottom: 24,
+                    width: width - 15,
+                }}
+                cacheEnabled={false}
+                cacheMode={"LOAD_NO_CACHE"}
+                onSizeUpdated={size => console.log(size.height)}
+                source={{
+                    html: `<style>img { overflow-wrap: break-word; word-wrap: break-word; max-width: 100%; width:auto; height: auto; }</style>
+                                <body>${content}</body>` }}
+                viewportContent="width=device-width, user-scalable=no"
+            />
+        </View>
     )
 }
 
@@ -132,7 +143,7 @@ export default function ArticleDetail(props) {
     const dispatch = useDispatch();
     const onLogout = () => dispatch(loginActions.logOut());
     const scrollA = useRef(new Animated.Value(0)).current;
-    const { image } = props.route.params;
+    const { image, title, content } = props.route.params;
     console.log(image, "Image")
 
     const _onScroll = (e) => {
@@ -164,7 +175,7 @@ export default function ArticleDetail(props) {
             <_RenderImage scroll={scrollA} props={image} />
             <_RenderIcon />
             <View style={styles.line} />
-            <_RenderHTML />
+            <_RenderHTML title={title} content={content} />
         </Animated.ScrollView>
         </>
     );

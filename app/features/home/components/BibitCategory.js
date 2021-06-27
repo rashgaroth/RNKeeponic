@@ -75,19 +75,19 @@ const BibitCategory = ({ category }) => {
         navigate("ProductDetail", param)
     }
 
-    // useEffect(() => {
-    //     console.log("Hitting use Effect !")
+    useEffect(() => {
+        console.log("Hitting use Effect !")
 
-    //     const getCategory = async () => {
-    //         const param = {
-    //             page: 0,
-    //             size: 10
-    //         }
-    //         await dispatch(homeActions.categoryGetBibit(param))
-    //     }
-    //     getCategory()
+        const getCategory = async () => {
+            const param = {
+                page: 0,
+                size: 10
+            }
+            await dispatch(homeActions.categoryGetBibit(param))
+        }
+        getCategory()
 
-    // }, [null])
+    }, [null])
 
     useFocusEffect(
         React.useCallback(() => {
@@ -95,11 +95,12 @@ const BibitCategory = ({ category }) => {
 
             const fetchFlatListData = async () => {
                 if (isActive) {
-                    const param = {
-                        page: 0,
-                        size: 10
-                    }
-                    await dispatch(homeActions.categoryGetBibit(param))
+                    console.log("AKTIF", isActive)
+                    // const param = {
+                    //     page: 0,
+                    //     size: 10
+                    // }
+                    // await dispatch(homeActions.categoryGetBibit(param))
                 }
             }
 

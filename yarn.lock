@@ -5708,6 +5708,13 @@ react-native-animated-pagination-dots@^0.1.72:
   dependencies:
     react-native-svg "^12.1.0"
 
+react-native-autoheight-webview@^1.5.8:
+  version "1.5.8"
+  resolved "https://registry.yarnpkg.com/react-native-autoheight-webview/-/react-native-autoheight-webview-1.5.8.tgz#afcbe65dfefcce4e2088c9aff9fee23dcd18aadf"
+  integrity sha512-6+LY0a47AsnfnGgqMP2JzNVgX0/sGnkgq7UV39OKgUf2Im/glFjUOggYm8EiyzmA93gb9tYVB1mRTORElWAiGQ==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-background-fetch@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/react-native-background-fetch/-/react-native-background-fetch-4.0.2.tgz#97842722b67c584fd860f30eb1fc70e481b207c0"

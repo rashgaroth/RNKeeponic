@@ -21,8 +21,6 @@ function* getHotProducts(state) {
     const token = loginState.user.token
     const userId = loginState.user.user_id
     try {
-        const page = state.data.page;
-        const size = state.data.size;
         const _fetchData = yield call(apiService.GET, API.BASE_URL + API.ENDPOINT.GET_PRODUCT + `/findAll?page=0&size=10`, HeaderAuth(token))
         if (_fetchData.status === 200 && _fetchData.data.error < 1) {
             const data = _fetchData.data.response.product;

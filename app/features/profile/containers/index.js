@@ -11,6 +11,7 @@ import * as homeAction from "../../home/actions";
 import BottomSheetComponent from '../../home/components/BottomSheet';
 import { height, width } from '../../../utils/theme';
 import { COLORS } from '../../../utils/colors';
+import { navigate } from '../../../navigation/NavigationService';
 
 export default function Profile(){
 
@@ -45,8 +46,9 @@ export default function Profile(){
   }
 
   const openQuisBottomSheet = (param) => {
-    setUrl(param)
-    setWebView(true)
+    // setUrl(param)
+    // setWebView(true)
+    navigate("OrderDetailWebview", {url: param})
   }
 
   return (
@@ -59,7 +61,7 @@ export default function Profile(){
           alignSelf: "center",
           marginLeft: 20,
           color: COLORS.primaryColor
-        }}>Keeponic v0.0.1</Text>
+        }}>Keeponic v0.0.4</Text>
         <IconButton
           icon="close"
           color={COLORS.black}

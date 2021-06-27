@@ -55,23 +55,23 @@ const RenderSkeleton = () => (
 const EmptyData = () => {
     return (
         <View style={{ alignSelf: 'center', alignItems: 'center'}}>
-            <EmptyCart />
+            <EmptyCart width={250} height={150} />
             <View style={{ alignSelf: 'center', alignItems: 'center', justifyContent: 'center'}}>
                 <Text
                     style={{
                         fontWeight: "bold",
-                        fontSize: 16,
+                        fontSize: 14,
                         marginTop: 10,
                         color: COLORS.red,
                     }}
-                >Kami belum dapat memberikanmu rekomendasi 😌</Text>
+                >Fitur Rekomendasi belum tersedia pada versi v.0.0.4 😌</Text>
             </View>
             <View style={{ alignSelf: 'center', marginTop: 5}}>
                 <Text style={{ 
                     alignSelf: 'center', 
                     textAlign: 'center',
-
-                }}>Beli produk akan membantu kami untuk mencari rekomendasi untukmu!✌</Text>
+                    fontSize: 12
+                }}>Bantu kami untuk mengisi kuesioner untuk dapat memberikan semangat kepada developer keeponic✌</Text>
             </View>
         </View>
     )

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, Text } from "react-native";
+import { Button } from 'react-native-paper';
+import Clipboard from '@react-native-clipboard/clipboard';
+
 import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import { HeaderAuth } from "../../../services/header";
@@ -15,6 +18,7 @@ const PaymentInfo = ({ invoiceId }) => {
         total: "",
         status: ""
     })
+    const [copy, setCopy] = useState(false)
     const loginState = useSelector(state => state.loginReducer)
     const token = loginState.user.token
     const ITEMS = [
@@ -106,11 +110,36 @@ const PaymentInfo = ({ invoiceId }) => {
         })
     }, [null])
 
+    const onPressCopy = () => {
+        Clipboard.setString(state.paymentCode)
+        setCopy(true)
+    }
+
     return (
         <View style={styles.orderDetail}>
+            <Button
+                mode="outlined"
+                icon={copy ? "check" : "content-copy"}
+                color={
+                    COLORS.primaryColor
+                }
+                style={{
+                    // width: 100,
+                    height: 25,
+                    fontSize: 10,
+                    marginLeft: 10,
+                    justifyContent: "center",
+                    alignSelf: "flex-start",
+                }}
+                theme={{
+                    mode: "adaptive",
+                    roundness: 6
+                }}
+                onPress={() => onPressCopy()}
+            >{copy ? "Kode Disalin" : "Salin Kode"}</Button>
             {
                 ITEMS.map((x, i) => (
-                    <View style={styles.row}>
+                    <View style={styles.row} key={i}>
                         <Text style={styles.textCommon}>{x.title}</Text>
                         <Text style={[styles.textCommon, { color: x.value.includes("pending") ? COLORS.red : x.value.includes("settlement") ? COLORS.primaryColor : COLORS.black, textAlign: 'right' }]}>
                             {x.value.includes("settlement") ? "Dibayar" : x.value}

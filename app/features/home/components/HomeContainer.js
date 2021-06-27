@@ -48,7 +48,7 @@ const HomeContainer = () => {
                     <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
                     <LifeStyleContainer />
                     {/* End */}
-                    <Header name="Rekomendasi Untuk Kamu" onPress={() => setIsDialogVisible(true)} />
+                    <Header name="Rekomendasi Untukmu" onPress={() => setIsDialogVisible(true)} />
                     <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
                     {/* <ProductList /> */}
                     <RecommendationList />
@@ -78,7 +78,7 @@ const HomeContainer = () => {
             <KpnNotFound
                 visible={isDialogVisible}
                 common="Oops! Maaf Fitur Belum Tersedia :("
-                title="Keeponic v0.0.1"
+                title="Keeponic v0.0.4"
                 onBackDropPressed={() => setIsDialogVisible(false)}
             />
         </View>

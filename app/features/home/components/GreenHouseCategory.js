@@ -75,41 +75,41 @@ const GreenHouseCategory = ({ category }) => {
         navigate("ProductDetail", param)
     }
 
-    // useEffect(() => {
-    //     console.log("Hitting use Effect !")
+    useEffect(() => {
+        console.log("Hitting use Effect !")
 
-    //     const getCategory = async () => {
-    //         const param = {
-    //             page: 0,
-    //             size: 10
+        const getCategory = async () => {
+            const param = {
+                page: 0,
+                size: 10
+            }
+            await dispatch(homeActions.categoryGetGreenHouse(param))
+        }
+        getCategory()
+
+    }, [null])
+
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         let isActive = true
+
+    //         const fetchFlatListData = async () => {
+    //             if (isActive) {
+    //                 const param = {
+    //                     page: 0,
+    //                     size: 10
+    //                 }
+    //                 await dispatch(homeActions.categoryGetGreenHouse(param))
+    //             }
     //         }
-    //         await dispatch(homeActions.categoryGetGreenHouse(param))
-    //     }
-    //     getCategory()
 
-    // }, [null])
+    //         fetchFlatListData()
 
-    useFocusEffect(
-        React.useCallback(() => {
-            let isActive = true
-
-            const fetchFlatListData = async () => {
-                if (isActive) {
-                    const param = {
-                        page: 0,
-                        size: 10
-                    }
-                    await dispatch(homeActions.categoryGetGreenHouse(param))
-                }
-            }
-
-            fetchFlatListData()
-
-            return () => {
-                isActive = false
-            }
-        }, [])
-    )
+    //         return () => {
+    //             isActive = false
+    //         }
+    //     }, [])
+    // )
 
     return (
         <View style={styles.cardProducts}>

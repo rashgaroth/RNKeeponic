@@ -266,6 +266,32 @@ export const homeReducer = createReducer(initialState, {
             scrollY: action.data
         }
     },
+    [types.CLEAR_USER](state, action) {
+        return {
+            ...state,
+            userProfile: {
+                ...state.userProfile,
+                name: "",
+                email: "",
+                username: "",
+                is_email_validated: null,
+                phone: "",
+                is_phone_validated: null,
+                avatar: null,
+                auth_provider: null,
+                auth_profile_id: null,
+                auth_data: null,
+                is_admin: null,
+                status: null,
+            },
+            userAddress: {
+                ...state.userAddress,
+                subdistrict: "",
+                city: "",
+                prov: ""
+            }
+        }
+    },
     [types.GET_PROFILE_SUCCESS](state, action) {
         return {
             ...state,

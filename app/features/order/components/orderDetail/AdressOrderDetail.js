@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, TextInput, ScrollView, BackHandler, Alert } from 'react-native';
+import { View, StyleSheet, TextInput, ScrollView, BackHandler, Alert, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Card, Title, Paragraph, Text, IconButton } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { WebView } from 'react-native-webview';
@@ -78,6 +78,7 @@ const RenderQuantityChanger = ({onIncrease, onDecrease, qty, disabled}) => {
                     borderBottomWidth: 1
                 }}
                 defaultValue={qty || "0"}
+                editable={false}
             />
             <IconButton
                 icon="plus-circle-outline"
@@ -128,7 +129,7 @@ export default function AddressOrderDetail(props){
     const [errorTitle, setErrorTitle] = useState('Stok Barang Sedang Kosong');
     const [errorCommon, setErrorCommon] = useState('Kamu bisa menunggu sampai Seller mengupdate barang');
     const [ownerAddress, setOwnerAddress] = useState();
-    const [courierCost, setCourierCost] = useState('');
+    const [courierCost, setCourierCost] = useState(9000);
     const [etd, setEtd] = useState('');
     const [dialogVisible, setDialogVisible] = useState(false);
 
@@ -539,15 +540,17 @@ export default function AddressOrderDetail(props){
                     left={LeftContentShipment}
                     // right={(props) => <RightContentShipment {...props} onClick={() => setShipmentModalVisible(true)} postalCode={postalCode} />}
                 />
-                <Card.Content style={styles.shipmentContainer}>
-                    <View style={{ flexDirection: 'column' }}>
-                        <Text style={{ color: COLORS.blackSans }}>Kurir : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>JNE</Text></Text>
-                        <Text style={{ color: COLORS.blackSans }}>Penerima : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>{name}</Text></Text>
-                        <Text style={{ color: COLORS.blackSans }}>Pengirim : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>{dataObjects.marketName ? dataObjects.marketName : '----'}</Text></Text>
-                        <Text style={{ color: COLORS.blackSans }}>Alamat Pengirim : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>Bandung</Text></Text>
-                            <Text style={{ color: COLORS.blackSans }}>No Telepon : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>{phone}</Text></Text>
-                    </View>
-                </Card.Content>
+                <TouchableOpacity onPress={() => onChangeAddress()}>
+                    <Card.Content style={styles.shipmentContainer}>
+                        <View style={{ flexDirection: 'column' }}>
+                            <Text style={{ color: COLORS.blackSans }}>Kurir : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>JNE</Text></Text>
+                            <Text style={{ color: COLORS.blackSans }}>Penerima : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>{name}</Text></Text>
+                            <Text style={{ color: COLORS.blackSans }}>Pengirim : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>{dataObjects.marketName ? dataObjects.marketName : '----'}</Text></Text>
+                            <Text style={{ color: COLORS.blackSans }}>Alamat Pengirim : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>Bandung</Text></Text>
+                                <Text style={{ color: COLORS.blackSans }}>No Telepon : <Text style={{ fontWeight: 'bold', color: COLORS.blackSans }}>{phone}</Text></Text>
+                        </View>
+                    </Card.Content>
+                </TouchableOpacity>
                 {
                     isPhoneNull ? 
                             <View style={styles.shipmentError}>
@@ -614,11 +617,7 @@ export default function AddressOrderDetail(props){
 
                     <Paragraph style={{ fontSize: 14, fontWeight: 'bold', color: COLORS.red }}>Total Harga {"\n"}
                     <Text style={{ fontSize: 14, fontWeight: "bold" }}> 
-                    {!isLoading ? dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' : "-----"} {"\n"} 
-                    {!isLoading ? convertToIdr(Math.ceil(0.1 * (actualPrice * quantity))) : "-----"} {' '} {"\n"}
-                    {!isLoading ? convertToIdr(2000) : "-----"} {"\n"} 
-                    {!isLoading ? convertToIdr(courierCost) : "-----"} {' '} {"\n"}
-                    {/* {"---------------------"}{"\n"} */}
+                    
                     <Text style={{ fontSize: 14, fontWeight: "bold", color: COLORS.orange }}>
                     {' ' + !isLoading ? dataObjects.price ? convertToIdr( (quantity * actualPrice) + Math.ceil((0.1 * (actualPrice * quantity))) + Math.ceil(2000) + courierCost) : '----' :"-----" }
                     </Text></Text></Paragraph>

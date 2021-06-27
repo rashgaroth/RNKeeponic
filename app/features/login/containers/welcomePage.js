@@ -27,6 +27,8 @@ import { height } from "../../../utils/theme";
 export default function WelcomePage({}){
     const [signingProcess, setSigningProcess] = useState(false)
     const dispatch = useDispatch();
+    const loginState = useSelector(state => state.loginReducer);
+    const isNewUser = loginState.isNewUser;
 
     const onGoogleLogin = async () => {
         try {
@@ -89,49 +91,50 @@ export default function WelcomePage({}){
     }, [null])
 
     return (
-        <ScrollView style={{ backgroundColor: COLORS.white }}>
-            <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
-            <Swiper 
-            style={styles.wrapper} 
-            showsButtons={true} 
-            loop={false} 
-            activeDotColor={COLORS.primaryColor}
-            endFillColor={COLORS.primaryColor}
-            >
-                <View testID="Hello" style={styles.slide1}>
-                    <View style={styles.logos}>
-                        <Logo />
+        isNewUser ? (
+            <ScrollView style={{ backgroundColor: COLORS.white }}>
+                <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
+                <Swiper
+                    style={styles.wrapper}
+                    showsButtons={true}
+                    loop={false}
+                    activeDotColor={COLORS.primaryColor}
+                    endFillColor={COLORS.primaryColor}
+                >
+                    <View testID="Hello" style={styles.slide1}>
+                        <View style={styles.logos}>
+                            <Logo />
+                        </View>
+                        <Welcome1 />
+                        <Text style={styles.text}>Selamat Datang di Keeponic</Text>
+                        <Text style={styles.innerText}>
+                            Keeponic adalah aplikasi jual beli antara penjual dan pembeli,
+                            dimana setiap pengguna akan dapat menggunakan aplikasi ini sebagai
+                            penjual hasil atau alat pertanian Hidroponik (seller) ataupun sebagai
+                            pembeli hasil atau alat pertanian Hidroponik (buyer)
+                        </Text>
                     </View>
-                    <Welcome1 />
-                    <Text style={styles.text}>Selamat Datang di Keeponic</Text>
-                    <Text style={styles.innerText}>
-                        Keeponic adalah aplikasi jual beli antara penjual dan pembeli, 
-                        dimana setiap pengguna akan dapat menggunakan aplikasi ini sebagai 
-                        penjual hasil atau alat pertanian Hidroponik (seller) ataupun sebagai 
-                        pembeli hasil atau alat pertanian Hidroponik (buyer)
-                    </Text>
-                </View>
-                <View testID="Beautiful" style={styles.slide2}>
-                    <View style={styles.logos}>
-                        <Logo />
+                    <View testID="Beautiful" style={styles.slide2}>
+                        <View style={styles.logos}>
+                            <Logo />
+                        </View>
+                        <Welcome2 />
+                        <Text style={styles.text}>Bertani Itu Keren!</Text>
+                        <Text style={styles.innerText}>
+                            Nikmati layanan Keeponic untuk membeli barang Hidroponik, serta membeli hasil
+                            segar pertanian hidroponik secara langsung!
+                        </Text>
                     </View>
-                    <Welcome2 />
-                    <Text style={styles.text}>Bertani Itu Keren!</Text>
-                    <Text style={styles.innerText}>
-                        Nikmati layanan Keeponic untuk membeli barang Hidroponik, serta membeli hasil
-                        segar pertanian hidroponik secara langsung!
-                    </Text>
-                </View>
-                <View testID="Simple" style={styles.slide3}>
-                    <View style={styles.logos}>
-                        <Logo />
-                    </View>
-                    <Welcome3 />
-                    <Text style={styles.text}>Eksplor Keeponic Sekarang!</Text>
-                    <Text style={styles.innerText}>
-                        Kami akan berikan rekomendasi terbaik untuk anda
-                    </Text>
-                    {/* <KpnButton
+                    <View testID="Simple" style={styles.slide3}>
+                        <View style={styles.logos}>
+                            <Logo />
+                        </View>
+                        <Welcome3 />
+                        <Text style={styles.text}>Eksplor Keeponic Sekarang!</Text>
+                        <Text style={styles.innerText}>
+                            Kami akan berikan rekomendasi terbaik untuk anda
+                        </Text>
+                        {/* <KpnButton
                         text={"Lihat Beranda"}
                         isRounded
                         color={COLORS.primaryColor}
@@ -139,33 +142,88 @@ export default function WelcomePage({}){
                         onPress={() => onPressExploration()}
                     >
                     </KpnButton> */}
-                    {/* <KpnButton
+                        {/* <KpnButton
                         text={"Login Keeponic Seller"}
                         isRounded
                         style={styles.button}
                         onPress={() => onPressLoginButton()}
                     /> */}
-                    {/* <KpnButton
+                        {/* <KpnButton
                         text={"Daftar Seller"}
                         isRounded
                         style={styles.button}
                         color={COLORS.blue}
                         onPress={() => onPressRegisterSeller()}
                     /> */}
-                    <View style={styles.loginGoogle}>
-                        <View style={styles.line}></View>
-                        <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Login Dengan</Text>
-                        <View style={styles.line} ></View>
+                        <View style={styles.loginGoogle}>
+                            <View style={styles.line}></View>
+                            <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Login Dengan</Text>
+                            <View style={styles.line} ></View>
+                        </View>
+                        <GoogleSigninButton
+                            style={{ width: '74%', alignSelf: 'center', marginTop: 10 }}
+                            size={GoogleSigninButton.Size.Wide}
+                            color={GoogleSigninButton.Color.Light}
+                            onPress={onGoogleLogin}
+                            disabled={signingProcess} />
                     </View>
-                    <GoogleSigninButton
-                        style={{ width: '74%', alignSelf: 'center', marginTop: 10 }}
-                        size={GoogleSigninButton.Size.Wide}
-                        color={GoogleSigninButton.Color.Light}
-                        onPress={onGoogleLogin}
-                        disabled={signingProcess} />
-                </View>
-            </Swiper>
-        </ScrollView>
+                </Swiper>
+            </ScrollView>
+        ) : (
+                <ScrollView style={{ backgroundColor: COLORS.white }}>
+                    <StatusBar backgroundColor={COLORS.white} animated barStyle="dark-content" />
+                    <Swiper
+                        style={styles.wrapper}
+                        showsButtons={true}
+                        loop={false}
+                        activeDotColor={COLORS.primaryColor}
+                        endFillColor={COLORS.primaryColor}
+                    >
+                        <View testID="Simple" style={styles.slide3}>
+                            <View style={styles.logos}>
+                                <Logo />
+                            </View>
+                            <Welcome3 />
+                            <Text style={styles.text}>Eksplor Keeponic Sekarang!</Text>
+                            <Text style={styles.innerText}>
+                                Kami akan berikan rekomendasi terbaik untuk anda
+                            </Text>
+                            {/* <KpnButton
+                        text={"Lihat Beranda"}
+                        isRounded
+                        color={COLORS.primaryColor}
+                        style={styles.button}
+                        onPress={() => onPressExploration()}
+                    >
+                    </KpnButton> */}
+                            {/* <KpnButton
+                        text={"Login Keeponic Seller"}
+                        isRounded
+                        style={styles.button}
+                        onPress={() => onPressLoginButton()}
+                    /> */}
+                            {/* <KpnButton
+                        text={"Daftar Seller"}
+                        isRounded
+                        style={styles.button}
+                        color={COLORS.blue}
+                        onPress={() => onPressRegisterSeller()}
+                    /> */}
+                            <View style={styles.loginGoogle}>
+                                <View style={styles.line}></View>
+                                <Text style={[styles.innerText, { color: COLORS.fontColor }]}>Login Dengan</Text>
+                                <View style={styles.line} ></View>
+                            </View>
+                            <GoogleSigninButton
+                                style={{ width: '74%', alignSelf: 'center', marginTop: 10 }}
+                                size={GoogleSigninButton.Size.Wide}
+                                color={GoogleSigninButton.Color.Light}
+                                onPress={onGoogleLogin}
+                                disabled={signingProcess} />
+                        </View>
+                    </Swiper>
+                </ScrollView>
+        )
     )
 }
 
@@ -173,7 +231,7 @@ var styles = StyleSheet.create({
     wrapper: {
         color: COLORS.primaryColor,
         backgroundColor: COLORS.primaryColor,
-        height: height
+        height: height - 20
     },
     slide1: {
         flex: 1,
@@ -197,7 +255,10 @@ var styles = StyleSheet.create({
         color: COLORS.primaryColor,
         marginTop: 10,
         fontSize: 30,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        textAlign: 'center',
+        alignItems: 'center',
+        alignContent: 'center',
     },
     innerText: {
         color: COLORS.primaryColor,

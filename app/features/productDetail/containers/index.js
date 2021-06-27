@@ -388,7 +388,7 @@ export default function Home(props) {
       />
       <KpnNotFound
         visible={isDialogVisible}
-        title={"Keeponic v0.0.1"}
+        title={"Keeponic v0.0.4"}
         common={"Oops! Maaf Fitur Belum Tersedia :("}
         onBackDropPressed={() => setIsDialogVisible(false)}
       />

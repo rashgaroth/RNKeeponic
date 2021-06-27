@@ -122,3 +122,9 @@
                 }
                 yield put(orderActions.setLoading(false))
             }
+
+            {!isLoading ? dataObjects.price ? convertToIdr(quantity * actualPrice) : '----' : "-----"} {"\n"} 
+                    {!isLoading ? convertToIdr(Math.ceil(0.1 * (actualPrice * quantity))) : "-----"} {' '} {"\n"}
+                    {!isLoading ? convertToIdr(2000) : "-----"} {"\n"} 
+                    {!isLoading ? convertToIdr(courierCost) : "-----"} {' '} {"\n"}
+                    {/* {"---------------------"}{"\n"} */}

@@ -5,20 +5,25 @@
  * pwd - password
  */
 import { all, takeEvery, put, select, call, fork } from 'redux-saga/effects';
-import { delay } from 'redux-saga';
 
 import API from '../../../api/ApiConstants';
 import * as apiService from "../../../services/index";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 // import loginUser from 'app/api/methods/loginUser';
 import * as loginActions from '../actions';
-import { trimString } from "../../../utils/stringUtils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { HeaderAuth, Header } from '../../../services/header';
-import { navigate } from '../../../navigation/NavigationService';
 
 let loginState = state => state.loginReducer;
+
+async function storeLoggedIn(data){
+    try {
+        await AsyncStorage.setItem('@userLoggedIn', data);
+    } catch (error) {
+        console.log('AsyncStorage error during token store:', error);
+    }
+}
 
 // Our worker Saga that logins the user
 export default function* loginGoogle(state) {
@@ -36,6 +41,8 @@ export default function* loginGoogle(state) {
                 console.log(googleResponse, "DATA RESPON")
                 // yield AsyncStorage.setItem("@isLoggedIn", "true")
                 // yield AsyncStorage.setItem("@token", googleResponse.data.token)
+                // yield AsyncStorage.setItem("@userLoggedIn", "true")
+                yield call(storeLoggedIn, "true")
                 yield put(loginActions.clearForm())
                 yield put(loginActions.setToken(googleResponse.data.token))
                 yield put(loginActions.onSuccessGoogleAuth(googleResponse.data.user))

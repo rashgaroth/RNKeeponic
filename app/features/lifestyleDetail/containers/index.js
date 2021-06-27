@@ -26,6 +26,9 @@ import { KpnWideCard } from "../../../components";
 import { IHome } from "../../interfaces";
 import { ITEM_WIDTH, SPACING } from "../../../utils/theme";
 import { truncate } from '../../../utils/stringUtils';
+import { HeaderAuth } from '../../../services/header';
+import API from '../../../api/ApiConstants';
+import * as apiService from "../../../services/index";
 
 const smallSize = width / 5;
 const itemWidth = width * .67;
@@ -51,6 +54,7 @@ const SMALL_ITEMS = [
   'https://s-media-cache-ak0.pinimg.com/564x/54/7d/13/547d1303000793176aca26505312089c.jpg',
   ''
 ]
+
 const LOVERS_ITEMS = [
   {
     image: "http://3.bp.blogspot.com/-CJIsgAGspzM/VMMrxjonumI/AAAAAAAAACg/vE5S-hlVmog/s1600/PaulMcCartney.jpg",
@@ -88,11 +92,18 @@ export default function App() {
 
   const [scrollX, setScrollX] = useState(new Animated.Value(0))
   const [indicator, setIndicator] = useState(new Animated.Value(1))
+  const [articleItems, setArticleItems] = useState([])
+  const [loading, setLoading] = useState(false)
 
+  const token = useSelector(state => state.loginReducer.user.token)
   const bottomSheetRef = useRef(null);
   const bottomSheetLoversRef = useRef(null);
   const snapPoints = useMemo(() => ["3%", "40%"], []);
   const snapPointsLovers = useMemo(() => [0, "40%"], []);
+
+  const onPressBottomArticleLists = (image, title, date, content, id) => {
+    navigate("ArticleDetail", { image, title, content, id })
+  }
 
   const onPressLove = () => {
     bottomSheetRef.current.snapTo(0)
@@ -101,6 +112,31 @@ export default function App() {
 
   useEffect(() => {
     LayoutAnimation.spring()
+  }, [null])
+
+  useEffect(() => {
+    const fetchArticleData = async () => {
+      setLoading(true)
+      try {
+        console.log("fetching ... ")
+        const _response = await apiService.GET(API.BASE_URL + API.ENDPOINT.ARTICLE, HeaderAuth(token))
+        if(_response.data.status === 200){
+          setLoading(false)
+          setArticleItems(_response.data.data.items)
+          console.log(_response.data.data.items, "article")
+          console.log(articleItems, "ITEM")
+        }else{
+          setLoading(false)
+          console.log("No internet connection")
+          console.log(_response.data)
+        }
+      } catch (error) {
+        setLoading(false)
+        console.log(error, "ERROR article")
+      }
+    }
+
+    fetchArticleData()
   }, [null])
 
   const renderRow = (image, i) => {
@@ -112,8 +148,8 @@ export default function App() {
       return <View key={i} style={[styles.emptyItem, { width: width * .33 }]}></View>
     }
 
-    const onPressImage = async (image) => {
-      navigate("ArticleDetail", { image })
+    const onPressImage = async (image, title, content, id) => {
+      navigate("ArticleDetail", { image, title, content, id })
     }
 
     return (
@@ -127,7 +163,7 @@ export default function App() {
           outputRange: [itemHeight * .8, itemHeight, itemHeight],
         })
       }]}>
-        <Text style={{ marginTop: 10, fontSize: 20, fontWeight: "bold"}}>Judul Artikel</Text>
+        <Text style={{ marginTop: 10, fontSize: 20, fontWeight: "bold"}}>{truncate(articleItems[i].title, 20)}</Text>
         <View style={styles.lineView} />
         <View style={styles.chipGroup}>
           <TouchableOpacity style={styles.chip} onPress={() => onPressLove()}>
@@ -149,7 +185,7 @@ export default function App() {
             size={20}
           />
         </View>
-        <TouchableOpacity onPress={() => onPressImage(image)}>
+        <TouchableOpacity onPress={() => onPressImage(image, articleItems[i].title, articleItems[i].content, articleItems[i].id)}>
           <SharedElement
             id={`item.${image}.article`}
             key={i}
@@ -225,8 +261,8 @@ export default function App() {
         { useNativeDriver: false }
       )}
     >
-      {ITEMS.map((image, i) => {
-        return renderRow(image, i)
+      {articleItems.map((image, i) => {
+        return renderRow(image.image, i, )
       })}
     </Animated.ScrollView>
   }
@@ -252,16 +288,18 @@ export default function App() {
     )
   }
 
-  const renderNormal = (image, i) => {
+  const renderNormal = (image, i, title, date, content, id) => {
     if (image === '') {
       return null
     }
 
-    return <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+    const subString = date.substr(0, 10);
+
+    return <TouchableOpacity onPress={() => onPressBottomArticleLists(image, title, date, content, id)} key={i} style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
       <ImageBackground source={{ uri: image }} style={[{ height: smallSize, width: smallSize, opacity: 1, resizeMode: 'cover' }]} />
       <View style={{ marginLeft: 20 }}>
-        <Text style={{ fontWeight: '600', fontSize: 16 }}>Words of wisdom</Text>
-        <Text style={{ fontWeight: '300', fontSize: 12 }}>We live in a world of deadlines</Text>
+        <Text style={{ fontWeight: '100', fontSize: 16, maxWidth: 300 }}>{title}</Text>
+        <Text style={{ fontWeight: '300', fontSize: 12 }}>{"Diupload pada tanggal " + subString}</Text>
       </View>
     </TouchableOpacity>
   }
@@ -299,17 +337,17 @@ export default function App() {
       <ScrollView style={{ backgroundColor: COLORS.white, width: width }}>
         {/* dwiyan */}
         <View style={styles.lineView} />
-        <Text style={{ 
+        {/* <Text style={{ 
           fontWeight: "bold", 
           fontSize: 17, 
           marginHorizontal: 10
-          }}> Gaya Hidup Hidroponik </Text>
-        <Image 
+          }}> Gaya Hidup Hidroponik </Text> */}
+        {/* <Image 
         source={ require('../../../assets/images/png/petani.png') } 
         style={styles.imageFlatlist}
         resizeMode="contain"
-        />
-        <FlatList 
+        /> */}
+        {/* <FlatList 
           horizontal
           data={wideData}
           snapToInterval={ITEM_WIDTH + SPACING * 1.6}
@@ -326,7 +364,7 @@ export default function App() {
           )}
           keyExtractor={(item) => item.id}
           onScrollEndDrag={(e) => console.log("End", e.nativeEvent.contentOffset.x)}
-        />
+        /> */}
       </ScrollView>
       <BottomSheet
         ref={bottomSheetRef}
@@ -337,9 +375,9 @@ export default function App() {
       >
           <Text style={styles.title}> Artikel Pilihan Untukmu ✔</Text>
           <BottomSheetScrollView contentContainerStyle={{ alignItems: 'flex-start' }} style={{ paddingHorizontal: 10, flex: 1, width: width }}>
-              {SMALL_ITEMS.map((image, i) => {
-                return renderNormal(image, i)
-              })}
+            {articleItems.map((item, i) => {
+              return renderNormal(item.image, i, item.title, item.created_date, item.content, item.id)
+            })}
           </BottomSheetScrollView>
       </BottomSheet>
       <BottomSheet

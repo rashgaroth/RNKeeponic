@@ -30,20 +30,20 @@ export default function RegisterVerification() {
         setTimer(60)
     }
 
-    const setCountDownTimer = () => {
-        setTimer(60)
-        let interval = setInterval(() => {
-            setTimer(lastTimerCount => {
-                lastTimerCount <= 1 && clearInterval(interval)
-                if (lastTimerCount == 1) {
-                    setDisabled(false)
-                }
-                return lastTimerCount - 1
-            })
-        }, 1000)
+    // const setCountDownTimer = () => {
+    //     setTimer(60)
+    //     let interval = setInterval(() => {
+    //         setTimer(lastTimerCount => {
+    //             lastTimerCount <= 1 && clearInterval(interval)
+    //             if (lastTimerCount == 1) {
+    //                 setDisabled(false)
+    //             }
+    //             return lastTimerCount - 1
+    //         })
+    //     }, 1000)
 
-        return () => clearInterval(interval)
-    }
+    //     return () => clearInterval(interval)
+    // }
 
     useEffect( () => {
         if(onTimeRun){

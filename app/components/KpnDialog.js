@@ -135,7 +135,7 @@ const KpnDialog = ({
                 animationInTiming={1000}
                 animationOut="bounceOut"
                 animationOutTiming={200}
-                style={{ height: 300, borderRadius: 16 }}
+                style={{ /* height: 300, */ borderRadius: 16 }}
             >
                 <ModalContent
                     onBackPressed={onBackDropPressed}
@@ -153,7 +153,7 @@ const KpnDialog = ({
 
 const styles = StyleSheet.create({
     container: {
-        height: height - 550,
+        // height: height - 550,
         marginHorizontal: 20,
         backgroundColor: COLORS.white,
         borderRadius: 16,

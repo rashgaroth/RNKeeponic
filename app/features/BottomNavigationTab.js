@@ -2,66 +2,63 @@ import * as React from 'react';
 import { BottomNavigation } from 'react-native-paper';
 import { StyleSheet } from "react-native";
 import HomePage from "./home/containers/index";
-import SearchPage from "./search/containers/index";
 import LifeStyleDetail from "./lifestyleDetail/containers";
 import OrderPage from "./order/containers/index";
 import ProfilePage from "./profile/containers/index";
 import { COLORS } from '../utils/colors';
 import { useDispatch, useSelector } from "react-redux";
-import { Badge } from 'react-native-paper';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { IOrderState } from './interfaces';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const HomeRoute = () => <HomePage />;
 
-const SearchRoute = () => <LifeStyleDetail />;
+const ArticleRoute = () => <LifeStyleDetail />;
 
 const OrderRoute = () => <OrderPage />;
 
 const ProfileRoute = () => <ProfilePage />;
 
+const Tab = createBottomTabNavigator();
+
 const BottomNavTabs = () => {
-    const [index, setIndex] = React.useState(0);
-    const [routes] = React.useState([
-        { key: 'beranda', title: 'Beranda', icon: 'home', color: COLORS.white },
-        { key: 'pesanan', title: 'Pesanan', icon: 'cart', color: COLORS.white },
-        { key: 'artikel', title: 'Artikel', icon: 'book-variant', color: COLORS.white },
-        { key: 'akun', title: 'Akun', icon: 'account', color: COLORS.white }
-    ]);
     const orderState:IOrderState = useSelector(state => state.orderReducer)
     const cart = orderState.wishListData.cart;
     const ordered = orderState.wishListData.ordered;
 
     const count = cart.length + ordered.length;
 
-    const renderScene = BottomNavigation.SceneMap({
-        beranda: HomeRoute,
-        pesanan: OrderRoute,
-        artikel: SearchRoute,
-        akun: ProfileRoute
-    });
-
     return (
-        <BottomNavigation
-            navigationState={{ index, routes }}
-            onIndexChange={setIndex}
-            renderScene={renderScene}
-            activeColor={COLORS.primaryOpacity}
-            inactiveColor={COLORS.blackSans}
-            keyboardHidesNavigationBar
-            style={styles.bottomNav}
-            getBadge={(props) => {
-                if (props.route.key === "pesanan"){
-                    return (<Badge size={19} >{count ? String(count) : 0}</Badge>)
-                }
-            }}
-        />
-    );
-};
+            <Tab.Navigator
+                screenOptions={({route}) => ({
+                    tabBarIcon: ({ focused, color, size }) => {
+                        let iconName;
 
-const styles = StyleSheet.create({
-    bottomNav: {
-        
-    }
-})
+                        if (route.name === 'Beranda') {
+                            iconName = focused ? 'home' : 'home-outline';
+                        } else if (route.name === 'Keranjang') {
+                            iconName = focused ? 'cart' : 'cart-outline';
+                        } else if (route.name === 'Artikel') {
+                            iconName = focused ? 'book' : 'book-outline';
+                        } else if (route.name === 'Profil') {
+                            iconName = focused ? 'person' : 'person-outline';
+                        }
+
+                        // You can return any component that you like here!
+                        return <Ionicons name={iconName} size={size} color={focused ? COLORS.sans : COLORS.blackSans} />;
+                    },
+                })}
+                tabBarOptions={{
+                    activeTintColor: COLORS.sans,
+                    inactiveTintColor: COLORS.blackSans
+                }}
+            >
+                <Tab.Screen name="Beranda" component={HomeRoute} />
+                <Tab.Screen name="Keranjang" component={OrderRoute} options={{ tabBarBadge: count }} />
+                <Tab.Screen name="Artikel" component={ArticleRoute} />
+                <Tab.Screen name="Profil" component={ProfileRoute} />
+            </Tab.Navigator>
+    )
+};
 
 export default BottomNavTabs;

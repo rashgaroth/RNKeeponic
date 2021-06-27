@@ -58,7 +58,7 @@ const RenderSkeleton = () => (
 
 const Footer = ({ onPressLoad, onLoad }) => {
     return (
-        <View>
+        <View style={{ marginBottom: 20 }}>
             {
                 onLoad ? <ActivityIndicator color={COLORS.primaryColor} />
                     : <Button
@@ -101,7 +101,7 @@ const ProductList = ({ category }) => {
 
     const token = loginState.user.token;
 
-    const onNavigateToDetail = async (user_id, product_id, props) => {
+    const onNavigateToDetail = async (product_id, props) => {
         const image = []
         image.push(props.avatar)
         if (props.second_avatar) {
@@ -147,26 +147,30 @@ const ProductList = ({ category }) => {
         return () => setListData([])
     }, [null])
 
-    useFocusEffect(
-        React.useCallback(() => {
-            let isActive = true
+    useEffect(() => {
+        let isActive = true
 
-            const fetchFlatListData = async () => {
-                if(isActive){
-                    // setPage(0)
-                    setListData([])
-                    console.log(page, "PAGE")
-                    await loadData(page)
-                }
+        const fetchFlatListData = async () => {
+            if (isActive) {
+                // setPage(0)
+                setListData([])
+                console.log(page, "PAGE")
+                await loadData(page)
             }
+        }
 
-            fetchFlatListData()
+        fetchFlatListData()
 
-            return () => {
-                isActive = false
-            }
-        }, [])
-    )
+        return () => {
+            isActive = false
+        }
+    }, [null])
+
+    // useFocusEffect(
+    //     React.useCallback(() => {
+            
+    //     }, [])
+    // )
 
     return (
         <View style={styles.cardProducts}>

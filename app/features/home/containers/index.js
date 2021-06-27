@@ -27,6 +27,7 @@ export default function Home({ navigation }) {
   const dispatch = useDispatch();
   const homeSelector:IHome = useSelector(state => state.homeReducer)
   const loginSelector = useSelector(state => state.loginReducer)
+  const orderSelector = useSelector(state => state.orderReducer)
 
   const [isFocus, setIsFocus] = useState(false);
   const [query, setQuery] = useState('');
@@ -43,6 +44,9 @@ export default function Home({ navigation }) {
     await dispatch(homeAction.categoryGetHotProduct())
     await dispatch(homeAction.categoryGetGreenHouse())
     await dispatch(homeAction.categoryGetBibit())
+    // await dispatch(orderActions.getWishlist())
+    // await dispatch(orderActions.getOrderedList())
+    // await dispatch(orderActions.getOrderedList(3, 4))
   }
 
   useEffect(() => {
@@ -56,7 +60,15 @@ export default function Home({ navigation }) {
   useEffect(() => {
     let isMounted = true;
     const fetchHomeData = async () => {
-      await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
+      if(homeSelector.userProfile.name === ""){
+        console.log("fetch user")
+        await dispatch(homeAction.getUserProfile("", loginSelector.user.user_id))
+      }
+      if (orderSelector.wishListData.ordered < 1){
+        console.log(" < 1")
+        await dispatch(orderActions.getWishlist())
+        await dispatch(orderActions.getOrderedList())
+      }
     }
     
     fetchHomeData();
@@ -154,7 +166,7 @@ export default function Home({ navigation }) {
       <KpnNotFound 
       visible={isDialogVisible} 
       common="Oops! Maaf Fitur Belum Tersedia :(" 
-      title="Keeponic v0.0.1" 
+      title="Keeponic v0.0.4" 
       onBackDropPressed={() => setIsDialogVisible(false)}
       />
     </View>

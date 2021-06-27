@@ -189,3 +189,9 @@ export function cleanUpCategory(data){
         data
     }
 }
+
+export function clearUser(){
+    return {
+        type: types.CLEAR_USER
+    }
+}

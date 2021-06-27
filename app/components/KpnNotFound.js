@@ -56,7 +56,7 @@ const ShipmentModal = ({
 
 const styles = StyleSheet.create({
     container: {
-        height: height - 510,
+        // height: height - 510,
         marginHorizontal: 20,
         backgroundColor: COLORS.white,
         borderRadius: 16

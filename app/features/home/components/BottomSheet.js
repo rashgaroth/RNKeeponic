@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Alert } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import BottomSheet, { BottomSheetScrollView,  BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { useDispatch, useSelector } from 'react-redux';
@@ -101,39 +101,43 @@ const BottomSheetProduct = ({ onFinishLoading }) => {
     }
 
     const onSubmitAddresses = async () => {
-        const token = loginState.user.token
-        const param = {
-            userId: loginState.user.user_id,
-            subdistrictId: subdistrictId,
-            phone: phone,
-            postalCode: postalCode,
-            detail: detail
-        }
-        console.log(param, token, "BASE")
-        console.log(subdistName, "nama sub")
-        console.log(cityName, "nama kota")
-        try {
-            await dispatch(registerActions.setLoader(true, "loadingNext"))
-            const _result = await apiServices.POST(
-                API.BASE_URL + API.ENDPOINT.GET_PROFILE + "/userAddress", 
-                param,
-                HeaderAuth(token)
+        if(phone === ""){
+            Alert.alert("Nomor Telepon tidak boleh kosong", "Pastikan nomor telepon sudah terisi dengan benar")
+        }else{
+            const token = loginState.user.token
+            const param = {
+                userId: loginState.user.user_id,
+                subdistrictId: subdistrictId,
+                phone: phone,
+                postalCode: postalCode,
+                detail: detail
+            }
+            console.log(param, token, "BASE")
+            console.log(subdistName, "nama sub")
+            console.log(cityName, "nama kota")
+            try {
+                await dispatch(registerActions.setLoader(true, "loadingNext"))
+                const _result = await apiServices.POST(
+                    API.BASE_URL + API.ENDPOINT.GET_PROFILE + "/userAddress",
+                    param,
+                    HeaderAuth(token)
                 )
-            if (_result.status === 200 || _result.data.data) {
-                console.log('success address')
-                console.log("success")
-                // TODO: ganti phone dan alamat
-                await dispatch(homeActions.setAddressUpdated('subdistrict', subdistName))
-                await dispatch(homeActions.setAddressUpdated('city', cityName))
-                await dispatch(loginActions.setPhoneUpdated(phone))
-                await dispatch(registerActions.setLoader(false, "loadingNext"))
-                onFinishLoading(subdistName, cityName, phone, postalCode)
-            } else {
+                if (_result.status === 200 || _result.data.data) {
+                    console.log('success address')
+                    console.log("success")
+                    // TODO: ganti phone dan alamat
+                    await dispatch(homeActions.setAddressUpdated('subdistrict', subdistName))
+                    await dispatch(homeActions.setAddressUpdated('city', cityName))
+                    await dispatch(loginActions.setPhoneUpdated(phone))
+                    await dispatch(registerActions.setLoader(false, "loadingNext"))
+                    onFinishLoading(subdistName, cityName, phone, postalCode)
+                } else {
+                    await dispatch(registerActions.setLoader(false, "loadingNext"))
+                }
+            } catch (error) {
+                console.log("error : ", error)
                 await dispatch(registerActions.setLoader(false, "loadingNext"))
             }
-        } catch (error) {
-            console.log("error : ", error)
-            await dispatch(registerActions.setLoader(false, "loadingNext"))
         }
     }
 
@@ -162,7 +166,8 @@ const BottomSheetProduct = ({ onFinishLoading }) => {
             <Swiper 
             style={styles.wrapper} 
             showsButtons={true}
-            showsPagination={false}
+            showsPagination={true}
+            activeDotColor={COLORS.primaryColor}
             nextButton={
                 <Button
                 color={COLORS.primaryColor}
@@ -185,25 +190,27 @@ const BottomSheetProduct = ({ onFinishLoading }) => {
                         >{buttonName}</Button>
                     }
             prevButton={
-                <Button
-                color={COLORS.primaryColor}
-                style={{
-                    // width: 200,
-                    height: 30,
-                    fontSize: 15,
-                    justifyContent: "center",
-                    alignSelf: "flex-end",
-                }}
-                theme={{
-                    fonts: {
-                        thin: 15
-                    },
-                    animation: 20,
-                    roundness: 10
-                }}
-                disabled={buttonBackDisabled}
-                mode="outlined"
-                >Kembali</Button>
+                (
+                    <Button
+                        color={COLORS.primaryColor}
+                        style={{
+                            // width: 200,
+                            height: 30,
+                            fontSize: 15,
+                            justifyContent: "center",
+                            alignSelf: "flex-end",
+                        }}
+                        theme={{
+                            fonts: {
+                                thin: 15
+                            },
+                            animation: 20,
+                            roundness: 10
+                        }}
+                        disabled={buttonBackDisabled}
+                        mode="outlined"
+                    >Kembali</Button>
+                )
             }
             onMomentumScrollEnd={(e, s, c) => onScrollEnd(e, s, c)}
             buttonWrapperStyle={{ 

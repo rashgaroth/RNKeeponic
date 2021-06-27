@@ -1,18 +1,14 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import { 
     View, 
-    Text, 
     StyleSheet, 
-    ScrollView, 
-    RefreshControl,
     FlatList,
-    SafeAreaView
+    SafeAreaView,
+    RefreshControl
 } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
-import { Snackbar, Button, Dialog, Portal } from 'react-native-paper';
-import Spinner from "react-native-loading-spinner-overlay";
+import { Snackbar } from 'react-native-paper';
 import { useIsFocused } from "@react-navigation/native";
-import { useFocusEffect } from '@react-navigation/native';
 
 import { COLORS } from '../../../utils/colors';
 import { convertToIdr } from '../../../utils/stringUtils';
@@ -22,10 +18,9 @@ import * as apiServices from "../../../services/index"
 import API from '../../../api/ApiConstants';
 import * as orderActions from '../actions';
 import { Alert } from 'react-native';
-import { ICategory, IData, IMarket, IProductWishList, IWishList, IHome, IProductDetail } from "../../interfaces";
+import { IData, IHome, IProductDetail } from "../../interfaces";
 import { HeaderAuth } from "../../../services/header";
 import { navigate } from '../../../navigation/NavigationService';
-import * as productDetailActions from "../../productDetail/actions";
 import { KpnLoading, KpnDialog } from '../../../components'
 
 export default function OrderBefore(navigation) {
@@ -34,7 +29,6 @@ export default function OrderBefore(navigation) {
     const [validatorErrorMsg, setValidatorErrorMsg] = useState('')
     const [errVisible, setErrVisible] = useState(false)
     const [isError, setIsError] = useState(false)
-    const [isEmpty, setIsEmpty] = useState(false)
     const [dialogVisible, setDialogVisible] = useState(false)
     const [deleteId, setDeleteId] = useState(null)
 
@@ -125,7 +119,7 @@ export default function OrderBefore(navigation) {
         }
     }
 
-    const onRefresh = async() => {
+    const onRefresh = async () => {
         await dispatch(orderActions.getWishlist())
         await dispatch(orderActions.getOrderedList())
     }
@@ -230,43 +224,9 @@ export default function OrderBefore(navigation) {
         }
     }
 
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         let isMounted = true;
-
-    //         const fetchData = async () => {
-    //             try {
-    //                 console.log("hitting useCallback")
-    //                 // if(cartData.length < 1){
-    //                     await dispatch(orderActions.getWishlist())
-    //                 // }
-    //                 console.log(isMounted, "mounted cart")
-    //             } catch (error) {
-    //                 console.log(error, "ERROR")
-    //             }
-    //         }
-
-    //         fetchData();
-
-    //         return () => {
-    //             console.log("cleaning")
-    //             isMounted = false;
-    //         }
-    //     }, [cartChange])
-    // )
-    // console.log(cartData, "CART-----------------------------")
     return (
         <>
-            <ScrollView style={styles.container}
-            refreshControl={
-                <RefreshControl
-                    refreshing={orderState.loading}
-                    onRefresh={onRefresh}
-                    style={{ paddingTop: 60 }}
-                />
-            }
-            >
-            <SafeAreaView>
+            <View style={styles.container}>
                 <FlatList
                     key={'#'}
                     data={cartData.length > 0 ? cartData : []}
@@ -274,7 +234,7 @@ export default function OrderBefore(navigation) {
                     style={styles.flatListContainer}
                     renderItem={({ item }) => (
                         <OrderList
-                            address={item.address}
+                            address={homeSelector.userAddress.subdistrict}
                             avatar={item.avatar}
                             category={item.category_name}
                             isFavorite={item.isFavorite === 1 ? true : false}
@@ -297,32 +257,15 @@ export default function OrderBefore(navigation) {
                             onRefresh={() => onRefresh()}
                         />
                     )}
+                    // refreshing={orderState.loading}
+                    // onRefresh={() => onRefresh()}
+                    refreshControl={<RefreshControl
+                        refreshing={orderState.loading}
+                        onRefresh={onRefresh}
+                        style={{ paddingTop: 60 }}
+                    />}
                 />
-                    {/* { isEmpty ? <OnEmptyList /> : cartData.length > 0 ? cartData.map((x, i) => (
-                        <OrderList 
-                        key={i}
-                        address={x.address}
-                        avatar={x.avatar}
-                        category={x.category}
-                        isFavorite={x.isFavorite === 1 ? true : false}
-                        marketName={x.marketName}
-                        price={convertToIdr(x.price)}
-                        title={x.productTitle}
-                        qty={x.quantity.toString()}
-                        onPressBuy={ () => onPressBuy(x.id) }
-                        onCheck={(e) => onPressFav(x.id, e)}
-                        onDecrease={() => onDecrease(x.id)}
-                        onIncrease={() => onIncrease(x.id)}
-                        onPressDelete={() => onPressDelete(x.id)}
-                        onPressProduct={() => onPressItem(x.product_id)}
-                        status="Di Keranjang"
-                        />
-                    )) : 
-                    <OnEmptyList
-                        onRefresh={ () => onRefresh() }
-                    />} */}
-                </SafeAreaView>
-            </ScrollView>
+            </View>
             <KpnLoading visible={loading} />
             <KpnDialog
                 key={1}

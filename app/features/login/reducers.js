@@ -1,7 +1,7 @@
 /* Login Reducer
  * handles login states in the app
  */
-import createReducer from 'app/lib/createReducer';
+import createReducer from '../../lib/createReducer';
 import * as types from './types';
 
 const initialState = {
@@ -99,6 +99,7 @@ export const loginReducer = createReducer(initialState, {
     return {
       ...state,
       isLoggedIn: false,
+      isNewUser: false,
       user: {
         ...state.user,
         user_id: 0,

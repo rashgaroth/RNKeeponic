@@ -68,10 +68,10 @@ export default function OrderDetailWebview(props){
                 key={`@a$`}
                 negativeButtonText={"Tidak"}
                 positiveButtonText={"Ya"}
-                title="Pembatalan Chekout"
+                title={params.avatar ? "Pembatalan Checkout" : "Halaman Keeponic"}
                 onBackDropPressed={() => setDialogVisible(false)}
                 visible={dialogVisible}
-                text={"Batalkan Pembelian ?"}
+                text={params.avatar ? "Batalkan Pembelian ?" : "Kembali ?"}
                 onPositive={() => onPositive()}
                 onNegative={() => onNegative()}
             />

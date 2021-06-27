@@ -19,6 +19,7 @@ import Animated from 'react-native-reanimated';
 import {
     GoogleSignin
 } from "@react-native-google-signin/google-signin";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -45,6 +46,7 @@ export default function Profile({ onAddress, onQuis }) {
     const userProfile = homeSelector.userProfile;
     const userAddress = homeSelector.userAddress;
     const isSeller = loginSelector.user.is_admin;
+    const isSupplier = homeSelector.isSeller;
     const detailUser = [
         {
             title: "Nama",
@@ -70,9 +72,11 @@ export default function Profile({ onAddress, onQuis }) {
 
     const onLogout = async () => {
         try {
+            await AsyncStorage.removeItem("@userLoggedIn")
             await GoogleSignin.revokeAccess();
             await GoogleSignin.signOut();
             await removeAllItems();
+            await dispatch(homeActions.clearUser());
             await dispatch(loginActions.logOut());
         } catch (error) {
             console.error(error);
@@ -188,9 +192,7 @@ export default function Profile({ onAddress, onQuis }) {
                             }
                             {/* View Button */}
                             <View style={stylesLocal.buttonGroup}>
-                            <Button mode="contained" onPress={(e) => bottomSheetRef.current.snapTo(0)} style={stylesLocal.button} color={COLORS.red}>Keluar</Button>
-                            <Button mode="contained" onPress={onAddress} style={stylesLocal.button} color={COLORS.primaryColor}>Edit Alamat</Button>
-                            <Button mode="contained" labelStyle={{ color: COLORS.white }} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller === 0 ? COLORS.blue : COLORS.sans}>{ isSeller === 0 ? "Login Seller" : "Daftar Toko"}</Button>
+                                <Button mode="outlined" labelStyle={{ color: COLORS.primaryOpacity, width: width - 50}} onPress={(e) => onPressDaftarToko()} style={stylesLocal.button} color={isSeller === 0 ? COLORS.blue : COLORS.sans}>{isSeller === 0 || isSupplier || isSeller === -2 ? "Login Seller" : "Daftar Toko"}</Button>
                             </View>
                             {/* View Setting ON/OFF */}
                             <View>
@@ -206,6 +208,26 @@ export default function Profile({ onAddress, onQuis }) {
                             {/* skip */}
                             {/* View Tetang */}
                             <View>
+                                <TouchableOpacity onPress={onAddress}>
+                                    <View style={stylesLocal.detailUsers}>
+                                        <View style={stylesLocal.switch}>
+                                            <Text style={[stylesLocal.textInfo, { color: COLORS.blue, fontWeight: 'bold'}]}>Ganti Alamat Lengkap</Text>
+                                            <IconButton style={stylesLocal.infoIcon} icon="circle-edit-outline" size={25} />
+                                        </View>
+                                    </View>
+                                    <View style={stylesLocal.line}></View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={(e) => bottomSheetRef.current.snapTo(0)}>
+                                    <View style={stylesLocal.detailUsers}>
+                                        <View style={stylesLocal.switch}>
+                                            <Text style={[stylesLocal.textInfo, { color: COLORS.red, fontWeight: 'bold'}]}>Keluar Akun</Text>
+                                            <IconButton style={stylesLocal.infoIcon} icon="logout" size={25} />
+                                        </View>
+                                    </View>
+                                    <View style={stylesLocal.line}></View>
+                                </TouchableOpacity>
+
                                 <TouchableOpacity>
                                     <View style={stylesLocal.detailUsers}>
                                         <View style={stylesLocal.switch}>
@@ -220,7 +242,7 @@ export default function Profile({ onAddress, onQuis }) {
                                     <View style={{ marginLeft: 10 }}>
                                         <View style={stylesLocal.switch}>
                                             <Text style={stylesLocal.textInfo}>Bantuan</Text>
-                                            <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+                                            <IconButton style={stylesLocal.infoIcon} icon="account-question" size={25} />
                                         </View>
                                     </View>
                                     <View style={stylesLocal.line}></View>
@@ -229,8 +251,8 @@ export default function Profile({ onAddress, onQuis }) {
                                 <TouchableOpacity>
                                     <View style={{ marginLeft: 10 }}>
                                         <View style={stylesLocal.switch}>
-                                            <Text style={stylesLocal.textInfo}>Versi Aplikasi <Text style={{ fontWeight: 'bold', color: COLORS.primaryColor}}> v0.0.2 </Text></Text>
-                                            <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+                                            <Text style={stylesLocal.textInfo}>Versi Aplikasi <Text style={{ fontWeight: 'bold', color: COLORS.primaryColor}}> v0.0.4 </Text></Text>
+                                            <IconButton style={stylesLocal.infoIcon} icon="android" size={25} />
                                         </View>
                                     </View>
                                     <View style={stylesLocal.line}></View>
@@ -240,7 +262,7 @@ export default function Profile({ onAddress, onQuis }) {
                                 <View style={{ marginLeft: 10 }}>
                                     <View style={stylesLocal.switch}>
                                         <Text style={[stylesLocal.textInfo, { color: COLORS.red, fontWeight: 'bold'}]}>Isi Kuisioner Disini </Text>
-                                        <IconButton style={stylesLocal.infoIcon} icon="information-outline" size={25} />
+                                        <IconButton style={stylesLocal.infoIcon} icon="calendar-question" size={25} />
                                     </View>
                                 </View>
                                 <View style={stylesLocal.line}></View>
@@ -310,9 +332,9 @@ const stylesLocal = StyleSheet.create({
     },
     buttonGroup: {
         margin: 10,
-        flexWrap: 'nowrap',
+        flexWrap: 'wrap',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
     },
     button: {
         borderRadius: 15,
