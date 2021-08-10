@@ -48,10 +48,10 @@ const HomeContainer = () => {
                     <Text style={styles.textLebihHemat}>Jadikan sumber inspirasimu!</Text>
                     <LifeStyleContainer />
                     {/* End */}
-                    <Header name="Rekomendasi Untukmu" onPress={() => setIsDialogVisible(true)} />
-                    <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text>
+                    {/* <Header name="Rekomendasi Untukmu" onPress={() => setIsDialogVisible(true)} />
+                    <Text style={styles.textLebihHemat}>Belanja lebih hemat dengan paket Hidroponik</Text> */}
                     {/* <ProductList /> */}
-                    <RecommendationList />
+                    {/* <RecommendationList /> */}
                     {/* End */}
                     <Header onPress={() => setIsDialogVisible(true)} name="Media Tanam" icon="buffer" color={COLORS.secondColor} />
                     <Text style={styles.textLebihHemat}>Barang yang direkomendasikan untuk anda!</Text>

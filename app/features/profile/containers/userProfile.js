@@ -112,7 +112,7 @@ export default function Profile({ onAddress, onQuis }) {
     }, [null]);
 
     const onPressDaftarToko = useCallback(async () => {
-        if(isSeller === 0){
+        if (isSeller === 0 || isSupplier || isSeller === -2){
             const supported = await Linking.canOpenURL(url);
             if (supported) {
                 onQuis(url)

@@ -42,12 +42,12 @@ export default function RegisterPassword(props) {
             setValidatorErrorMsg("Password Konfirmasi Tidak Boleh Kosong")
             setIsError(true)
             return false
-        } else if (confirmation.length <= 8) {
+        } else if (confirmation.length < 8) {
             setValidatorErrorMsg("Minimum Password yang dimasukkan adalah 8 huruf")
             setIsError(true)
             return false
         } else if (confirmation == '' && password == '') {
-            setValidatorErrorMsg("Minimum Password yang dimasukkan adalah 8 huruf")
+            setValidatorErrorMsg("Password Konfirmasi Tidak Boleh Kosong")
             setIsError(true)
             return false
         } else {
